@@ -1,0 +1,32 @@
+{
+  "name": "hubot-symphony",
+  "version": "1.0.0",
+  "description": "Hubot adapter for Symphony",
+  "main": "src/adapter.coffee",
+  "scripts": {
+    "test": "mocha --compilers \"coffee:coffee-script/register\" test/*.coffee"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonfreedman/hubot-symphony.git"
+  },
+  "keywords": [
+    "hubot",
+    "adapter",
+    "symphony"
+  ],
+  "author": "Jon Freedman",
+  "license": "GPL-3.0+",
+  "bugs": {
+    "url": "https://github.com/jonfreedman/hubot-symphony/issues"
+  },
+  "homepage": "https://github.com/jonfreedman/hubot-symphony",
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "hubot": ">=2.0"
+  },
+  "devDependencies": {
+    "coffee-script": ">=1.2.0"
+  }
+}

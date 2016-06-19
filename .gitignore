@@ -1,0 +1,4 @@
+node_modules
+.idea
+hubot-symphony.iml
+npm-debug.log
