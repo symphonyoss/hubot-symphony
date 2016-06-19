@@ -1,0 +1,1 @@
+Bot = require '../src/symphony'
