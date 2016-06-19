@@ -4,7 +4,7 @@
   "description": "Hubot adapter for Symphony",
   "main": "src/symphony.coffee",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --require coffee-script --compilers coffee:coffee-script test/*.coffee"
+    "test": "mocha --compilers coffee:coffee-script/register test/*.coffee"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "hubot": ">=2.0"
   },
   "devDependencies": {
-    "coffee-script": ">=1.2.0",
+    "coffee-script": ">=1.10.0",
     "mocha": ">=2.5.3"
   }
 }
