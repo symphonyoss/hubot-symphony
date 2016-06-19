@@ -23,11 +23,9 @@
   "homepage": "https://github.com/jonfreedman/hubot-symphony",
   "dependencies": {
   },
-  "peerDependencies": {
-    "hubot": ">=2.0"
-  },
   "devDependencies": {
     "coffee-script": ">=1.10.0",
+    "hubot": ">=2.19",
     "mocha": ">=2.5.3"
   }
 }
