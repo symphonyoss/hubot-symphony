@@ -33,8 +33,8 @@ describe 'REST API test suite', () ->
         assert.fail(0, 1, util.format('Failed with error %s', error))
 
   it 'sendMessage should obtain session and key tokens and get message ack', () ->
-    msg = 'Testing 123...'
-    symphony.sendMessage(nock.streamId, msg)
+    msg = '<messageML>Testing 123...</messageML>'
+    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
       .then (response) ->
         assert.equal(msg, response.message)
         assert.equal(nock.botUserId, response.fromUserId)
@@ -42,8 +42,8 @@ describe 'REST API test suite', () ->
         assert.fail(0, 1, util.format('Failed with error %s', error))
 
   it 'getMessages should get all messages', () ->
-    msg = 'Yo!'
-    symphony.sendMessage(nock.streamId, msg)
+    msg = '<messageML>Yo!</messageML>'
+    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
       .then (response) ->
         assert.equal(msg, response.message)
         symphony.getMessages(nock.streamId, nock.firstMessageTimestamp)
@@ -51,5 +51,12 @@ describe 'REST API test suite', () ->
         assert.isAtLeast(response.length, 2)
         assert.isAtLeast((m for m in response when m.message is '<messageML>Hello World</messageML>').length, 1)
         assert.isAtLeast((m for m in response when m.message is msg).length, 1)
+      .fail (error) ->
+        assert.fail(0, 1, util.format('Failed with error %s', error))
+
+  it 'getUser should expose user details', () ->
+    symphony.getUser(nock.realUserId)
+      .then (response) ->
+        assert.equal('johndoe@symphony.com', response.userAttributes.emailAddress)
       .fail (error) ->
         assert.fail(0, 1, util.format('Failed with error %s', error))

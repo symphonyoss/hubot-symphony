@@ -63,6 +63,37 @@ class NockServer
                     message: 'Invalid session'
                   })
 
+    @podScope = nock(@host)
+      .persist()
+      .matchHeader('sessionToken', 'SESSION_TOKEN')
+      .matchHeader('keyManagerToken', (val) -> !val?)
+      .get('/pod/v1/admin/user/' + @realUserId)
+      .reply(200, {
+                    userAttributes: {
+                      emailAddress: 'johndoe@symphony.com'
+                      firstName: 'John'
+                      lastName: 'Doe'
+                      userName: 'johndoe'
+                      displayName: 'John Doe'
+                    }
+                    userSystemInfo: {
+                      id: @realUserId
+                    }
+                  })
+      .get('/pod/v1/admin/user/' + @botUserId)
+      .reply(200, {
+                    userAttributes: {
+                      emailAddress: 'mozart@symphony.com'
+                      firstName: 'Wolfgang Amadeus'
+                      lastName: 'Mozart'
+                      userName: 'mozart'
+                      displayName: 'Mozart'
+                    }
+                    userSystemInfo: {
+                      id: @realUserId
+                    }
+                  })
+
     @agentScope = nock(@host)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')

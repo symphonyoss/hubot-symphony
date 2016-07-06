@@ -28,19 +28,29 @@ class Symphony
     @keyAuth = @_httpPost('/keyauth/v1/authenticate')
 
   echo: (body) =>
-    @_httpPostWithAuth('/agent/v1/util/echo', body)
+    @_httpAgentPost('/agent/v1/util/echo', body)
 
-  sendMessage: (streamId, message) =>
+  sendMessage: (streamId, message, format) =>
     body = {
       message: message
-      format: 'TEXT'
+      format: format
     }
-    @_httpPostWithAuth('/agent/v2/stream/' + streamId + '/message/create', body)
+    @_httpAgentPost('/agent/v2/stream/' + streamId + '/message/create', body)
 
   getMessages: (streamId, since, limit = 100) =>
-    @_httpGetWithAuth('/agent/v2/stream/' + streamId + '/message')
+    @_httpAgentGet('/agent/v2/stream/' + streamId + '/message')
 
-  _httpGetWithAuth: (path, body) =>
+  getUser: (userId) =>
+    @_httpPodGet('/pod/v1/admin/user/' + userId)
+
+  _httpPodGet: (path, body) =>
+   @sessionAuth.then (value) =>
+      headers = {
+        sessionToken: value.token
+      }
+      @_httpGet(path, headers)
+
+  _httpAgentGet: (path, body) =>
     Q.all([@sessionAuth, @keyAuth]).then (values) =>
       headers = {
         sessionToken: values[0].token
@@ -48,7 +58,7 @@ class Symphony
       }
       @_httpGet(path, headers)
 
-  _httpPostWithAuth: (path, body) =>
+  _httpAgentPost: (path, body) =>
     Q.all([@sessionAuth, @keyAuth]).then (values) =>
       headers = {
         sessionToken: values[0].token
