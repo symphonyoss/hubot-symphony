@@ -6,7 +6,9 @@ class NockServer
   constructor: (@host) ->
     logger.info util.format('Setting up mocks for %s', @host)
     nock.disableNetConnect()
-    @scope = nock(@host)
+    @authScope = nock(@host)
+      .matchHeader('sessionToken', (val) -> !val?)
+      .matchHeader('keyManagerToken', (val) -> !val?)
       .post('/sessionauth/v1/authenticate')
       .reply(200, {
                     "name": "sessionToken",
@@ -17,14 +19,16 @@ class NockServer
                     "name": "keyManagerToken",
                     "token": "KEY_MANAGER_TOKEN"
                   })
-      #.matchHeader('sessionToken', 'SESSION_TOKEN')
-      #.matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
+      .post('/agent/v1/util/echo')
+      .reply(401, {
+                    "code": 401,
+                    "message": "Invalid session"
+                  })
+
+    @agentScope = nock(@host)
+      .matchHeader('sessionToken', 'SESSION_TOKEN')
+      .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
       .post('/agent/v1/util/echo')
       .reply(200, (uri, requestBody) -> requestBody)
-      #.post('/agent/v1/util/echo')
-      #.reply(401, {
-      #              "code": 401,
-      #              "message": "Invalid session"
-      #            })
 
 module.exports = NockServer
