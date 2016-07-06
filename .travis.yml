@@ -13,10 +13,11 @@ script:
 after_success:
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
 
-addons:
-  coverity_scan:
-    project:
-      name: jonfreedman/hubot-symphony
-    notification_email: "${COVERITY_EMAIL}"
-    build_command: "--no-command --fs-capture-search ./"
-    branch_pattern: master
+# Coverity does not appear to support CoffeeScript
+#addons:
+#  coverity_scan:
+#    project:
+#      name: jonfreedman/hubot-symphony
+#    notification_email: "${COVERITY_EMAIL}"
+#    build_command: "--no-command --fs-capture-search ./"
+#    branch_pattern: master
