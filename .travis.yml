@@ -1,3 +1,13 @@
 language: node_js
 node_js:
-  - "node"
+- node
+env:
+  global:
+    secure: XOdm9qeTHvToeZGtHLxTfe7NCKTE8ebzzTHvCQ1j28S3L8lpm5CQcclS5+XvLFnAEu34/M4QJ8hrJzMKX4ygLt5Uxa6s0oB7ZytbgvUFPVgTjwBtD7yIMzd9e1o5KvxDi9jZa+Oiwjk07S+MsHg1gJRCJOwQyJdaTpU+dOpv9pUTInG4WRvWA0ITVmfFHNmqd5eX4qncnLTQYkzMdT816ekTCwOkchYOreDdl9KUnlbm3epF01wpZK6cbzH44uViZtg9z9uTfn4p7NFSMY3sZxxqzGvETV+x+XjrfonF4xGCv93wdl7MjteTehCH6xUc+BdoBglI1CrwH5X4qvX1amxjIDvAuXawAonUa8Qbz4J7QMV9WXcJgrXyQESlYh3VXB4mNcna23LJYbOx9/jRCJ8l34Rbkp1mReXtteG1561kWPYc//7YY22SKfnaDXszkscYXg7IJ8rGyoe+PdITrfM4UbYi+qMGSJtaQPE7SsWEAY1uXg7C5UVJW71pKPnhsIf54yHNENvOVDSLHYeaDcELp9ssPc0iaaRFmSp3ZA1GpJFJQUnSgb4CWwx0UpfuqH+5TdjEHwx5n1xw+lTqTLkn+/5I2OYytaJwbvX0InoA26eY+j3ZLCzOl88mJIlzqF5iQXIbgXQ+R3TMj0fqbFv9WbVJhyvIBpB5k47qPYM=
+addons:
+  coverity_scan:
+    project:
+      name: jonfreedman/hubot-symphony
+    notification_email: jon.freedman@zoho.com
+    build_command: '--no-command --fs-capture-search ./'
+    branch_pattern: master
