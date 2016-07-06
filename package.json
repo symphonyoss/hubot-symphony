@@ -38,10 +38,5 @@
     "mocha": ">=2.5.3",
     "nock": "^8.0.0",
     "node-uuid": "^1.4.7"
-  },
-  "config": {
-    "blanket": {
-      "pattern": "/src/*.js"
-    }
   }
 }
