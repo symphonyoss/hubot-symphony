@@ -8,7 +8,10 @@ env:
   - secure: dubctRgixnaupIdhlTmARQ2aA34js+4VUjMUtdoKG2olstVmpHz2B0RnjaM+YYwP7IQLKeTAkS2UW9pmJTLZZVHlS39kxD70G38gE7iPqL9TSiWRGOeuhuLRoT+lZVYMwMiUreVj6S2HyYRlKC6HNNkgreHofyAciTTewLYKO5MEQTfnpogIq1PPs9nEopQQx/6WzgRb8CLYwOOvx1FMfuKHsPQR1JnGhbYLBSY+ZbNyrCK9v6NKODqWkQQmfTrqRwwaNnpr8z0BS6fQzY7pzlBPXcYIFuykFnzZA8G5dp2FaYRjF10fzaKH6vZTfarlN6+8F/jdOeyVEC0WgluRcaMjZNFkRTLHFB+W714aNTvbLKj7/rqSq75n0RmEQgzKGfrCSn5rqKj1V+HSspHvmhIMxh7gqks0mYCxZZGIN9khd2lSqf5ckHnhheLjup/pI0NLC4QCoCWrsUWPcqb8a4G51IkREWM6kgDVkhgtQibgdPkBBEM51q6tN9TqtN+lnTLdqGGmBU5un55G7prMkJl+oc6AUZY6kZslekpfEwCzD/tBylJQjmrZiLNcOXBjyZLcrI6HlFVE/57S4eijvyW2i4wgTDrriureQJJWzz2FJ0gT2+oB8kfCIKpDTlFZvYwxjvkLyxoNtu5FNIB8blK9hTOIi3lmuct1TvKz6WI=
 
 script:
-  - npm test-cov
+  - npm run-script test-cov
+
+after_success:
+  - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls.js'
 
 addons:
   coverity_scan:

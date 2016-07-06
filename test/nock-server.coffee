@@ -64,12 +64,13 @@ class NockServer
                   })
 
     @agentScope = nock(@host)
+      .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
       .post('/agent/v1/util/echo')
       .reply(200, (uri, requestBody) -> requestBody)
       .post('/agent/v2/stream/' + @streamId + '/message/create')
-      .times(2).reply(200, (uri, requestBody) =>
+      .reply(200, (uri, requestBody) =>
         message = {
           id: uuid.v1()
           timestamp: new Date().valueOf()
