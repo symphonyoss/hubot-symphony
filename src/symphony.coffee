@@ -24,18 +24,28 @@ class Symphony
 
   constructor: (@host, @privateKey, @publicKey) ->
     logger.info('Connecting to ' + @host)
-    @sessionAuth = @httpPost('/sessionauth/v1/authenticate')
-    @keyAuth = @httpPost('/keyauth/v1/authenticate')
+    @sessionAuth = @_httpPost('/sessionauth/v1/authenticate')
+    @keyAuth = @_httpPost('/keyauth/v1/authenticate')
 
   echo: (body) =>
+    @_httpPostWithAuth('/agent/v1/util/echo', body)
+
+  sendMessage: (streamId, message) =>
+    body = {
+      message: message
+      format: 'TEXT'
+    }
+    @_httpPostWithAuth('/agent/v2/stream/' + streamId + '/message/create', body)
+
+  _httpPostWithAuth: (path, body) =>
     Q.all([@sessionAuth, @keyAuth]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @httpPost('/agent/v1/util/echo', headers, body)
+      @_httpPost(path, headers, body)
 
-  httpPost: (path, headers = {}, body) =>
+  _httpPost: (path, headers = {}, body) =>
     deferred = Q.defer()
     options = {
       host: @host

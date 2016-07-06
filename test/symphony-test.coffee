@@ -19,14 +19,24 @@ assert = require('chai').assert
 Symphony = require '../src/symphony'
 NockServer = require './nock-server'
 
-scope = new NockServer('https://foundation.symphony.com').scope
+nock = new NockServer('https://foundation.symphony.com')
 
-describe 'echo test', () ->
-  it 'should obtain session and key tokens and echo response', () ->
-    symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem')
+describe 'REST API test suite', () ->
+  symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem')
+
+  it 'echo should obtain session and key tokens and echo response', () ->
     msg = { foo: 'bar' }
     symphony.echo(msg)
       .then (response) ->
         assert.deepEqual(msg, response)
+      .fail (error) ->
+        assert.fail(0, 1, util.format('Failed with error %s', error))
+
+  it 'sendMessage should obtain session and key tokens and get message ack', () ->
+    msg = 'Testing 123...'
+    symphony.sendMessage(nock.streamId, msg)
+      .then (response) ->
+        assert.equal(msg, response.message)
+        assert.equal(nock.botUserId, response.fromUserId)
       .fail (error) ->
         assert.fail(0, 1, util.format('Failed with error %s', error))
