@@ -11,7 +11,7 @@ script:
   - npm run-script test-cov
 
 after_success:
-  - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls.js'
+  - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
 
 addons:
   coverity_scan:
