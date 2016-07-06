@@ -22,6 +22,10 @@
   },
   "homepage": "https://github.com/jonfreedman/hubot-symphony",
   "dependencies": {
+    "fs": "0.0.2",
+    "https": "^1.0.0",
+    "q": "^1.4.1",
+    "tls": "0.0.1"
   },
   "devDependencies": {
     "coffee-script": ">=1.10.0",
