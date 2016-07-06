@@ -8,6 +8,5 @@ addons:
   coverity_scan:
     project:
       name: jonfreedman/hubot-symphony
-    notification_email: jon.freedman@zoho.com
     build_command: '--no-command --fs-capture-search ./'
     branch_pattern: master
