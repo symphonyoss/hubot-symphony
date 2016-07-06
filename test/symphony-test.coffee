@@ -40,3 +40,16 @@ describe 'REST API test suite', () ->
         assert.equal(nock.botUserId, response.fromUserId)
       .fail (error) ->
         assert.fail(0, 1, util.format('Failed with error %s', error))
+
+  it 'getMessages should get all messages', () ->
+    msg = 'Yo!'
+    symphony.sendMessage(nock.streamId, msg)
+      .then (response) ->
+        assert.equal(msg, response.message)
+        symphony.getMessages(nock.streamId, nock.firstMessageTimestamp)
+      .then (response) ->
+        assert.isAtLeast(response.length, 2)
+        assert.isAtLeast((m for m in response when m.message is '<messageML>Hello World</messageML>').length, 1)
+        assert.isAtLeast((m for m in response when m.message is msg).length, 1)
+      .fail (error) ->
+        assert.fail(0, 1, util.format('Failed with error %s', error))

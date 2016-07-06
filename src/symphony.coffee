@@ -37,6 +37,17 @@ class Symphony
     }
     @_httpPostWithAuth('/agent/v2/stream/' + streamId + '/message/create', body)
 
+  getMessages: (streamId, since, limit = 100) =>
+    @_httpGetWithAuth('/agent/v2/stream/' + streamId + '/message')
+
+  _httpGetWithAuth: (path, body) =>
+    Q.all([@sessionAuth, @keyAuth]).then (values) =>
+      headers = {
+        sessionToken: values[0].token
+        keyManagerToken: values[1].token
+      }
+      @_httpGet(path, headers)
+
   _httpPostWithAuth: (path, body) =>
     Q.all([@sessionAuth, @keyAuth]).then (values) =>
       headers = {
@@ -45,7 +56,13 @@ class Symphony
       }
       @_httpPost(path, headers, body)
 
+  _httpGet: (path, headers = {}) =>
+    @_httpRequest('GET', path, headers)
+
   _httpPost: (path, headers = {}, body) =>
+    @_httpRequest('POST', path, headers, body)
+
+  _httpRequest: (method, path, headers, body) =>
     deferred = Q.defer()
     options = {
       host: @host
@@ -53,7 +70,7 @@ class Symphony
       headers: Object.assign(headers, {
         accept: 'application/json'
       })
-      method: 'POST'
+      method: method
       key: fs.readFileSync(@privateKey)
       cert: fs.readFileSync(@publicKey)
     }

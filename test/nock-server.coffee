@@ -26,6 +26,8 @@ class NockServer
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
 
+    @firstMessageTimestamp = 1461808889185
+
     @realUserId = 7215545078229
 
     @botUserId = 7696581411197
@@ -33,7 +35,7 @@ class NockServer
     @messages = [
       {
         id: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA'
-        timestamp: '1461808889185'
+        timestamp: @firstMessageTimestamp
         v2messageType: 'V2Message'
         streamId: @streamId
         message: '<messageML>Hello World</messageML>'
@@ -67,7 +69,7 @@ class NockServer
       .post('/agent/v1/util/echo')
       .reply(200, (uri, requestBody) -> requestBody)
       .post('/agent/v2/stream/' + @streamId + '/message/create')
-      .reply(200, (uri, requestBody) =>
+      .times(2).reply(200, (uri, requestBody) =>
         message = {
           id: uuid.v1()
           timestamp: new Date().valueOf()
@@ -81,5 +83,7 @@ class NockServer
         logger.debug util.format('Seen %s messages', @messages.length)
         message
       )
+      .get('/agent/v2/stream/' + @streamId + '/message')
+      .reply(200, (uri, requestBody) => JSON.stringify(@messages))
 
 module.exports = NockServer
