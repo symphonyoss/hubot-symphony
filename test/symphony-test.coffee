@@ -21,7 +21,7 @@ NockServer = require './nock-server'
 nock = new NockServer('https://foundation.symphony.com')
 
 describe 'REST API test suite', () ->
-  symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem')
+  symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit')
 
   it 'echo should obtain session and key tokens and echo response', () ->
     msg = { foo: 'bar' }

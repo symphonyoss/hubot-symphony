@@ -21,7 +21,7 @@ logger = require('log4js').getLogger()
 
 class Symphony
 
-  constructor: (@host, @privateKey, @publicKey) ->
+  constructor: (@host, @privateKey, @publicKey, @passphrase) ->
     logger.info "Connecting to #{@host}"
     @sessionAuth = @_httpPost('/sessionauth/v1/authenticate')
     @keyAuth = @_httpPost('/keyauth/v1/authenticate')
@@ -90,6 +90,7 @@ class Symphony
       method: method
       key: fs.readFileSync(@privateKey)
       cert: fs.readFileSync(@publicKey)
+      passphrase: @passphrase
     }
     if body?
       options.body = body

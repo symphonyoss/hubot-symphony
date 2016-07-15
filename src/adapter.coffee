@@ -25,6 +25,7 @@ class SymphonyAdapter extends Adapter
     throw new Error('HUBOT_SYMPHONY_HOST undefined') unless process.env.HUBOT_SYMPHONY_HOST
     throw new Error('HUBOT_SYMPHONY_PUBLIC_KEY undefined') unless process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
+    throw new Error('HUBOT_SYMPHONY_PASSPHRASE undefined') unless process.env.HUBOT_SYMPHONY_PASSPHRASE
 
   send: (envelope, strings...) ->
     @robot.logger.debug "Send"
@@ -37,7 +38,7 @@ class SymphonyAdapter extends Adapter
 
   run: ->
     @robot.logger.info "Initialising..."
-    @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY)
+    @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY, process.env.HUBOT_SYMPHONY_PASSPHRASE)
     @symphony.whoAmI()
       .then (response) =>
         @symphony.getUser(response.userId)

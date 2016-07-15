@@ -16,8 +16,8 @@
 
 logger = require('log4js').getLogger()
 argv = require('yargs')
-  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --host [host.symphony.com]')
-  .demand(['publicKey', 'privateKey', 'host'])
+  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]')
+  .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
   .argv
 
 Symphony = require './symphony'
@@ -29,7 +29,7 @@ if argv.runOffline?
 
 logger.info "Running diagnostics against https://#{argv.host}"
 
-symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey)
+symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey, argv.passphrase)
 
 logger.info 'Connection initiated, starting tests...'
 
