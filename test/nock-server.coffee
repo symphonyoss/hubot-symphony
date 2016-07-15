@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-util = require 'util'
 logger = require('log4js').getLogger()
 nock = require 'nock'
 uuid = require 'node-uuid'
@@ -22,7 +21,7 @@ uuid = require 'node-uuid'
 class NockServer
 
   constructor: (@host) ->
-    logger.info util.format('Setting up mocks for %s', @host)
+    logger.info "Setting up mocks for #{@host}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
 
@@ -118,7 +117,7 @@ class NockServer
           fromUserId: @botUserId
         }
         @messages.push(message)
-        logger.debug util.format('Seen %s messages', @messages.length)
+        logger.debug "Seen #{@messages.length} messages"
         message
       )
       .get('/agent/v2/stream/' + @streamId + '/message')

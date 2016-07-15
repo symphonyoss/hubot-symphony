@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-util = require 'util'
 assert = require('chai').assert
 Symphony = require '../src/symphony'
 NockServer = require './nock-server'
@@ -30,21 +29,21 @@ describe 'REST API test suite', () ->
       .then (response) ->
         assert.deepEqual(msg, response)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'whoAmI should get userId', () ->
     symphony.whoAmI()
       .then (response) ->
         assert.equal(nock.botUserId, response.userId)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'getUser should expose user details', () ->
     symphony.getUser(nock.realUserId)
       .then (response) ->
         assert.equal('johndoe@symphony.com', response.userAttributes.emailAddress)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'sendMessage should obtain session and key tokens and get message ack', () ->
     msg = '<messageML>Testing 123...</messageML>'
@@ -53,7 +52,7 @@ describe 'REST API test suite', () ->
         assert.equal(msg, response.message)
         assert.equal(nock.botUserId, response.fromUserId)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'getMessages should get all messages', () ->
     msg = '<messageML>Yo!</messageML>'
@@ -66,14 +65,14 @@ describe 'REST API test suite', () ->
         assert.isAtLeast((m for m in response when m.message is '<messageML>Hello World</messageML>').length, 1)
         assert.isAtLeast((m for m in response when m.message is msg).length, 1)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'createDatafeed should generate a datafeed id', () ->
     symphony.createDatafeed()
       .then (response) ->
         assert.equal(nock.datafeedId, response.id)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'readDatafeed should pull messages', () ->
     msg1 = '<messageML>foo</messageML>'
@@ -99,7 +98,7 @@ describe 'REST API test suite', () ->
           assert.equal(1, response.length)
           assert.equal(msg2, response[0].message)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")
 
   it 'readDatafeed should not fail if no messages are available', () ->
     symphony.createDatafeed()
@@ -111,4 +110,4 @@ describe 'REST API test suite', () ->
         .then (response) ->
           assert.isNull(response)
       .fail (error) ->
-        assert.fail(0, 1, util.format('Failed with error %s', error))
+        assert.fail(0, 1,"Failed with error #{error}")

@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-util = require 'util'
 logger = require('log4js').getLogger()
 argv = require('yargs')
   .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --host [host.symphony.com]')
@@ -28,7 +27,7 @@ if argv.runOffline?
   NockServer = require '../test/nock-server'
   nock = new NockServer('https://foundation.symphony.com')
 
-logger.info util.format('Running diagnostics against https://%s', argv.host)
+logger.info "Running diagnostics against https://#{argv.host}"
 
 symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey)
 
@@ -37,24 +36,24 @@ logger.info 'Connection initiated, starting tests...'
 # check tokens
 symphony.sessionAuth
   .then (response) =>
-    logger.info util.format('Session token: %s', response.token)
+    logger.info "Session token: #{response.token}"
   .fail (err) =>
-    logger.error util.format('Failed to fetch session token: %s', err)
+    logger.error "Failed to fetch session token: #{err}"
   .done
 symphony.keyAuth
   .then (response) =>
-    logger.info util.format('Key manager token: %s', response.token)
+    logger.info "Key manager token: #{response.token}"
   .fail (err) =>
-    logger.error util.format('Failed to fetch key manager token: %s', err)
+    logger.error "Failed to fetch key manager token: #{err}"
   .done
 
 # who am i
 userId = symphony.whoAmI()
   .then (response) =>
-    logger.info util.format('UserId: %s', response.userId)
+    logger.info "UserId: #{response.userId}"
     symphony.getUser(response.userId)
   .then (response) =>
-    logger.info util.format('My name is %s [%s] and I\'m %s', response.userAttributes?.displayName, response.userAttributes?.emailAddress, response.userSystemInfo?.status)
+    logger.info "My name is #{response.userAttributes?.displayName} [#{response.userAttributes?.emailAddress}] and I'm #{response.userSystemInfo?.status}"
   .fail (err) =>
-    logger.error util.format('Failed to fetch userId: %s', err)
+    logger.error "Failed to fetch userId: #{err}"
   .done

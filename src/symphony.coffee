@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-util = require 'util'
 fs = require 'fs'
 request = require 'request'
 Q = require 'q'
@@ -23,7 +22,7 @@ logger = require('log4js').getLogger()
 class Symphony
 
   constructor: (@host, @privateKey, @publicKey) ->
-    logger.info('Connecting to ' + @host)
+    logger.info "Connecting to #{@host}"
     @sessionAuth = @_httpPost('/sessionauth/v1/authenticate')
     @keyAuth = @_httpPost('/keyauth/v1/authenticate')
 
@@ -97,10 +96,10 @@ class Symphony
 
     request(options, (err, res, data) =>
       if err?
-        logger.warn util.format('received error response from %s: %s', path, err)
+        logger.warn "received error response from #{path}: #{err}"
         deferred.reject(new Error(err))
       else
-        logger.debug util.format('received %s response from %s: %s', res.statusCode, path, JSON.stringify(data))
+        logger.debug "received #{res.statusCode} response from #{path}: #{JSON.stringify(data)}"
         if data?
           deferred.resolve data
         else
