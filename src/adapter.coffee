@@ -66,10 +66,11 @@ class SymphonyAdapter extends Adapter
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
 
   _receiveMessage: (message) =>
-    user = @symphony.getUser(message.fromUserId)
-    v2 = new V2Message(user, message)
-    @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
-    @robot.receive v2
+    @symphony.getUser(message.fromUserId)
+      .then (response) =>
+        v2 = new V2Message(response, message)
+        @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
+        @robot.receive v2
 
 exports.use = (robot) ->
   new SymphonyAdapter robot
