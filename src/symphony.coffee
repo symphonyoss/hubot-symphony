@@ -16,7 +16,7 @@
 
 util = require 'util'
 fs = require 'fs'
-https = require 'https'
+request = require 'request'
 Q = require 'q'
 logger = require('log4js').getLogger()
 
@@ -33,6 +33,9 @@ class Symphony
   whoAmI: =>
     @_httpPodGet('/pod/v1/sessioninfo')
 
+  getUser: (userId) =>
+    @_httpPodGet('/pod/v1/admin/user/' + userId)
+
   sendMessage: (streamId, message, format) =>
     body = {
       message: message
@@ -43,8 +46,11 @@ class Symphony
   getMessages: (streamId, since, limit = 100) =>
     @_httpAgentGet('/agent/v2/stream/' + streamId + '/message')
 
-  getUser: (userId) =>
-    @_httpPodGet('/pod/v1/admin/user/' + userId)
+  createDatafeed: =>
+    @_httpAgentPost('/agent/v1/datafeed/create')
+
+  readDatafeed: (datafeedId) =>
+    @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read')
 
   _httpPodGet: (path, body) =>
    @sessionAuth.then (value) =>
@@ -78,29 +84,28 @@ class Symphony
   _httpRequest: (method, path, headers, body) =>
     deferred = Q.defer()
     options = {
-      host: @host
-      path: path
-      headers: Object.assign(headers, {
-        accept: 'application/json'
-      })
+      baseUrl: 'https://' + @host
+      url: path
+      json: true
+      headers: headers
       method: method
       key: fs.readFileSync(@privateKey)
       cert: fs.readFileSync(@publicKey)
     }
-
-    req = https.request(options, (res) =>
-      res.on('data', (data) =>
-        logger.debug util.format('received response from %s: %s', path, data)
-        deferred.resolve JSON.parse(data)
-      )
-    )
-    req.on('error', (e) =>
-      logger.warn util.format('received error response from %s: %s', path, e)
-      deferred.reject(new Error(e))
-    )
     if body?
-      req.write(JSON.stringify(body))
-    req.end()
+      options.body = body
+
+    request(options, (err, res, data) =>
+      if err?
+        logger.warn util.format('received error response from %s: %s', path, err)
+        deferred.reject(new Error(err))
+      else
+        logger.debug util.format('received %s response from %s: %s', res.statusCode, path, JSON.stringify(data))
+        if data?
+          deferred.resolve data
+        else
+          deferred.resolve null
+    )
     deferred.promise
 
 module.exports = Symphony

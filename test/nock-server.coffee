@@ -32,6 +32,8 @@ class NockServer
 
     @botUserId = 7696581411197
 
+    @datafeedId = 1234
+
     @messages = [
       {
         id: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA'
@@ -111,7 +113,7 @@ class NockServer
           timestamp: new Date().valueOf()
           v2messageType: 'V2Message'
           streamId: @streamId
-          message: JSON.parse(requestBody).message
+          message: requestBody.message
           attachments: []
           fromUserId: @botUserId
         }
@@ -121,5 +123,17 @@ class NockServer
       )
       .get('/agent/v2/stream/' + @streamId + '/message')
       .reply(200, (uri, requestBody) => JSON.stringify(@messages))
+      .post('/agent/v1/datafeed/create')
+      .reply(200, {
+                    id: @datafeedId
+                  })
+      .get('/agent/v2/datafeed/' + @datafeedId + '/read')
+      .reply (uri, requestBody) =>
+        if @messages.length == 0
+          [204, null]
+        else
+          copy = @messages
+          @messages = []
+          [200, JSON.stringify(copy)]
 
 module.exports = NockServer
