@@ -57,3 +57,14 @@ userId = symphony.whoAmI()
   .fail (err) =>
     logger.error "Failed to fetch userId: #{err}"
   .done
+
+# read a message...
+symphony.createDatafeed()
+  .then (response) =>
+    logger.info "Created datafeed: #{response.id}"
+    logger.info "You should send me a message..."
+    symphony.readDatafeed(response.id)
+  .then (response) =>
+    logger.info "Received '#{msg.message}'" for msg in response when msg.v2messageType = 'V2Message'
+  .fail (err) =>
+    logger.error "Failed to receive a message: #{err}"
