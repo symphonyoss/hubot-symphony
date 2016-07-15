@@ -30,6 +30,9 @@ class Symphony
   echo: (body) =>
     @_httpAgentPost('/agent/v1/util/echo', body)
 
+  whoAmI: =>
+    @_httpPodGet('/pod/v1/sessioninfo')
+
   sendMessage: (streamId, message, format) =>
     body = {
       message: message

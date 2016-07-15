@@ -67,6 +67,10 @@ class NockServer
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', (val) -> !val?)
+      .get('/pod/v1/sessioninfo')
+      .reply(200, {
+                    userId: @botUserId
+                  })
       .get('/pod/v1/admin/user/' + @realUserId)
       .reply(200, {
                     userAttributes: {

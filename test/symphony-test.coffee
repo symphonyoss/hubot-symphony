@@ -24,6 +24,13 @@ nock = new NockServer('https://foundation.symphony.com')
 describe 'REST API test suite', () ->
   symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem')
 
+  it 'whoAmI should get userId', () ->
+    symphony.whoAmI()
+      .then (response) ->
+        assert.equal(nock.botUserId, response.userId)
+      .fail (error) ->
+        assert.fail(0, 1, util.format('Failed with error %s', error))
+
   it 'echo should obtain session and key tokens and echo response', () ->
     msg = { foo: 'bar' }
     symphony.echo(msg)
