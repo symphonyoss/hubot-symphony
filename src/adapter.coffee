@@ -20,9 +20,8 @@ Symphony = require './symphony'
 
 class SymphonyAdapter extends Adapter
 
-  constructor: (robot) ->
+  constructor: ->
     super
-    @robot = robot
     throw new Error('HUBOT_SYMPHONY_HOST undefined') unless process.env.HUBOT_SYMPHONY_HOST
     throw new Error('HUBOT_SYMPHONY_PUBLIC_KEY undefined') unless process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
