@@ -26,6 +26,7 @@ class SymphonyAdapter extends Adapter
     throw new Error('HUBOT_SYMPHONY_PUBLIC_KEY undefined') unless process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
     throw new Error('HUBOT_SYMPHONY_PASSPHRASE undefined') unless process.env.HUBOT_SYMPHONY_PASSPHRASE
+    this.on 'poll', (id) => @_pollDataFeed(id)
 
   send: (envelope, strings...) ->
     @robot.logger.debug "Send"
@@ -48,20 +49,21 @@ class SymphonyAdapter extends Adapter
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     @symphony.createDatafeed()
       .then (response) =>
-        @emit "connected"
-        @_pollDatafeed(response.id)
+        @robot.logger.info "Created datafeed: #{response.id}"
+        @emit 'connected'
+        @emit 'poll', response.id
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
 
   _pollDatafeed: (datafeedId) =>
     @robot.logger.debug "Polling datafeed #{datafeedId}"
-    while true
-      @symphony.readDatafeed(datafeedId)
-        .then (response) =>
-          @robot.logger.debug "Received #{response.length} datafeed messages"
-          @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
-        .fail (err) =>
-          @robot.emit 'error', new Error("Unable to read datafeed #{datafeedId}: #{err}")
+    @symphony.readDatafeed(datafeedId)
+      .then (response) =>
+        @robot.logger.debug "Received #{response.length} datafeed messages"
+        @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
+        @emit 'poll', response.id
+      .fail (err) =>
+        @robot.emit 'error', new Error("Unable to read datafeed #{datafeedId}: #{err}")
 
   _receiveMessage: (message) =>
     user = @symphony.getUser(message.fromUserId)
