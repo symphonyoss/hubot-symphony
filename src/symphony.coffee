@@ -101,10 +101,7 @@ class Symphony
         deferred.reject(new Error(err))
       else
         logger.debug "received #{res.statusCode} response from #{path}: #{JSON.stringify(data)}"
-        if data?
-          deferred.resolve data
-        else
-          deferred.resolve null
+        deferred.resolve data
     )
     deferred.promise
 

@@ -109,7 +109,7 @@ describe 'REST API test suite', () ->
         .then (response) ->
           symphony.readDatafeed(initialResponse.id)
         .then (response) ->
-          assert.isNull(response)
+          assert.isUndefined(response)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
