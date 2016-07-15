@@ -71,6 +71,8 @@ class SymphonyAdapter extends Adapter
         v2 = new V2Message(response, message)
         @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
         @robot.receive v2
+      .fail (err) =>
+        @robot.emit 'error', new Error("Unable to fetch user details: #{err}")
 
 exports.use = (robot) ->
   new SymphonyAdapter robot
