@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-{Adapter} = require 'hubot'
+{Adapter, TextMessage, User} = require 'hubot'
 Symphony = require './symphony'
 {V2Message} = require './message'
 
@@ -49,6 +49,7 @@ class SymphonyAdapter extends Adapter
     @symphony.createDatafeed()
       .then (response) =>
         @robot.logger.info "Created datafeed: #{response.id}"
+        @emit 'connected'
         this.on 'poll', () =>
           @robot.logger.debug "Polling datafeed #{response.id}"
           @symphony.readDatafeed(response.id)
@@ -59,7 +60,6 @@ class SymphonyAdapter extends Adapter
               @emit 'poll', response.id
             .fail (err) =>
               @robot.emit 'error', new Error("Unable to read datafeed #{response.id}: #{err}")
-        @emit 'connected'
         @emit 'poll'
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
