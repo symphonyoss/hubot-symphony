@@ -67,7 +67,8 @@ class SymphonyAdapter extends Adapter
   _receiveMessage: (message) =>
     user = @symphony.getUser(message.fromUserId)
     user.room = message.streamId
-    message = new TextMessage(new User(message.fromUserId, name: user.displayName), message.id)
+    match = ///<messageML>(.*)</messageML>///i.exec(message.message)
+    message = new TextMessage(new User(message.fromUserId, name: user.displayName), match[1], message.id)
     @robot.receive message
 
 exports.use = (robot) ->
