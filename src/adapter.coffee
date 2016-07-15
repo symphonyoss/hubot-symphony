@@ -14,8 +14,9 @@
 #    limitations under the License.
 #
 
-{Adapter, TextMessage, User} = require 'hubot'
+{Adapter} = require 'hubot'
 Symphony = require './symphony'
+{V2Message} = require './message'
 
 class SymphonyAdapter extends Adapter
 
@@ -66,10 +67,9 @@ class SymphonyAdapter extends Adapter
 
   _receiveMessage: (message) =>
     user = @symphony.getUser(message.fromUserId)
-    user.room = message.streamId
-    match = ///<messageML>(.*)</messageML>///i.exec(message.message)
-    message = new TextMessage(new User(message.fromUserId, name: user.displayName), match[1], message.id)
-    @robot.receive message
+    v2 = new V2Message(user, message)
+    @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
+    @robot.receive v2
 
 exports.use = (robot) ->
   new SymphonyAdapter robot
