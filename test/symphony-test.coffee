@@ -114,42 +114,23 @@ describe 'REST API test suite', () ->
         assert.fail(0, 1,"Failed with error #{error}")
 
 describe 'Object model test suite', () ->
-  it 'parse a V2Message', () ->
-    msg = {
-            id: 'foobar'
-            v2messageType: 'V2Message'
-            streamId: 'baz'
-            message: '<messageML>Hello World</messageML>'
-            fromUserId: 12345
-          }
-    user = {
-             userAttributes: {
-               displayName: 'John Doe'
+  for text in ['<messageML>Hello World</messageML>', 'Hello World']
+    it 'parse a V2Message containing ' + text, () ->
+      msg = {
+              id: 'foobar'
+              v2messageType: 'V2Message'
+              streamId: 'baz'
+              message: text
+              fromUserId: 12345
+            }
+      user = {
+               userAttributes: {
+                 displayName: 'John Doe'
+               }
              }
-           }
-    v2 = new V2Message(user, msg)
-    assert.equal('Hello World', v2.text)
-    assert.equal('foobar', v2.id)
-    assert.equal(12345, v2.user.id)
-    assert.equal('John Doe', v2.user.name)
-    assert.equal('baz', v2.room)
-
-  it 'parse a V2Message with plaintext if that happens to arrive', () ->
-    msg = {
-            id: 'foobar'
-            v2messageType: 'V2Message'
-            streamId: 'baz'
-            message: 'Hello World'
-            fromUserId: 12345
-          }
-    user = {
-             userAttributes: {
-               displayName: 'John Doe'
-             }
-           }
-    v2 = new V2Message(user, msg)
-    assert.equal('Hello World', v2.text)
-    assert.equal('foobar', v2.id)
-    assert.equal(12345, v2.user.id)
-    assert.equal('John Doe', v2.user.name)
-    assert.equal('baz', v2.room)
+      v2 = new V2Message(user, msg)
+      assert.equal('Hello World', v2.text)
+      assert.equal('foobar', v2.id)
+      assert.equal(12345, v2.user.id)
+      assert.equal('John Doe', v2.user.name)
+      assert.equal('baz', v2.room)
