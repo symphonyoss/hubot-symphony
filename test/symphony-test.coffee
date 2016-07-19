@@ -115,7 +115,7 @@ describe 'REST API test suite', () ->
 
 describe 'Object model test suite', () ->
   for text in ['<messageML>Hello World</messageML>', 'Hello World']
-    it 'parse a V2Message containing ' + text, () ->
+    it "parse a V2Message containing '#{text}'", () ->
       msg = {
               id: 'foobar'
               v2messageType: 'V2Message'
