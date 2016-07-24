@@ -14,13 +14,56 @@
 #    limitations under the License.
 #
 
+EventEmitter = require 'events'
 assert = require('chai').assert
 SymphonyAdapter = require '../src/adapter'
+NockServer = require './nock-server'
+
+nock = new NockServer('https://foundation-bot.symphony.com')
+
+process.env['HUBOT_SYMPHONY_HOST'] = 'foundation-bot.symphony.com'
+process.env['HUBOT_SYMPHONY_PUBLIC_KEY'] = './test/resources/publicKey.pem'
+process.env['HUBOT_SYMPHONY_PRIVATE_KEY'] = './test/resources/privateKey.pem'
+process.env['HUBOT_SYMPHONY_PASSPHRASE'] = 'changeit'
 
 describe 'Adapter test suite', () ->
   constructorProps = ['HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE']
 
   for constructorProp in constructorProps
     it "should throw on construction if #{constructorProp} missing", () ->
-      process.env[propToSet] = 'foo' for propToSet in constructorProps.filter (p) -> p isnt constructorProp
+      prop = process.env[constructorProp]
+      delete process.env[constructorProp]
       assert.throws(SymphonyAdapter.use, new RegExp("#{constructorProp} undefined"))
+      process.env[constructorProp] = prop
+
+  it 'should connect and receive message', (done) ->
+    robot = _fakeRobot()
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      robot.on 'received', () ->
+        assert.isAtLeast((m for m in robot.received when m.message.message is '<messageML>Hello World</messageML>').length, 1)
+        adapter.close()
+        done()
+    adapter.run()
+
+  _fakeRobot = ->
+    robot = new EventEmitter
+    # noop the logging
+    robot.logger =
+      logs: {}
+      log: (type, message) ->
+        @logs[type] ?= []
+        @logs[type].push(message)
+      info: (message) ->
+        @log('info', message)
+      debug: (message) ->
+        @log('debug', message)
+      error: (message) ->
+        @log('error', message)
+    # record all received messages
+    robot.received = []
+    robot.receive = (msg) ->
+      @received.push msg
+      robot.emit 'received'
+    robot

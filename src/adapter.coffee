@@ -36,33 +36,44 @@ class SymphonyAdapter extends Adapter
     @robot.logger.debug "Reply"
     @send(envelope, strings)
 
-  run: ->
+  run: =>
     @robot.logger.info "Initialising..."
     @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY, process.env.HUBOT_SYMPHONY_PASSPHRASE)
     @symphony.whoAmI()
       .then (response) =>
         @symphony.getUser(response.userId)
         .then (response) =>
+          @robot.displayName = response.userAttributes?.displayName
           @robot.logger.info "Connected as #{response.userAttributes?.displayName} [#{response.userSystemInfo?.status}]"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     @symphony.createDatafeed()
       .then (response) =>
         @robot.logger.info "Created datafeed: #{response.id}"
+        this.on 'poll', @_pollDatafeed
         @emit 'connected'
-        this.on 'poll', () =>
-          @robot.logger.debug "Polling datafeed #{response.id}"
-          @symphony.readDatafeed(response.id)
-            .then (response) =>
-              if response?
-                @robot.logger.debug "Received #{response.length} datafeed messages"
-                @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
-              @emit 'poll', response.id
-            .fail (err) =>
-              @robot.emit 'error', new Error("Unable to read datafeed #{response.id}: #{err}")
-        @emit 'poll'
+        @robot.logger.debug "'connected' event emitted"
+        @emit 'poll', response.id
+        @robot.logger.debug "First 'poll' event emitted"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
+
+  close: =>
+    @robot.logger.debug 'Removing datafeed poller'
+    this.removeListener 'poll', @_pollDatafeed
+
+  _pollDatafeed: (id) =>
+    # defer execution to ensure we don't go into an infinite polling loop
+    process.nextTick =>
+      @robot.logger.debug "Polling datafeed #{id}"
+      @symphony.readDatafeed(id)
+        .then (response) =>
+          if response?
+            @robot.logger.debug "Received #{response.length} datafeed messages"
+            @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
+          @emit 'poll', id
+        .fail (err) =>
+          @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
 
   _receiveMessage: (message) =>
     @symphony.getUser(message.fromUserId)
