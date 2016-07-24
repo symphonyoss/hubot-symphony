@@ -41,6 +41,7 @@ class SymphonyAdapter extends Adapter
     @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY, process.env.HUBOT_SYMPHONY_PASSPHRASE)
     @symphony.whoAmI()
       .then (response) =>
+        @robot.userId = response.userId
         @symphony.getUser(response.userId)
         .then (response) =>
           @robot.displayName = response.userAttributes?.displayName
