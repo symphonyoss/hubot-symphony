@@ -6,6 +6,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/9358/badge.svg)](https://scan.coverity.com/projects/symphonyoss-hubot-symphony)
 
+## Usage
+You must pass the following environment variables to hubot
+* `HUBOT_SYMPHONY_HOST` set to the url of your pod without the https:// prefix
+* `HUBOT_SYMPHONY_PUBLIC_KEY` set to the location of your bot account .pem public key file
+* `HUBOT_SYMPHONY_PRIVATE_KEY` set to the location of your bot account .pem private key file
+* `HUBOT_SYMPHONY_PASSPHRASE` set to the passphrase associated with your bot account private key
+
+These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
+
 ### Diagnostics
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:
 
