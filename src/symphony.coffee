@@ -14,10 +14,12 @@
 #    limitations under the License.
 #
 
+Log = require('log')
+logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
+
 fs = require 'fs'
 request = require 'request'
 Q = require 'q'
-logger = require('log4js').getLogger()
 
 class Symphony
 

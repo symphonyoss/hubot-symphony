@@ -14,7 +14,9 @@
 #    limitations under the License.
 #
 
-logger = require('log4js').getLogger()
+Log = require('log')
+logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
+
 nock = require 'nock'
 uuid = require 'node-uuid'
 

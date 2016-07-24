@@ -14,7 +14,9 @@
 #    limitations under the License.
 #
 
-logger = require('log4js').getLogger()
+Log = require('log')
+logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
+
 argv = require('yargs')
   .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]')
   .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
