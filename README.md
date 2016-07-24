@@ -14,5 +14,7 @@ npm install hubot-symphony
 npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]
 ```
 
+If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.
+
 #### Note
 The privateKey.pem and publicKey.pem files under test/resources have been generated at random and are not real keys.

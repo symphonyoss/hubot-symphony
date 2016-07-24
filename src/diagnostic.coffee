@@ -14,6 +14,8 @@
 #    limitations under the License.
 #
 
+### !pragma coverage-skip-block ###
+
 Log = require('log')
 logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
 
