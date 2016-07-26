@@ -99,7 +99,7 @@ class Symphony
 
     request(options, (err, res, data) =>
       if err?
-        logger.warn "received error response from #{path}: #{err}"
+        logger.warning "received error response from #{path}: #{err}"
         deferred.reject(new Error(err))
       else
         logger.debug "received #{res.statusCode} response from #{path}: #{JSON.stringify(data)}"
