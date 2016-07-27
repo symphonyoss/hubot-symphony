@@ -50,6 +50,8 @@ class SymphonyAdapter extends Adapter
           @robot.logger.info "Connected as #{response.userAttributes?.displayName} [#{response.userSystemInfo?.status}]"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
+    hourlyRefresh = memoize @symphony.getUser, {maxAge: 3600000, length: 1}
+    @userLookup = (userId) => hourlyRefresh userId
     @symphony.createDatafeed()
       .then (response) =>
         @robot.logger.info "Created datafeed: #{response.id}"
@@ -79,7 +81,7 @@ class SymphonyAdapter extends Adapter
           @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
 
   _receiveMessage: (message) =>
-    @symphony.getUser(message.fromUserId)
+    @userLookup(message.fromUserId)
       .then (response) =>
         v2 = new V2Message(response, message)
         @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
