@@ -19,7 +19,7 @@
 class V2Message extends TextMessage
 
   constructor: (@user, @message) ->
-    super new User(@message.fromUserId, {name: @user.userAttributes?.displayName, room: @message.streamId}), @_getMessageText(@message), @message.id
+    super new User(@message.fromUserId, {name: @user.userAttributes?.displayName, emailAddress: @user.userAttributes?.emailAddress, room: @message.streamId}), @_getMessageText(@message), @message.id
 
   _getMessageText: (message) ->
     match = /<messageML>(.*)<\/messageML>/i.exec message.message

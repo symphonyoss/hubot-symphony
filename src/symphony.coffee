@@ -15,18 +15,23 @@
 #
 
 Log = require('log')
-logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
+logger = new Log process.env.HUBOT_SYMPHONY_LOG_LEVEL or process.env.HUBOT_LOG_LEVEL or 'info'
 
 fs = require 'fs'
 request = require 'request'
 Q = require 'q'
+memoize = require 'memoizee'
 
 class Symphony
 
   constructor: (@host, @privateKey, @publicKey, @passphrase) ->
     logger.info "Connecting to #{@host}"
-    @sessionAuth = @_httpPost('/sessionauth/v1/authenticate')
-    @keyAuth = @_httpPost('/keyauth/v1/authenticate')
+    # refresh tokens on a weekly basis
+    weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 1}
+    @sessionAuth = => weeklyRefresh '/sessionauth/v1/authenticate'
+    @keyAuth = => weeklyRefresh '/keyauth/v1/authenticate'
+    Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
+      logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
   echo: (body) =>
     @_httpAgentPost('/agent/v1/util/echo', body)
@@ -54,14 +59,14 @@ class Symphony
     @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read')
 
   _httpPodGet: (path, body) =>
-   @sessionAuth.then (value) =>
+   @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
       @_httpGet(path, headers)
 
   _httpAgentGet: (path, body) =>
-    Q.all([@sessionAuth, @keyAuth]).then (values) =>
+    Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
@@ -69,7 +74,7 @@ class Symphony
       @_httpGet(path, headers)
 
   _httpAgentPost: (path, body) =>
-    Q.all([@sessionAuth, @keyAuth]).then (values) =>
+    Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token

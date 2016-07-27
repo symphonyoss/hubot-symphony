@@ -14,7 +14,8 @@
 #    limitations under the License.
 #
 
-{Adapter, TextMessage, User} = require 'hubot'
+{Adapter} = require 'hubot'
+
 Symphony = require './symphony'
 {V2Message} = require './message'
 
@@ -34,7 +35,8 @@ class SymphonyAdapter extends Adapter
 
   reply: (envelope, strings...) ->
     @robot.logger.debug "Reply"
-    @send(envelope, strings)
+    for string in strings
+      @symphony.sendMessage(envelope.room, "<messageML><mention email='#{envelope.user.emailAddress}'/> #{string}</messageML>", 'MESSAGEML')
 
   run: =>
     @robot.logger.info "Initialising..."
