@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-{Adapter} = require 'hubot'
+  {Adapter} = require 'hubot'
 
 Symphony = require './symphony'
 {V2Message} = require './message'
@@ -82,13 +82,14 @@ class SymphonyAdapter extends Adapter
           @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
 
   _receiveMessage: (message) =>
-    @userLookup(message.fromUserId)
-      .then (response) =>
-        v2 = new V2Message(response, message)
-        @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
-        @receive v2
-      .fail (err) =>
-        @robot.emit 'error', new Error("Unable to fetch user details: #{err}")
+    if message.fromUserId != @robot.userId
+      @userLookup(message.fromUserId)
+        .then (response) =>
+          v2 = new V2Message(response, message)
+          @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
+          @receive v2
+        .fail (err) =>
+          @robot.emit 'error', new Error("Unable to fetch user details: #{err}")
 
 exports.use = (robot) ->
   new SymphonyAdapter robot
