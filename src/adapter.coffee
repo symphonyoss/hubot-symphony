@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-  {Adapter} = require 'hubot'
+{Adapter} = require 'hubot'
 
 Symphony = require './symphony'
 {V2Message} = require './message'
