@@ -117,17 +117,17 @@ describe 'Object model test suite', () ->
   for text in ['<messageML>Hello World</messageML>', 'Hello World']
     it "parse a V2Message containing '#{text}'", () ->
       msg = {
-              id: 'foobar'
-              v2messageType: 'V2Message'
-              streamId: 'baz'
-              message: text
-              fromUserId: 12345
-            }
+        id: 'foobar'
+        v2messageType: 'V2Message'
+        streamId: 'baz'
+        message: text
+        fromUserId: 12345
+      }
       user = {
-               userAttributes: {
-                 displayName: 'John Doe'
-               }
-             }
+        userAttributes: {
+          displayName: 'John Doe'
+        }
+      }
       v2 = new V2Message(user, msg)
       assert.equal('Hello World', v2.text)
       assert.equal('foobar', v2.id)

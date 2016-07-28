@@ -52,19 +52,19 @@ class NockServer
       .matchHeader('keyManagerToken', (val) -> !val?)
       .post('/sessionauth/v1/authenticate')
       .reply(200, {
-                    name: 'sessionToken'
-                    token: 'SESSION_TOKEN'
-                  })
+        name: 'sessionToken'
+        token: 'SESSION_TOKEN'
+      })
       .post('/keyauth/v1/authenticate')
       .reply(200, {
-                    name: 'keyManagerToken'
-                    token: 'KEY_MANAGER_TOKEN'
-                  })
+        name: 'keyManagerToken'
+        token: 'KEY_MANAGER_TOKEN'
+      })
       .post('/agent/v1/util/echo')
       .reply(401, {
-                    code: 401
-                    message: 'Invalid session'
-                  })
+        code: 401
+        message: 'Invalid session'
+      })
 
     @podScope = nock(@host)
       .persist()
@@ -72,34 +72,34 @@ class NockServer
       .matchHeader('keyManagerToken', (val) -> !val?)
       .get('/pod/v1/sessioninfo')
       .reply(200, {
-                    userId: @botUserId
-                  })
+        userId: @botUserId
+      })
       .get('/pod/v1/admin/user/' + @realUserId)
       .reply(200, {
-                    userAttributes: {
-                      emailAddress: 'johndoe@symphony.com'
-                      firstName: 'John'
-                      lastName: 'Doe'
-                      userName: 'johndoe'
-                      displayName: 'John Doe'
-                    }
-                    userSystemInfo: {
-                      id: @realUserId
-                    }
-                  })
+        userAttributes: {
+          emailAddress: 'johndoe@symphony.com'
+          firstName: 'John'
+          lastName: 'Doe'
+          userName: 'johndoe'
+          displayName: 'John Doe'
+        }
+        userSystemInfo: {
+          id: @realUserId
+        }
+      })
       .get('/pod/v1/admin/user/' + @botUserId)
       .reply(200, {
-                    userAttributes: {
-                      emailAddress: 'mozart@symphony.com'
-                      firstName: 'Wolfgang Amadeus'
-                      lastName: 'Mozart'
-                      userName: 'mozart'
-                      displayName: 'Mozart'
-                    }
-                    userSystemInfo: {
-                      id: @realUserId
-                    }
-                  })
+        userAttributes: {
+          emailAddress: 'mozart@symphony.com'
+          firstName: 'Wolfgang Amadeus'
+          lastName: 'Mozart'
+          userName: 'mozart'
+          displayName: 'Mozart'
+        }
+        userSystemInfo: {
+          id: @realUserId
+        }
+      })
 
     @agentScope = nock(@host)
       .persist()
@@ -126,8 +126,8 @@ class NockServer
       .reply(200, (uri, requestBody) => JSON.stringify(@messages))
       .post('/agent/v1/datafeed/create')
       .reply(200, {
-                    id: @datafeedId
-                  })
+        id: @datafeedId
+      })
       .get('/agent/v2/datafeed/' + @datafeedId + '/read')
       .reply (uri, requestBody) =>
         if @messages.length == 0
