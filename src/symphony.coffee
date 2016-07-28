@@ -59,7 +59,7 @@ class Symphony
     @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read')
 
   _httpPodGet: (path, body) =>
-   @sessionAuth().then (value) =>
+    @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
