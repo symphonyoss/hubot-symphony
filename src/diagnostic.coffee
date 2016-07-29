@@ -38,13 +38,13 @@ symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey, argv.passphr
 logger.info 'Connection initiated, starting tests...'
 
 # check tokens
-symphony.sessionAuth
+symphony.sessionAuth()
   .then (response) =>
     logger.info "Session token: #{response.token}"
   .fail (err) =>
     logger.error "Failed to fetch session token: #{err}"
   .done
-symphony.keyAuth
+symphony.keyAuth()
   .then (response) =>
     logger.info "Key manager token: #{response.token}"
   .fail (err) =>
