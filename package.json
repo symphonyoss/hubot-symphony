@@ -1,12 +1,12 @@
 {
   "name": "hubot-symphony",
-  "version": "1.0.0",
   "description": "Hubot adapter for Symphony",
   "main": "src/adapter.coffee",
   "scripts": {
     "diagnostic": "coffee src/diagnostic.coffee",
     "test": "mocha test/*.coffee",
-    "test-cov": "mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report text-summary lcov"
+    "test-cov": "mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report text-summary lcov",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
@@ -41,6 +41,7 @@
     "mocha": ">=2.5.3",
     "nock": "^8.0.0",
     "node-uuid": "^1.4.7",
-    "yargs": "^4.8.0"
+    "yargs": "^4.8.0",
+    "semantic-release": "^4.3.5"
   }
 }
