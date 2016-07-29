@@ -18,15 +18,26 @@
 
 class V2Message extends TextMessage
 
-  constructor: (@user, @message) ->
-    super new User(@message.fromUserId, {name: @user.userAttributes?.displayName, emailAddress: @user.userAttributes?.emailAddress, room: @message.streamId}), @_getMessageText(@message), @message.id
+  constructor: (@symphonyUser, @symphonyMessage) ->
+    super(
+      new User(
+        @symphonyMessage.fromUserId,
+        {
+          name: @symphonyUser.userAttributes?.displayName,
+          emailAddress: @symphonyUser.userAttributes?.emailAddress,
+          room: @symphonyMessage.streamId
+        }
+      ),
+      @_getMessageText(@symphonyMessage),
+      @symphonyMessage.id
+    )
 
-  _getMessageText: (message) ->
-    match = /<messageML>(.*)<\/messageML>/i.exec message.message
+  _getMessageText: (symphonyMessage) ->
+    match = /<messageML>(.*)<\/messageML>/i.exec symphonyMessage.message
     if match?
       match[1]
     else
-      message.message
+      symphonyMessage.message
 
 module.exports = {
   V2Message

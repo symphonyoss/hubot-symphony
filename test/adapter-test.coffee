@@ -42,7 +42,7 @@ describe 'Adapter test suite', () ->
     adapter.on 'connected', () ->
       assert.isDefined(adapter.symphony)
       robot.on 'received', () ->
-        assert.isAtLeast((m for m in robot.received when m.message.message is '<messageML>Hello World</messageML>').length, 1)
+        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
         adapter.close()
         done()
     adapter.run()
