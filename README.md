@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
 [![Dependency Status](https://www.versioneye.com/user/projects/57991bd627629700333f615c/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57991bd627629700333f615c)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/9358/badge.svg)](https://scan.coverity.com/projects/symphonyoss-hubot-symphony)
+[![NSP Status](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a/badge)](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a)
 
 ## Usage
 You must pass the following environment variables to hubot
