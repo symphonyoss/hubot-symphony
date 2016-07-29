@@ -15,9 +15,11 @@
 #
 
 assert = require('chai').assert
+{TextListener} = require 'hubot'
 Symphony = require '../src/symphony'
 {V2Message} = require '../src/message'
 NockServer = require './nock-server'
+{FakeRobot} = require './fakes'
 
 nock = new NockServer('https://foundation.symphony.com')
 
@@ -134,3 +136,22 @@ describe 'Object model test suite', () ->
       assert.equal(12345, v2.user.id)
       assert.equal('John Doe', v2.user.name)
       assert.equal('baz', v2.room)
+
+  it 'regex test', (done) ->
+    msg = {
+      id: 'foobar'
+      v2messageType: 'V2Message'
+      streamId: 'baz'
+      message: 'butler ping'
+      fromUserId: 12345
+    }
+    user = {
+      userAttributes: {
+        displayName: 'John Doe'
+      }
+    }
+    robot = new FakeRobot
+    callback = (response) =>
+      done()
+    listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback)
+    listener.call new V2Message(user, msg)

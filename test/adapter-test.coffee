@@ -14,10 +14,10 @@
 #    limitations under the License.
 #
 
-EventEmitter = require 'events'
 assert = require('chai').assert
 SymphonyAdapter = require '../src/adapter'
 NockServer = require './nock-server'
+{FakeRobot} = require './fakes'
 
 nock = new NockServer('https://foundation-bot.symphony.com')
 
@@ -37,7 +37,7 @@ describe 'Adapter test suite', () ->
       process.env[constructorProp] = prop
 
   it 'should connect and receive message', (done) ->
-    robot = _fakeRobot()
+    robot = new FakeRobot
     adapter = SymphonyAdapter.use(robot)
     adapter.on 'connected', () ->
       assert.isDefined(adapter.symphony)
@@ -46,24 +46,3 @@ describe 'Adapter test suite', () ->
         adapter.close()
         done()
     adapter.run()
-
-  _fakeRobot = ->
-    robot = new EventEmitter
-    # noop the logging
-    robot.logger =
-      logs: {}
-      log: (type, message) ->
-        @logs[type] ?= []
-        @logs[type].push(message)
-      info: (message) ->
-        @log('info', message)
-      debug: (message) ->
-        @log('debug', message)
-      error: (message) ->
-        @log('error', message)
-    # record all received messages
-    robot.received = []
-    robot.receive = (msg) ->
-      @received.push msg
-      robot.emit 'received'
-    robot
