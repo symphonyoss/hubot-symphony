@@ -21,10 +21,16 @@ Symphony = require '../src/symphony'
 NockServer = require './nock-server'
 {FakeRobot} = require './fakes'
 
-nock = new NockServer('https://foundation.symphony.com')
-
 describe 'REST API test suite', () ->
-  symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit')
+  nock = null
+  symphony = null
+
+  beforeEach ->
+    nock = new NockServer('https://foundation.symphony.com')
+    symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit')
+
+  afterEach ->
+    nock.close()
 
   it 'echo should obtain session and key tokens and echo response', () ->
     msg = { foo: 'bar' }

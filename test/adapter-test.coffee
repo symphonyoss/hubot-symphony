@@ -19,14 +19,12 @@ SymphonyAdapter = require '../src/adapter'
 NockServer = require './nock-server'
 {FakeRobot} = require './fakes'
 
-nock = new NockServer('https://foundation-bot.symphony.com')
-
-process.env['HUBOT_SYMPHONY_HOST'] = 'foundation-bot.symphony.com'
+process.env['HUBOT_SYMPHONY_HOST'] = 'foundation.symphony.com'
 process.env['HUBOT_SYMPHONY_PUBLIC_KEY'] = './test/resources/publicKey.pem'
 process.env['HUBOT_SYMPHONY_PRIVATE_KEY'] = './test/resources/privateKey.pem'
 process.env['HUBOT_SYMPHONY_PASSPHRASE'] = 'changeit'
 
-describe 'Adapter test suite', () ->
+describe 'Constructor test', () ->
   constructorProps = ['HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE']
 
   for constructorProp in constructorProps
@@ -35,6 +33,16 @@ describe 'Adapter test suite', () ->
       delete process.env[constructorProp]
       assert.throws(SymphonyAdapter.use, new RegExp("#{constructorProp} undefined"))
       process.env[constructorProp] = prop
+
+describe 'Adapter test suite', () ->
+  nock = null
+  symphony = null
+
+  beforeEach ->
+    nock = new NockServer('https://foundation.symphony.com')
+
+  afterEach ->
+    nock.close()
 
   it 'should connect and receive message', (done) ->
     robot = new FakeRobot
@@ -45,4 +53,37 @@ describe 'Adapter test suite', () ->
         assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
         adapter.close()
         done()
+    adapter.run()
+
+  it 'should send with no adornment', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      envelope = {room: nock.streamId}
+      adapter.send(envelope, 'foo bar')
+      adapter.close()
+    nock.on 'received', () ->
+      robot.logger.info "all messages: #{nock.messages}"
+      assert.isAtLeast((m for m in nock.messages when m.message is 'foo bar').length, 1)
+      done()
+    adapter.run()
+
+  it 'should reply with @mention', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      envelope = {
+        room: nock.streamId
+        user: {
+          emailAddress: 'johndoe@symphony.com'
+        }
+      }
+      adapter.reply(envelope, 'foo bar baz')
+      adapter.close()
+    nock.on 'received', () ->
+      robot.logger.info "all messages: #{JSON.stringify(nock.messages)}"
+      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email='johndoe@symphony.com'/> foo bar baz</messageML>").length, 1)
+      done()
     adapter.run()

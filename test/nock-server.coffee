@@ -14,15 +14,16 @@
 #    limitations under the License.
 #
 
+EventEmitter = require 'events'
 Log = require('log')
 logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
 
 nock = require 'nock'
 uuid = require 'node-uuid'
 
-class NockServer
+class NockServer extends EventEmitter
 
-  constructor: (@host) ->
+  constructor: (@host, startWithHelloWorldMessage = true) ->
     logger.info "Setting up mocks for #{@host}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
@@ -35,16 +36,16 @@ class NockServer
 
     @datafeedId = 1234
 
-    @messages = [
-      {
+    @messages = []
+    if startWithHelloWorldMessage
+      @messages.push({
         id: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA'
         timestamp: @firstMessageTimestamp
         v2messageType: 'V2Message'
         streamId: @streamId
         message: '<messageML>Hello World</messageML>'
         fromUserId: @realUserId
-      }
-    ]
+      })
 
     nock.disableNetConnect()
     @authScope = nock(@host)
@@ -118,8 +119,7 @@ class NockServer
           attachments: []
           fromUserId: @botUserId
         }
-        @messages.push(message)
-        logger.debug "Seen #{@messages.length} messages"
+        @_receiveMessage message
         message
       )
       .get('/agent/v2/stream/' + @streamId + '/message')
@@ -136,5 +136,13 @@ class NockServer
           copy = @messages
           @messages = []
           [200, JSON.stringify(copy)]
+
+  close: () =>
+    logger.info "Cleaning up nock for #{@host}"
+    nock.cleanAll()
+
+  _receiveMessage: (msg) =>
+    @messages.push(msg)
+    @emit 'received'
 
 module.exports = NockServer
