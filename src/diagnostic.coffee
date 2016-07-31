@@ -70,5 +70,8 @@ symphony.createDatafeed()
     symphony.readDatafeed(response.id)
   .then (response) =>
     logger.info "Received '#{msg.message}'" for msg in response when msg.v2messageType = 'V2Message'
+    if argv.runOffline?
+      nock.close()
+    process.exit(0)
   .fail (err) =>
     logger.error "Failed to receive a message: #{err}"
