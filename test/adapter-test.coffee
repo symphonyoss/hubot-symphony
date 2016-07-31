@@ -64,7 +64,6 @@ describe 'Adapter test suite', () ->
       adapter.send(envelope, 'foo bar')
       adapter.close()
     nock.on 'received', () ->
-      robot.logger.info "all messages: #{nock.messages}"
       assert.isAtLeast((m for m in nock.messages when m.message is 'foo bar').length, 1)
       done()
     adapter.run()
@@ -83,7 +82,6 @@ describe 'Adapter test suite', () ->
       adapter.reply(envelope, 'foo bar baz')
       adapter.close()
     nock.on 'received', () ->
-      robot.logger.info "all messages: #{JSON.stringify(nock.messages)}"
       assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email='johndoe@symphony.com'/> foo bar baz</messageML>").length, 1)
       done()
     adapter.run()
