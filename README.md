@@ -6,6 +6,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
 [![Dependency Status](https://www.versioneye.com/user/projects/57991bd627629700333f615c/badge)](https://www.versioneye.com/user/projects/57991bd627629700333f615c)
+[![bitHound Dependencies](https://www.bithound.io/github/symphonyoss/hubot-symphony/badges/dependencies.svg)](https://www.bithound.io/github/symphonyoss/hubot-symphony/master/dependencies/npm)
+[![bitHound Dev Dependencies](https://www.bithound.io/github/symphonyoss/hubot-symphony/badges/devDependencies.svg)](https://www.bithound.io/github/symphonyoss/hubot-symphony/master/dependencies/npm)
 [![NSP Status](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a/badge)](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a)
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
