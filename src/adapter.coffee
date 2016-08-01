@@ -63,6 +63,7 @@ class SymphonyAdapter extends Adapter
         @robot.logger.debug "First 'poll' event emitted"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
+    return
 
   close: =>
     @robot.logger.debug 'Removing datafeed poller'
