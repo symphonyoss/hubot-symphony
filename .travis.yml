@@ -11,7 +11,6 @@ before_script:
 env:
   global:
   - secure: XOdm9qeTHvToeZGtHLxTfe7NCKTE8ebzzTHvCQ1j28S3L8lpm5CQcclS5+XvLFnAEu34/M4QJ8hrJzMKX4ygLt5Uxa6s0oB7ZytbgvUFPVgTjwBtD7yIMzd9e1o5KvxDi9jZa+Oiwjk07S+MsHg1gJRCJOwQyJdaTpU+dOpv9pUTInG4WRvWA0ITVmfFHNmqd5eX4qncnLTQYkzMdT816ekTCwOkchYOreDdl9KUnlbm3epF01wpZK6cbzH44uViZtg9z9uTfn4p7NFSMY3sZxxqzGvETV+x+XjrfonF4xGCv93wdl7MjteTehCH6xUc+BdoBglI1CrwH5X4qvX1amxjIDvAuXawAonUa8Qbz4J7QMV9WXcJgrXyQESlYh3VXB4mNcna23LJYbOx9/jRCJ8l34Rbkp1mReXtteG1561kWPYc//7YY22SKfnaDXszkscYXg7IJ8rGyoe+PdITrfM4UbYi+qMGSJtaQPE7SsWEAY1uXg7C5UVJW71pKPnhsIf54yHNENvOVDSLHYeaDcELp9ssPc0iaaRFmSp3ZA1GpJFJQUnSgb4CWwx0UpfuqH+5TdjEHwx5n1xw+lTqTLkn+/5I2OYytaJwbvX0InoA26eY+j3ZLCzOl88mJIlzqF5iQXIbgXQ+R3TMj0fqbFv9WbVJhyvIBpB5k47qPYM=
-  - secure: dubctRgixnaupIdhlTmARQ2aA34js+4VUjMUtdoKG2olstVmpHz2B0RnjaM+YYwP7IQLKeTAkS2UW9pmJTLZZVHlS39kxD70G38gE7iPqL9TSiWRGOeuhuLRoT+lZVYMwMiUreVj6S2HyYRlKC6HNNkgreHofyAciTTewLYKO5MEQTfnpogIq1PPs9nEopQQx/6WzgRb8CLYwOOvx1FMfuKHsPQR1JnGhbYLBSY+ZbNyrCK9v6NKODqWkQQmfTrqRwwaNnpr8z0BS6fQzY7pzlBPXcYIFuykFnzZA8G5dp2FaYRjF10fzaKH6vZTfarlN6+8F/jdOeyVEC0WgluRcaMjZNFkRTLHFB+W714aNTvbLKj7/rqSq75n0RmEQgzKGfrCSn5rqKj1V+HSspHvmhIMxh7gqks0mYCxZZGIN9khd2lSqf5ckHnhheLjup/pI0NLC4QCoCWrsUWPcqb8a4G51IkREWM6kgDVkhgtQibgdPkBBEM51q6tN9TqtN+lnTLdqGGmBU5un55G7prMkJl+oc6AUZY6kZslekpfEwCzD/tBylJQjmrZiLNcOXBjyZLcrI6HlFVE/57S4eijvyW2i4wgTDrriureQJJWzz2FJ0gT2+oB8kfCIKpDTlFZvYwxjvkLyxoNtu5FNIB8blK9hTOIi3lmuct1TvKz6WI=
 
 script:
   - npm run-script test-cov
@@ -19,12 +18,3 @@ script:
 after_success:
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
   - npm run semantic-release
-
-# Coverity does not appear to support CoffeeScript
-#addons:
-#  coverity_scan:
-#    project:
-#      name: jonfreedman/hubot-symphony
-#    notification_email: "${COVERITY_EMAIL}"
-#    build_command: "--no-command --fs-capture-search ./"
-#    branch_pattern: master
