@@ -24,6 +24,20 @@ You must pass the following environment variables to hubot
 
 These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
 
+If you want to send a rich message you can call send with an Object instead of a String
+```
+module.exports = (robot) ->
+  robot.respond /pug me/i, (msg) ->
+    msg.http("http://pugme.herokuapp.com/random")
+      .get() (err, res, body) ->
+        pug = JSON.parse(body).pug
+        msg.send pug
+        msg.send {
+          format: 'MESSAGEML'
+          text: "<a href=\"#{pug}\"/>"
+        }
+```
+
 ### Diagnostics
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:
 

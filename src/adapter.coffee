@@ -29,15 +29,17 @@ class SymphonyAdapter extends Adapter
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
     throw new Error('HUBOT_SYMPHONY_PASSPHRASE undefined') unless process.env.HUBOT_SYMPHONY_PASSPHRASE
 
-  send: (envelope, strings...) ->
+  send: (envelope, messages...) ->
     @robot.logger.debug "Send"
-    for string in strings
-      @symphony.sendMessage(envelope.room, string, 'TEXT')
+    for message in messages
+      format = message.format ? 'TEXT'
+      text = message.text ? message
+      @symphony.sendMessage(envelope.room, text, format)
 
-  reply: (envelope, strings...) ->
+  reply: (envelope, messages...) ->
     @robot.logger.debug "Reply"
-    for string in strings
-      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{string}</messageML>", 'MESSAGEML')
+    for message in messages
+      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{message}</messageML>", 'MESSAGEML')
 
   run: =>
     @robot.logger.info "Initialising..."
