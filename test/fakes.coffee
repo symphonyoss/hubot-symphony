@@ -33,6 +33,18 @@ class FakeRobot extends EventEmitter
         @_log('error', message)
     }
 
+    # save user details in brain
+    @users = {}
+    @brain = {
+      userForId: (id, options) =>
+        @logger.debug "Storing userId #{id} = #{JSON.stringify(options)}"
+        user = @users[id]
+        unless user
+          user = new User id, options
+          @users[id] = user
+        user
+    }
+
     # record all received messages
     @received = []
 

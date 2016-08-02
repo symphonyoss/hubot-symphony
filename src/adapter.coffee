@@ -52,7 +52,16 @@ class SymphonyAdapter extends Adapter
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @symphony.getUser, {maxAge: 3600000, length: 1}
-    @userLookup = (userId) => hourlyRefresh userId
+    @userLookup = (userId) =>
+      user = hourlyRefresh userId
+      user
+        .then (response) =>
+          # record basic user details in hubot's brain
+          @robot.brain.userForId(userId, {
+            name: response.userAttributes?.displayName
+            emailAddress: response.userAttributes?.emailAddress
+          })
+      user
     @_createDatafeed()
       .then (response) =>
         @emit 'connected'
