@@ -58,7 +58,8 @@ class SymphonyAdapter extends Adapter
         .then (response) =>
           # record basic user details in hubot's brain
           @robot.brain.userForId(userId, {
-            name: response.userAttributes?.displayName
+            name: response.userAttributes?.userName
+            displayName: response.userAttributes?.displayName
             emailAddress: response.userAttributes?.emailAddress
           })
       user

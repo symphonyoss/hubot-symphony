@@ -23,7 +23,8 @@ class V2Message extends TextMessage
       new User(
         @symphonyMessage.fromUserId,
         {
-          name: @symphonyUser.userAttributes?.displayName,
+          name: @symphonyUser.userAttributes?.userName,
+          displayName: @symphonyUser.userAttributes?.displayName,
           emailAddress: @symphonyUser.userAttributes?.emailAddress,
           room: @symphonyMessage.streamId
         }

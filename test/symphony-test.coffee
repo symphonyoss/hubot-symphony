@@ -133,6 +133,7 @@ describe 'Object model test suite', () ->
       }
       user = {
         userAttributes: {
+          userName: 'johndoe'
           displayName: 'John Doe'
         }
       }
@@ -140,7 +141,8 @@ describe 'Object model test suite', () ->
       assert.equal('Hello World', v2.text)
       assert.equal('foobar', v2.id)
       assert.equal(12345, v2.user.id)
-      assert.equal('John Doe', v2.user.name)
+      assert.equal('johndoe', v2.user.name)
+      assert.equal('John Doe', v2.user.displayName)
       assert.equal('baz', v2.room)
 
   it 'regex test', (done) ->
@@ -153,6 +155,7 @@ describe 'Object model test suite', () ->
     }
     user = {
       userAttributes: {
+        userName: 'johndoe'
         displayName: 'John Doe'
       }
     }
