@@ -21,11 +21,11 @@ class V2Message extends TextMessage
   constructor: (@symphonyUser, @symphonyMessage) ->
     super(
       new User(
-        @symphonyMessage.fromUserId,
+        @symphonyMessage.fromUserId
         {
-          name: @symphonyUser.userAttributes?.userName,
-          displayName: @symphonyUser.userAttributes?.displayName,
-          emailAddress: @symphonyUser.userAttributes?.emailAddress,
+          name: @symphonyUser.userAttributes?.userName
+          displayName: @symphonyUser.userAttributes?.displayName
+          emailAddress: @symphonyUser.userAttributes?.emailAddress
           room: @symphonyMessage.streamId
         }
       ),

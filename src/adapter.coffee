@@ -52,16 +52,17 @@ class SymphonyAdapter extends Adapter
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @symphony.getUser, {maxAge: 3600000, length: 1}
-    @userLookup = (userId) =>
+    @userLookup = (userId, streamId) =>
       user = hourlyRefresh userId
       user
         .then (response) =>
-          # record basic user details in hubot's brain
-          @robot.brain.userForId(userId, {
-            name: response.userAttributes?.userName
-            displayName: response.userAttributes?.displayName
-            emailAddress: response.userAttributes?.emailAddress
-          })
+          # record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
+          existing = @robot.brain.userForId(userId)
+          existing['name'] = response.userAttributes?.userName
+          existing['displayName'] = response.userAttributes?.displayName
+          existing['emailAddress'] = response.userAttributes?.emailAddress
+          existing['room'] = streamId
+          @robot.brain.userForId(userId, existing)
       user
     @_createDatafeed()
       .then (response) =>
@@ -102,7 +103,7 @@ class SymphonyAdapter extends Adapter
 
   _receiveMessage: (message) =>
     if message.fromUserId != @robot.userId
-      @userLookup(message.fromUserId)
+      @userLookup(message.fromUserId, message.streamId)
         .then (response) =>
           v2 = new V2Message(response, message)
           @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
