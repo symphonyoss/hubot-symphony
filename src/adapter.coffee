@@ -37,7 +37,7 @@ class SymphonyAdapter extends Adapter
   reply: (envelope, strings...) ->
     @robot.logger.debug "Reply"
     for string in strings
-      @symphony.sendMessage(envelope.room, "<messageML><mention email='#{envelope.user.emailAddress}'/> #{string}</messageML>", 'MESSAGEML')
+      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{string}</messageML>", 'MESSAGEML')
 
   run: =>
     @robot.logger.info "Initialising..."
@@ -53,21 +53,29 @@ class SymphonyAdapter extends Adapter
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @symphony.getUser, {maxAge: 3600000, length: 1}
     @userLookup = (userId) => hourlyRefresh userId
-    @symphony.createDatafeed()
+    @_createDatafeed()
       .then (response) =>
-        @robot.logger.info "Created datafeed: #{response.id}"
-        this.on 'poll', @_pollDatafeed
         @emit 'connected'
         @robot.logger.debug "'connected' event emitted"
-        @emit 'poll', response.id
-        @robot.logger.debug "First 'poll' event emitted"
-      .fail (err) =>
-        @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
     return
 
   close: =>
     @robot.logger.debug 'Removing datafeed poller'
     this.removeListener 'poll', @_pollDatafeed
+
+  _createDatafeed: =>
+    @symphony.createDatafeed()
+      .then (response) =>
+        if response.id?
+          @robot.logger.info "Created datafeed: #{response.id}"
+          this.removeAllListeners 'poll'
+          this.on 'poll', @_pollDatafeed
+          @emit 'poll', response.id
+          @robot.logger.debug "First 'poll' event emitted"
+        else
+          @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
+      .fail (err) =>
+        @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
 
   _pollDatafeed: (id) =>
     # defer execution to ensure we don't go into an infinite polling loop
@@ -76,7 +84,7 @@ class SymphonyAdapter extends Adapter
       @symphony.readDatafeed(id)
         .then (response) =>
           if response?
-            @robot.logger.debug "Received #{response.length} datafeed messages"
+            @robot.logger.debug "Received #{response.length ? 0} datafeed messages"
             @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
           @emit 'poll', id
         .fail (err) =>

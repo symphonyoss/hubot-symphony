@@ -82,6 +82,6 @@ describe 'Adapter test suite', () ->
       adapter.reply(envelope, 'foo bar baz')
       adapter.close()
     nock.on 'received', () ->
-      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email='johndoe@symphony.com'/> foo bar baz</messageML>").length, 1)
+      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email=\"johndoe@symphony.com\"/> foo bar baz</messageML>").length, 1)
       done()
     adapter.run()
