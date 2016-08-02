@@ -34,7 +34,7 @@ module.exports = (robot) ->
         msg.send pug
         msg.send {
           format: 'MESSAGEML'
-          text: "<a href=\"#{pug}\"/>"
+          text: "<messageML><a href=\"#{pug}\"/></messageML>"
         }
 ```
 
