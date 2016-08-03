@@ -68,6 +68,22 @@ describe 'Adapter test suite', () ->
       done()
     adapter.run()
 
+  it 'should send MESSAGEML', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      envelope = {room: nock.streamId}
+      adapter.send(envelope, {
+        format: 'MESSAGEML'
+        text: '<messageML><b>foo bar</b></messageML>'
+      })
+      adapter.close()
+    nock.on 'received', () ->
+      assert.isAtLeast((m for m in nock.messages when m.message is '<messageML><b>foo bar</b></messageML>').length, 1)
+      done()
+    adapter.run()
+
   it 'should reply with @mention', (done) ->
     robot = new FakeRobot
     adapter = SymphonyAdapter.use(robot)
@@ -82,6 +98,6 @@ describe 'Adapter test suite', () ->
       adapter.reply(envelope, 'foo bar baz')
       adapter.close()
     nock.on 'received', () ->
-      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email='johndoe@symphony.com'/> foo bar baz</messageML>").length, 1)
+      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email=\"johndoe@symphony.com\"/> foo bar baz</messageML>").length, 1)
       done()
     adapter.run()

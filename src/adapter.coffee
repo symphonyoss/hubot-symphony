@@ -29,15 +29,17 @@ class SymphonyAdapter extends Adapter
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
     throw new Error('HUBOT_SYMPHONY_PASSPHRASE undefined') unless process.env.HUBOT_SYMPHONY_PASSPHRASE
 
-  send: (envelope, strings...) ->
+  send: (envelope, messages...) ->
     @robot.logger.debug "Send"
-    for string in strings
-      @symphony.sendMessage(envelope.room, string, 'TEXT')
+    for message in messages
+      format = message.format ? 'TEXT'
+      text = message.text ? message
+      @symphony.sendMessage(envelope.room, text, format)
 
-  reply: (envelope, strings...) ->
+  reply: (envelope, messages...) ->
     @robot.logger.debug "Reply"
-    for string in strings
-      @symphony.sendMessage(envelope.room, "<messageML><mention email='#{envelope.user.emailAddress}'/> #{string}</messageML>", 'MESSAGEML')
+    for message in messages
+      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{message}</messageML>", 'MESSAGEML')
 
   run: =>
     @robot.logger.info "Initialising..."
@@ -52,22 +54,41 @@ class SymphonyAdapter extends Adapter
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @symphony.getUser, {maxAge: 3600000, length: 1}
-    @userLookup = (userId) => hourlyRefresh userId
-    @symphony.createDatafeed()
+    @userLookup = (userId, streamId) =>
+      user = hourlyRefresh userId
+      user
+        .then (response) =>
+          # record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
+          existing = @robot.brain.userForId(userId)
+          existing['name'] = response.userAttributes?.userName
+          existing['displayName'] = response.userAttributes?.displayName
+          existing['emailAddress'] = response.userAttributes?.emailAddress
+          existing['room'] = streamId
+          @robot.brain.userForId(userId, existing)
+      user
+    @_createDatafeed()
       .then (response) =>
-        @robot.logger.info "Created datafeed: #{response.id}"
-        this.on 'poll', @_pollDatafeed
         @emit 'connected'
         @robot.logger.debug "'connected' event emitted"
-        @emit 'poll', response.id
-        @robot.logger.debug "First 'poll' event emitted"
-      .fail (err) =>
-        @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
     return
 
   close: =>
     @robot.logger.debug 'Removing datafeed poller'
     this.removeListener 'poll', @_pollDatafeed
+
+  _createDatafeed: =>
+    @symphony.createDatafeed()
+      .then (response) =>
+        if response.id?
+          @robot.logger.info "Created datafeed: #{response.id}"
+          this.removeAllListeners 'poll'
+          this.on 'poll', @_pollDatafeed
+          @emit 'poll', response.id
+          @robot.logger.debug "First 'poll' event emitted"
+        else
+          @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
+      .fail (err) =>
+        @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
 
   _pollDatafeed: (id) =>
     # defer execution to ensure we don't go into an infinite polling loop
@@ -76,7 +97,7 @@ class SymphonyAdapter extends Adapter
       @symphony.readDatafeed(id)
         .then (response) =>
           if response?
-            @robot.logger.debug "Received #{response.length} datafeed messages"
+            @robot.logger.debug "Received #{response.length ? 0} datafeed messages"
             @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
           @emit 'poll', id
         .fail (err) =>
@@ -84,7 +105,7 @@ class SymphonyAdapter extends Adapter
 
   _receiveMessage: (message) =>
     if message.fromUserId != @robot.userId
-      @userLookup(message.fromUserId)
+      @userLookup(message.fromUserId, message.streamId)
         .then (response) =>
           v2 = new V2Message(response, message)
           @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
