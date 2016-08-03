@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-{Response} = require 'hubot'
+{Response, User} = require 'hubot'
 EventEmitter = require 'events'
 Log = require('log')
 logger = new Log process.env.HUBOT_SYMPHONY_LOG_LEVEL or process.env.HUBOT_LOG_LEVEL or 'info'
@@ -37,9 +37,13 @@ class FakeRobot extends EventEmitter
     @users = {}
     @brain = {
       userForId: (id, options) =>
-        @logger.debug "Storing userId #{id} = #{JSON.stringify(options)}"
         user = @users[id]
         unless user
+          @logger.debug "Creating userId #{id} = #{JSON.stringify(options)}"
+          user = new User id, options
+          @users[id] = user
+        if options and options.room and (!user.room or user.room isnt options.room)
+          @logger.debug "Updating userId #{id} = #{JSON.stringify(options)}"
           user = new User id, options
           @users[id] = user
         user

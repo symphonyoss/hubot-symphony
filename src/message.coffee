@@ -14,24 +14,13 @@
 #    limitations under the License.
 #
 
-{TextMessage, User} = require 'hubot'
+{TextMessage} = require 'hubot'
 
 class V2Message extends TextMessage
 
-  constructor: (@symphonyUser, @symphonyMessage) ->
-    super(
-      new User(
-        @symphonyMessage.fromUserId
-        {
-          name: @symphonyUser.userAttributes?.userName
-          displayName: @symphonyUser.userAttributes?.displayName
-          emailAddress: @symphonyUser.userAttributes?.emailAddress
-          room: @symphonyMessage.streamId
-        }
-      ),
-      @_getMessageText(@symphonyMessage),
-      @symphonyMessage.id
-    )
+  constructor: (user, @symphonyMessage) ->
+    super(user, @_getMessageText(@symphonyMessage), @symphonyMessage.id)
+    @room = @symphonyMessage.streamId
 
   _getMessageText: (symphonyMessage) ->
     match = /<messageML>(.*)<\/messageML>/i.exec symphonyMessage.message

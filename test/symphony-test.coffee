@@ -132,10 +132,9 @@ describe 'Object model test suite', () ->
         fromUserId: 12345
       }
       user = {
-        userAttributes: {
-          userName: 'johndoe'
-          displayName: 'John Doe'
-        }
+        id: 12345
+        name: 'johndoe'
+        displayName: 'John Doe'
       }
       v2 = new V2Message(user, msg)
       assert.equal('Hello World', v2.text)
@@ -154,10 +153,9 @@ describe 'Object model test suite', () ->
       fromUserId: 12345
     }
     user = {
-      userAttributes: {
-        userName: 'johndoe'
-        displayName: 'John Doe'
-      }
+      id: 12345
+      name: 'johndoe'
+      displayName: 'John Doe'
     }
     robot = new FakeRobot
     callback = (response) =>
