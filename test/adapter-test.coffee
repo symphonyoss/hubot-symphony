@@ -101,3 +101,21 @@ describe 'Adapter test suite', () ->
       assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email=\"johndoe@symphony.com\"/> foo bar baz</messageML>").length, 1)
       done()
     adapter.run()
+
+  it 'should escape xml chars in reply', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      envelope = {
+        room: nock.streamId
+        user: {
+          emailAddress: 'johndoe@symphony.com'
+        }
+      }
+      adapter.reply(envelope, '<&>')
+      adapter.close()
+    nock.on 'received', () ->
+      assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email=\"johndoe@symphony.com\"/> &lt;&amp;&gt;</messageML>").length, 1)
+      done()
+    adapter.run()

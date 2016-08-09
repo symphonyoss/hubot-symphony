@@ -19,6 +19,8 @@
 Symphony = require './symphony'
 {V2Message} = require './message'
 memoize = require 'memoizee'
+Entities = require('html-entities').XmlEntities
+entities = new Entities()
 
 class SymphonyAdapter extends Adapter
 
@@ -39,7 +41,7 @@ class SymphonyAdapter extends Adapter
   reply: (envelope, messages...) ->
     @robot.logger.debug "Reply"
     for message in messages
-      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{message}</messageML>", 'MESSAGEML')
+      @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{entities.encode(message)}</messageML>", 'MESSAGEML')
 
   run: =>
     @robot.logger.info "Initialising..."
@@ -91,6 +93,7 @@ class SymphonyAdapter extends Adapter
           @emit 'poll', id
         .fail (err) =>
           @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
+          @_createDatafeed()
 
   _receiveMessage: (message) =>
     if message.fromUserId != @robot.userId
