@@ -1,5 +1,5 @@
 {
-  "name": "hubot-symphony",
+  "name": "@symphonyoss/hubot-symphony",
   "description": "Hubot adapter for Symphony",
   "main": "src/adapter.coffee",
   "scripts": {
