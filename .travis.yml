@@ -8,10 +8,6 @@ node_js:
 before_script:
   - npm prune
 
-env:
-  global:
-  - secure: "GK8iLWyNkKQok7tWJwwxA2eVowpdJSMrOElMVCJ+3/ZUDL6QG+AN8jQzgajkqja4x/UtOBscORvkF/CJ6fgn1IU8W3CF9odcEAp9e36sREnHshpenDHgahPI/jD1dOnu2QBIe+nLivZxHkncB477keIesS14yHXVjv+UQf9KTEWL0tuZXtIH6DhOjKhnRwY9+ArXpAyAT9Txt2ESv6qIYEUVGgqa7Sx3NJXP/cnTzacEvDeM54JntD6umA1IgGHcMQ1oLngVIn6brWo7bR+AkOTfj7g9Pm4vBjHsKWzBqLQA6Pio1RfPBhSUSUSJxZJM/7cvHBX90paegvl/FXoIjIST+0BT4VhHkHgSDYBeNmv1uaYq4IL25TzSj4CnLCY5zOBx9KPrzW3pBnqU7tSt1TwnUJTFZ3vGDyvO4DuYmYTm/ziLJrViY0znmhkwi5+ffUcizrUN/GFcWD0CpgGtMMKmKGeZbDDj9hicRykeV66OwnMG4NgYC0ty7/Bfw9nqDHSjiTPQdA+AmhZD7ILSmWYUuR/7Y+gqi2y5z2zNU3VbIN3FbAljPgqBNrWbafcQrv9szqPsPeX1noZPIJG4W3moIdgA+aonB7axf+xCugubjXBJJZREDyCribURywfZivcgg6YpiQfymyGglZ8AZZKSDTWSo8VBrbmz2WqoIgc="
-
 script:
   - npm run-script test-cov
 
