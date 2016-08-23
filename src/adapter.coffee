@@ -89,7 +89,7 @@ class SymphonyAdapter extends Adapter
         .then (response) =>
           if response?
             @robot.logger.debug "Received #{response.length ? 0} datafeed messages"
-            @_receiveMessage msg for msg in response when msg.v2messageType = 'V2Message'
+            @_receiveMessage msg for msg in response when msg.v2messageType is 'V2Message'
           @emit 'poll', id
         .fail (err) =>
           @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
