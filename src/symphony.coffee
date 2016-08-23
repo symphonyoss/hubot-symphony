@@ -34,60 +34,60 @@ class Symphony
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
   echo: (body) =>
-    @_httpAgentPost('/agent/v1/util/echo', body)
+    @_httpAgentPost('/agent/v1/util/echo', true, body)
 
   whoAmI: =>
-    @_httpPodGet('/pod/v1/sessioninfo')
+    @_httpPodGet('/pod/v1/sessioninfo', true)
 
   getUser: (userId) =>
-    @_httpPodGet('/pod/v1/admin/user/' + userId)
+    @_httpPodGet('/pod/v1/admin/user/' + userId, true)
 
   sendMessage: (streamId, message, format) =>
     body = {
       message: message
       format: format
     }
-    @_httpAgentPost('/agent/v2/stream/' + streamId + '/message/create', body)
+    @_httpAgentPost('/agent/v2/stream/' + streamId + '/message/create', true, body)
 
   getMessages: (streamId, since, limit = 100) =>
-    @_httpAgentGet('/agent/v2/stream/' + streamId + '/message')
+    @_httpAgentGet('/agent/v2/stream/' + streamId + '/message', true)
 
   createDatafeed: =>
-    @_httpAgentPost('/agent/v1/datafeed/create')
+    @_httpAgentPost('/agent/v1/datafeed/create', true)
 
   readDatafeed: (datafeedId) =>
-    @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read')
+    @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read',  false)
 
-  _httpPodGet: (path, body) =>
+  _httpPodGet: (path, failUnlessHttp200) =>
     @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
-      @_httpGet(path, headers)
+      @_httpGet(path, headers, failUnlessHttp200)
 
-  _httpAgentGet: (path, body) =>
+  _httpAgentGet: (path, failUnlessHttp200) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpGet(path, headers)
+      @_httpGet(path, headers, failUnlessHttp200)
 
-  _httpAgentPost: (path, body) =>
+  _httpAgentPost: (path, failUnlessHttp200, body) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpPost(path, headers, body)
+      @_httpPost(path, headers, failUnlessHttp200, body)
 
-  _httpGet: (path, headers = {}) =>
-    @_httpRequest('GET', path, headers)
+  _httpGet: (path, headers = {}, failUnlessHttp200) =>
+    @_httpRequest('GET', path, headers, failUnlessHttp200)
 
-  _httpPost: (path, headers = {}, body) =>
-    @_httpRequest('POST', path, headers, body)
+  _httpPost: (path, headers = {}, failUnlessHttp200, body) =>
+    @_httpRequest('POST', path, headers, failUnlessHttp200, body)
 
-  _httpRequest: (method, path, headers, body) =>
+  _httpRequest: (method, path, headers, failUnlessHttp200, body) =>
     deferred = Q.defer()
     options = {
       baseUrl: 'https://' + @host
@@ -107,8 +107,13 @@ class Symphony
         logger.warning "received #{res?.statusCode} error response from #{path}: #{err}"
         deferred.reject(new Error(err))
       else
-        logger.debug "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
-        deferred.resolve data
+        if failUnlessHttp200 && res?.statusCode // 100 != 2
+          err = "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
+          logger.warning err
+          deferred.reject new Error(err)
+        else
+          logger.debug "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
+          deferred.resolve data
     )
     deferred.promise
 

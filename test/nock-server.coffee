@@ -36,6 +36,10 @@ class NockServer extends EventEmitter
 
     @datafeedId = 1234
 
+    @datafeedCreateHttp400Count = 0
+
+    @datafeedReadHttp400Count = 0
+
     @messages = []
     if startWithHelloWorldMessage
       @messages.push({
@@ -125,12 +129,18 @@ class NockServer extends EventEmitter
       .get('/agent/v2/stream/' + @streamId + '/message')
       .reply(200, (uri, requestBody) => JSON.stringify(@messages))
       .post('/agent/v1/datafeed/create')
-      .reply(200, {
-        id: @datafeedId
-      })
+      .reply (uri, requestBody) =>
+        if @datafeedCreateHttp400Count-- > 0
+          [400, null]
+        else
+          [200, JSON.stringify {
+            id: @datafeedId
+          }]
       .get('/agent/v2/datafeed/' + @datafeedId + '/read')
       .reply (uri, requestBody) =>
-        if @messages.length == 0
+        if @datafeedReadHttp400Count-- > 0
+          [400, null]
+        else if @messages.length == 0
           [204, null]
         else
           copy = @messages

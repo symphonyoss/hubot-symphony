@@ -119,3 +119,21 @@ describe 'Adapter test suite', () ->
       assert.isAtLeast((m for m in nock.messages when m.message is "<messageML><mention email=\"johndoe@symphony.com\"/> &lt;&amp;&gt;</messageML>").length, 1)
       done()
     adapter.run()
+
+  it 'should ignore http 400 errors when reading datafeed', (done) ->
+    nock.datafeedReadHttp400Count = 1
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      robot.on 'received', () ->
+        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
+        adapter.close()
+        done()
+    adapter.run()
+
+  it 'should exit datafeed cannot be created', (done) ->
+    nock.datafeedCreateHttp400Count = 1
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use robot, -> done()
+    adapter.run()
