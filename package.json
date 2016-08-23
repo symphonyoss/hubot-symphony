@@ -26,7 +26,6 @@
   "homepage": "https://github.com/symphonyoss/hubot-symphony",
   "dependencies": {
     "backoff": "^2.5.0",
-    "fs": "0.0.2",
     "html-entities": "^1.2.0",
     "log": "^1.4.0",
     "memoizee": "^0.4.1",
