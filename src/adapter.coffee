@@ -45,7 +45,12 @@ class SymphonyAdapter extends Adapter
 
   run: =>
     @robot.logger.info "Initialising..."
-    @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY, process.env.HUBOT_SYMPHONY_PASSPHRASE)
+    host = process.env.HUBOT_SYMPHONY_HOST
+    privateKey = process.env.HUBOT_SYMPHONY_PRIVATE_KEY
+    publicKey = process.env.HUBOT_SYMPHONY_PUBLIC_KEY
+    passprhase = process.env.HUBOT_SYMPHONY_PASSPHRASE
+    keyManagerHost = process.env.HUBOT_SYMPHONY_KM_HOST ? host
+    @symphony = new Symphony(host, privateKey, publicKey, passprhase, keyManagerHost)
     @symphony.whoAmI()
       .then (response) =>
         @robot.userId = response.userId

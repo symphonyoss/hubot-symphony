@@ -23,7 +23,8 @@ uuid = require 'node-uuid'
 
 class NockServer extends EventEmitter
 
-  constructor: (@host, startWithHelloWorldMessage = true) ->
+  constructor: (@host, @kmHost, startWithHelloWorldMessage = true) ->
+    @kmHost = @kmHost ? @host
     logger.info "Setting up mocks for #{@host}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
@@ -60,15 +61,18 @@ class NockServer extends EventEmitter
         name: 'sessionToken'
         token: 'SESSION_TOKEN'
       })
-      .post('/keyauth/v1/authenticate')
-      .reply(200, {
-        name: 'keyManagerToken'
-        token: 'KEY_MANAGER_TOKEN'
-      })
       .post('/agent/v1/util/echo')
       .reply(401, {
         code: 401
         message: 'Invalid session'
+      })
+    @keyAuthScope = nock(@kmHost)
+      .matchHeader('sessionToken', (val) -> !val?)
+      .matchHeader('keyManagerToken', (val) -> !val?)
+      .post('/keyauth/v1/authenticate')
+      .reply(200, {
+        name: 'keyManagerToken'
+        token: 'KEY_MANAGER_TOKEN'
       })
 
     @podScope = nock(@host)

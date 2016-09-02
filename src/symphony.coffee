@@ -24,12 +24,15 @@ memoize = require 'memoizee'
 
 class Symphony
 
-  constructor: (@host, @privateKey, @publicKey, @passphrase) ->
+  constructor: (@host, @privateKey, @publicKey, @passphrase, @keyManagerHost) ->
+    @keyManagerHost = @keyManagerHost ? @host
     logger.info "Connecting to #{@host}"
+    if @keyManagerHost isnt @host
+      logger.info "Using separate KeyManager #{@keyManagerHost}"
     # refresh tokens on a weekly basis
-    weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 1}
-    @sessionAuth = => weeklyRefresh '/sessionauth/v1/authenticate'
-    @keyAuth = => weeklyRefresh '/keyauth/v1/authenticate'
+    weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
+    @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
+    @keyAuth = => weeklyRefresh @keyManagerHost, '/keyauth/v1/authenticate'
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
@@ -63,7 +66,7 @@ class Symphony
       headers = {
         sessionToken: value.token
       }
-      @_httpGet(path, headers, failUnlessHttp200)
+      @_httpGet(@host, path, headers, failUnlessHttp200)
 
   _httpAgentGet: (path, failUnlessHttp200) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
@@ -71,7 +74,7 @@ class Symphony
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpGet(path, headers, failUnlessHttp200)
+      @_httpGet(@host, path, headers, failUnlessHttp200)
 
   _httpAgentPost: (path, failUnlessHttp200, body) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
@@ -79,18 +82,18 @@ class Symphony
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpPost(path, headers, failUnlessHttp200, body)
+      @_httpPost(@host, path, headers, failUnlessHttp200, body)
 
-  _httpGet: (path, headers = {}, failUnlessHttp200) =>
-    @_httpRequest('GET', path, headers, failUnlessHttp200)
+  _httpGet: (host, path, headers = {}, failUnlessHttp200) =>
+    @_httpRequest('GET', host, path, headers, failUnlessHttp200)
 
-  _httpPost: (path, headers = {}, failUnlessHttp200, body) =>
-    @_httpRequest('POST', path, headers, failUnlessHttp200, body)
+  _httpPost: (host, path, headers = {}, failUnlessHttp200, body) =>
+    @_httpRequest('POST', host, path, headers, failUnlessHttp200, body)
 
-  _httpRequest: (method, path, headers, failUnlessHttp200, body) =>
+  _httpRequest: (method, host, path, headers, failUnlessHttp200, body) =>
     deferred = Q.defer()
     options = {
-      baseUrl: 'https://' + @host
+      baseUrl: 'https://' + host
       url: path
       json: true
       headers: headers

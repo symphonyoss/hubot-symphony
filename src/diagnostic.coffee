@@ -20,7 +20,7 @@ Log = require('log')
 logger = new Log process.env.HUBOT_SYMPHONY_LOG_LEVEL or process.env.HUBOT_LOG_LEVEL or 'info'
 
 argv = require('yargs')
-  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]')
+  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com]')
   .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
   .argv
 
@@ -33,7 +33,7 @@ if argv.runOffline?
 
 logger.info "Running diagnostics against https://#{argv.host}"
 
-symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey, argv.passphrase)
+symphony = new Symphony(argv.host, argv.privateKey, argv.publicKey, argv.passphrase, argv.kmhost ? argv.host)
 
 logger.info 'Connection initiated, starting tests...'
 
