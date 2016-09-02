@@ -2,6 +2,9 @@ engines:
   coffeelint:
     enabled: true
     config: coffeelint.json
+    exclude_fingerprints:
+    - 96754c84f43c91090c5cbd8db1db582b
+    - ce6a82089724a66244f300c2e9918637
   fixme:
     enabled: true
 ratings:
