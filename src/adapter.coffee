@@ -24,8 +24,8 @@ entities = new Entities()
 
 class SymphonyAdapter extends Adapter
 
-  constructor: ->
-    super
+  constructor: (robot, @shutdownFunc) ->
+    super(robot)
     throw new Error('HUBOT_SYMPHONY_HOST undefined') unless process.env.HUBOT_SYMPHONY_HOST
     throw new Error('HUBOT_SYMPHONY_PUBLIC_KEY undefined') unless process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
@@ -45,7 +45,12 @@ class SymphonyAdapter extends Adapter
 
   run: =>
     @robot.logger.info "Initialising..."
-    @symphony = new Symphony(process.env.HUBOT_SYMPHONY_HOST, process.env.HUBOT_SYMPHONY_PRIVATE_KEY, process.env.HUBOT_SYMPHONY_PUBLIC_KEY, process.env.HUBOT_SYMPHONY_PASSPHRASE)
+    host = process.env.HUBOT_SYMPHONY_HOST
+    privateKey = process.env.HUBOT_SYMPHONY_PRIVATE_KEY
+    publicKey = process.env.HUBOT_SYMPHONY_PUBLIC_KEY
+    passprhase = process.env.HUBOT_SYMPHONY_PASSPHRASE
+    keyManagerHost = process.env.HUBOT_SYMPHONY_KM_HOST ? host
+    @symphony = new Symphony(host, privateKey, publicKey, passprhase, keyManagerHost)
     @symphony.whoAmI()
       .then (response) =>
         @robot.userId = response.userId
@@ -80,6 +85,7 @@ class SymphonyAdapter extends Adapter
           @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
+        @shutdownFunc()
 
   _pollDatafeed: (id) =>
     # defer execution to ensure we don't go into an infinite polling loop
@@ -117,5 +123,7 @@ class SymphonyAdapter extends Adapter
         @robot.brain.userForId(userId, existing)
         existing
 
-exports.use = (robot) ->
-  new SymphonyAdapter robot
+exports.use = (robot, shutdownFunc) ->
+  new SymphonyAdapter robot, shutdownFunc ? () ->
+    @robot.logger.info 'Shutting down...'
+    process.exit 1

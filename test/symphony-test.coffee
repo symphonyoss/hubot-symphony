@@ -21,6 +21,26 @@ Symphony = require '../src/symphony'
 NockServer = require './nock-server'
 {FakeRobot} = require './fakes'
 
+describe 'On-premise key manager', () ->
+  nock = null
+  symphony = null
+
+  beforeEach ->
+    nock = new NockServer('https://foundation.symphony.com', 'https://keymanager.notsymphony.com')
+    symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit', 'keymanager.notsymphony.com')
+
+  afterEach ->
+    nock.close()
+
+  it 'should connect to separate key manager url', () ->
+    msg = { foo: 'bar' }
+    symphony.echo(msg)
+      .then (response) ->
+        assert.deepEqual(msg, response)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+
 describe 'REST API test suite', () ->
   nock = null
   symphony = null

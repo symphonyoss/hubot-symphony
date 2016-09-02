@@ -23,7 +23,8 @@ uuid = require 'node-uuid'
 
 class NockServer extends EventEmitter
 
-  constructor: (@host, startWithHelloWorldMessage = true) ->
+  constructor: (@host, @kmHost, startWithHelloWorldMessage = true) ->
+    @kmHost = @kmHost ? @host
     logger.info "Setting up mocks for #{@host}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
@@ -35,6 +36,10 @@ class NockServer extends EventEmitter
     @botUserId = 7696581411197
 
     @datafeedId = 1234
+
+    @datafeedCreateHttp400Count = 0
+
+    @datafeedReadHttp400Count = 0
 
     @messages = []
     if startWithHelloWorldMessage
@@ -56,15 +61,18 @@ class NockServer extends EventEmitter
         name: 'sessionToken'
         token: 'SESSION_TOKEN'
       })
-      .post('/keyauth/v1/authenticate')
-      .reply(200, {
-        name: 'keyManagerToken'
-        token: 'KEY_MANAGER_TOKEN'
-      })
       .post('/agent/v1/util/echo')
       .reply(401, {
         code: 401
         message: 'Invalid session'
+      })
+    @keyAuthScope = nock(@kmHost)
+      .matchHeader('sessionToken', (val) -> !val?)
+      .matchHeader('keyManagerToken', (val) -> !val?)
+      .post('/keyauth/v1/authenticate')
+      .reply(200, {
+        name: 'keyManagerToken'
+        token: 'KEY_MANAGER_TOKEN'
       })
 
     @podScope = nock(@host)
@@ -125,12 +133,18 @@ class NockServer extends EventEmitter
       .get('/agent/v2/stream/' + @streamId + '/message')
       .reply(200, (uri, requestBody) => JSON.stringify(@messages))
       .post('/agent/v1/datafeed/create')
-      .reply(200, {
-        id: @datafeedId
-      })
+      .reply (uri, requestBody) =>
+        if @datafeedCreateHttp400Count-- > 0
+          [400, null]
+        else
+          [200, JSON.stringify {
+            id: @datafeedId
+          }]
       .get('/agent/v2/datafeed/' + @datafeedId + '/read')
       .reply (uri, requestBody) =>
-        if @messages.length == 0
+        if @datafeedReadHttp400Count-- > 0
+          [400, null]
+        else if @messages.length == 0
           [204, null]
         else
           copy = @messages

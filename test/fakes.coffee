@@ -22,6 +22,10 @@ logger = new Log process.env.HUBOT_SYMPHONY_LOG_LEVEL or process.env.HUBOT_LOG_L
 class FakeRobot extends EventEmitter
   
   constructor: ->
+    # echo any errors
+    @on 'error', (err) ->
+      logger.error err
+
     # noop the logging
     @logs = {}
     @logger = {
