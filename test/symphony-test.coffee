@@ -127,7 +127,7 @@ describe 'REST API test suite', () ->
           assert.equal(1, response.length)
           assert.equal(msg2, response[0].message)
       .fail (error) ->
-        assert.fail(0, 1,"Failed with error #{error}")
+        assert.fail(0, 1, "Failed with error #{error}")
 
   it 'readDatafeed should not fail if no messages are available', () ->
     symphony.createDatafeed()

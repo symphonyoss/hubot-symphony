@@ -19,17 +19,47 @@
 Symphony = require './symphony'
 {V2Message} = require './message'
 memoize = require 'memoizee'
+backoff = require 'backoff'
 Entities = require('html-entities').XmlEntities
 entities = new Entities()
 
 class SymphonyAdapter extends Adapter
 
-  constructor: (robot, @shutdownFunc) ->
+  constructor: (robot, @options = {}) ->
     super(robot)
     throw new Error('HUBOT_SYMPHONY_HOST undefined') unless process.env.HUBOT_SYMPHONY_HOST
     throw new Error('HUBOT_SYMPHONY_PUBLIC_KEY undefined') unless process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     throw new Error('HUBOT_SYMPHONY_PRIVATE_KEY undefined') unless process.env.HUBOT_SYMPHONY_PRIVATE_KEY
     throw new Error('HUBOT_SYMPHONY_PASSPHRASE undefined') unless process.env.HUBOT_SYMPHONY_PASSPHRASE
+
+    @expBackoff = backoff.exponential(initialDelay: 10, maxDelay: 60000)
+    @expBackoff.on 'backoff', (num, delay) =>
+      if num > 0
+        @robot.logger.info "Re-attempting to create datafeed - attempt #{num} after #{delay}ms"
+    @expBackoff.on 'ready', (num, delay) =>
+      @symphony.createDatafeed()
+        .then (response) =>
+          if response.id?
+            @robot.logger.info "Created datafeed: #{response.id}"
+            this.removeAllListeners 'poll'
+            this.on 'poll', @_pollDatafeed
+            @emit 'poll', response.id
+            @robot.logger.debug "First 'poll' event emitted"
+            @emit 'connected'
+            @robot.logger.debug "'connected' event emitted"
+            @expBackoff.reset()
+          else
+            @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
+            @expBackoff.backoff()
+        .fail (err) =>
+          @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
+          @expBackoff.backoff()
+    @expBackoff.on 'fail', () =>
+      @robot.logger.info 'Shutting down...'
+      @options.shutdownFunc()
+    failAfter = @options.failConnectAfter ? 23 # will time out reconnecting after ~10min
+    @robot.logger.info "Reconnect attempts = #{failAfter}"
+    @expBackoff.failAfter(failAfter)
 
   send: (envelope, messages...) ->
     @robot.logger.debug "Send"
@@ -63,9 +93,6 @@ class SymphonyAdapter extends Adapter
     hourlyRefresh = memoize @_getUser, {maxAge: 3600000, length: 2}
     @userLookup = (userId, streamId) => hourlyRefresh userId, streamId
     @_createDatafeed()
-      .then (response) =>
-        @emit 'connected'
-        @robot.logger.debug "'connected' event emitted"
     return
 
   close: =>
@@ -73,19 +100,7 @@ class SymphonyAdapter extends Adapter
     this.removeListener 'poll', @_pollDatafeed
 
   _createDatafeed: =>
-    @symphony.createDatafeed()
-      .then (response) =>
-        if response.id?
-          @robot.logger.info "Created datafeed: #{response.id}"
-          this.removeAllListeners 'poll'
-          this.on 'poll', @_pollDatafeed
-          @emit 'poll', response.id
-          @robot.logger.debug "First 'poll' event emitted"
-        else
-          @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
-      .fail (err) =>
-        @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
-        @shutdownFunc()
+    @expBackoff.backoff()
 
   _pollDatafeed: (id) =>
     # defer execution to ensure we don't go into an infinite polling loop
@@ -123,7 +138,7 @@ class SymphonyAdapter extends Adapter
         @robot.brain.userForId(userId, existing)
         existing
 
-exports.use = (robot, shutdownFunc) ->
-  new SymphonyAdapter robot, shutdownFunc ? () ->
-    @robot.logger.info 'Shutting down...'
+exports.use = (robot, options = {}) ->
+  options.shutdownFunc = options.shutdownFunc ? () ->
     process.exit 1
+  new SymphonyAdapter robot, options
