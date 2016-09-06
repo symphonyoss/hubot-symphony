@@ -110,7 +110,7 @@ class Symphony
         logger.warning "received #{res?.statusCode} error response from #{path}: #{err}"
         deferred.reject(new Error(err))
       else
-        if failUnlessHttp200 && res?.statusCode // 100 != 2
+        if failUnlessHttp200 && Math.floor(res?.statusCode / 100) != 2
           err = "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
           logger.warning err
           deferred.reject new Error(err)
