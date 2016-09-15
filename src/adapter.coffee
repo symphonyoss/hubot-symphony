@@ -86,8 +86,8 @@ class SymphonyAdapter extends Adapter
         @robot.userId = response.userId
         @symphony.getUser(response.userId)
         .then (response) =>
-          @robot.displayName = response.userAttributes?.displayName
-          @robot.logger.info "Connected as #{response.userAttributes?.displayName} [#{response.userSystemInfo?.status}]"
+          @robot.displayName = response.displayName
+          @robot.logger.info "Connected as #{response.displayName}"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @_getUser, {maxAge: 3600000, length: 2}
@@ -131,9 +131,9 @@ class SymphonyAdapter extends Adapter
       .then (response) =>
         # record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
         existing = @robot.brain.userForId(userId)
-        existing['name'] = response.userAttributes?.userName
-        existing['displayName'] = response.userAttributes?.displayName
-        existing['emailAddress'] = response.userAttributes?.emailAddress
+        existing['name'] = response.userName
+        existing['displayName'] = response.displayName
+        existing['emailAddress'] = response.emailAddress
         existing['room'] = streamId
         @robot.brain.userForId(userId, existing)
         existing

@@ -57,7 +57,7 @@ userId = symphony.whoAmI()
     logger.info "UserId: #{response.userId}"
     symphony.getUser(response.userId)
   .then (response) =>
-    logger.info "My name is #{response.userAttributes?.displayName} [#{response.userAttributes?.emailAddress}] and I'm #{response.userSystemInfo?.status}"
+    logger.info "My name is #{response.displayName} [#{response.emailAddress}]"
   .fail (err) =>
     logger.error "Failed to fetch userId: #{err}"
   .done
