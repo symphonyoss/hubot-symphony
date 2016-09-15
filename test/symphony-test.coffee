@@ -70,7 +70,7 @@ describe 'REST API test suite', () ->
   it 'getUser should expose user details', () ->
     symphony.getUser(nock.realUserId)
       .then (response) ->
-        assert.equal('johndoe@symphony.com', response.userAttributes.emailAddress)
+        assert.equal('johndoe@symphony.com', response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 

@@ -43,23 +43,23 @@ class Symphony
     @_httpPodGet('/pod/v1/sessioninfo', true)
 
   getUser: (userId) =>
-    @_httpPodGet('/pod/v1/admin/user/' + userId, true)
+    @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true", true)
 
   sendMessage: (streamId, message, format) =>
     body = {
       message: message
       format: format
     }
-    @_httpAgentPost('/agent/v2/stream/' + streamId + '/message/create', true, body)
+    @_httpAgentPost("/agent/v2/stream/#{streamId}/message/create", true, body)
 
   getMessages: (streamId, since, limit = 100) =>
-    @_httpAgentGet('/agent/v2/stream/' + streamId + '/message', true)
+    @_httpAgentGet("/agent/v2/stream/#{streamId}/message", true)
 
   createDatafeed: =>
     @_httpAgentPost('/agent/v1/datafeed/create', true)
 
   readDatafeed: (datafeedId) =>
-    @_httpAgentGet('/agent/v2/datafeed/' + datafeedId + '/read',  false)
+    @_httpAgentGet("/agent/v2/datafeed/#{datafeedId}/read",  false)
 
   _httpPodGet: (path, failUnlessHttp200) =>
     @sessionAuth().then (value) =>

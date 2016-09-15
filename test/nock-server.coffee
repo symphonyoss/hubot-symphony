@@ -83,31 +83,23 @@ class NockServer extends EventEmitter
       .reply(200, {
         userId: @botUserId
       })
-      .get('/pod/v1/admin/user/' + @realUserId)
+      .get("/pod/v2/user?uid=#{@realUserId}&local=true")
       .reply(200, {
-        userAttributes: {
-          emailAddress: 'johndoe@symphony.com'
-          firstName: 'John'
-          lastName: 'Doe'
-          userName: 'johndoe'
-          displayName: 'John Doe'
-        }
-        userSystemInfo: {
-          id: @realUserId
-        }
+        id: @realUserId
+        emailAddress: 'johndoe@symphony.com'
+        firstName: 'John'
+        lastName: 'Doe'
+        userName: 'johndoe'
+        displayName: 'John Doe'
       })
-      .get('/pod/v1/admin/user/' + @botUserId)
+      .get("/pod/v2/user?uid=#{@botUserId}&local=true")
       .reply(200, {
-        userAttributes: {
-          emailAddress: 'mozart@symphony.com'
-          firstName: 'Wolfgang Amadeus'
-          lastName: 'Mozart'
-          userName: 'mozart'
-          displayName: 'Mozart'
-        }
-        userSystemInfo: {
-          id: @realUserId
-        }
+        id: @realUserId
+        emailAddress: 'mozart@symphony.com'
+        firstName: 'Wolfgang Amadeus'
+        lastName: 'Mozart'
+        userName: 'mozart'
+        displayName: 'Mozart'
       })
 
     @agentScope = nock(@host)
@@ -116,7 +108,7 @@ class NockServer extends EventEmitter
       .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
       .post('/agent/v1/util/echo')
       .reply(200, (uri, requestBody) -> requestBody)
-      .post('/agent/v2/stream/' + @streamId + '/message/create')
+      .post("/agent/v2/stream/#{@streamId}/message/create")
       .reply(200, (uri, requestBody) =>
         message = {
           id: uuid.v1()
@@ -130,7 +122,7 @@ class NockServer extends EventEmitter
         @_receiveMessage message
         message
       )
-      .get('/agent/v2/stream/' + @streamId + '/message')
+      .get("/agent/v2/stream/#{@streamId}/message")
       .reply(200, (uri, requestBody) => JSON.stringify(@messages))
       .post('/agent/v1/datafeed/create')
       .reply (uri, requestBody) =>
@@ -140,7 +132,7 @@ class NockServer extends EventEmitter
           [200, JSON.stringify {
             id: @datafeedId
           }]
-      .get('/agent/v2/datafeed/' + @datafeedId + '/read')
+      .get("/agent/v2/datafeed/#{@datafeedId}/read")
       .reply (uri, requestBody) =>
         if @datafeedReadHttp400Count-- > 0
           [400, null]
