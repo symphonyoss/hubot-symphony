@@ -27,7 +27,9 @@ There is also an optional argument which should be used if you are running an on
 
 These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
 
-If you want to send a rich message you can call send with an Object instead of a String
+### Non-standard messaging
+
+If you want to send a rich message you can call send with an Object instead of a String:
 ```
 module.exports = (robot) ->
   robot.respond /pug me/i, (msg) ->
@@ -40,6 +42,18 @@ module.exports = (robot) ->
           text: "<messageML><a href=\"#{pug}\"/></messageML>"
         }
 ```
+The various supported tags are documented [here](https://rest-api.symphony.com/docs/message-format).
+
+If you want to send a direct message to a user in response to a webhook you can interact with the adaptor via the robot variable:
+```
+module.exports = (robot) ->
+  robot.router.post '/hubot/webhook', (req, res) ->
+    email = req.params.email
+    message = req.params.message
+    robot.adapter.sendDirectMessageToEmail(email, message)
+    res.send 'OK'
+```
+
 
 ### Diagnostics
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:

@@ -32,8 +32,30 @@ class NockServer extends EventEmitter
     @firstMessageTimestamp = 1461808889185
 
     @realUserId = 7215545078229
+    @realUserName = 'johndoe'
+    @realUserEmail = 'johndoe@symphony.com'
+
+    @realUserObject = {
+      id: @realUserId
+      emailAddress: @realUserEmail
+      firstName: 'John'
+      lastName: 'Doe'
+      userName: @realUserName
+      displayName: 'John Doe'
+    }
 
     @botUserId = 7696581411197
+    @botUserName = 'mozart'
+    @botUserEmail = 'mozart@symphony.com'
+
+    @botUserObject = {
+      id: @realUserId
+      emailAddress: @botUserEmail
+      firstName: 'Wolfgang Amadeus'
+      lastName: 'Mozart'
+      userName: @botUserName
+      displayName: 'Mozart'
+    }
 
     @datafeedId = 1234
 
@@ -84,22 +106,20 @@ class NockServer extends EventEmitter
         userId: @botUserId
       })
       .get("/pod/v2/user?uid=#{@realUserId}&local=true")
-      .reply(200, {
-        id: @realUserId
-        emailAddress: 'johndoe@symphony.com'
-        firstName: 'John'
-        lastName: 'Doe'
-        userName: 'johndoe'
-        displayName: 'John Doe'
-      })
+      .reply(200, @realUserObject)
+      .get("/pod/v2/user?email=#{@realUserEmail}&local=true")
+      .reply(200, @realUserObject)
+      .get("/pod/v2/user?username=#{@realUserName}&local=true")
+      .reply(200, @realUserObject)
       .get("/pod/v2/user?uid=#{@botUserId}&local=true")
+      .reply(200, @botUserObject)
+      .get("/pod/v2/user?email=#{@botUserEmail}&local=true")
+      .reply(200, @botUserObject)
+      .get("/pod/v2/user?username=#{@botUserName}&local=true")
+      .reply(200, @botUserObject)
+      .post('/pod/v1/im/create', [@realUserId])
       .reply(200, {
-        id: @realUserId
-        emailAddress: 'mozart@symphony.com'
-        firstName: 'Wolfgang Amadeus'
-        lastName: 'Mozart'
-        userName: 'mozart'
-        displayName: 'Mozart'
+        id: @streamId
       })
 
     @agentScope = nock(@host)
@@ -148,6 +168,7 @@ class NockServer extends EventEmitter
     nock.cleanAll()
 
   _receiveMessage: (msg) =>
+    logger.debug "Received #{JSON.stringify(msg)}"
     @messages.push(msg)
     @emit 'received'
 
