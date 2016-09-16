@@ -34,7 +34,7 @@ describe 'Constructor test', () ->
       assert.throws(SymphonyAdapter.use, new RegExp("#{constructorProp} undefined"))
       process.env[constructorProp] = prop
 
-describe 'Adapter test suite', () ->
+describe 'Adapter test suite with helloWorld message', () ->
   nock = null
   symphony = null
 
@@ -54,6 +54,40 @@ describe 'Adapter test suite', () ->
         adapter.close()
         done()
     adapter.run()
+
+  it 'should ignore http 400 errors when reading datafeed', (done) ->
+    nock.datafeedReadHttp400Count = 1
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      robot.on 'received', () ->
+        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
+        adapter.close()
+        done()
+    adapter.run()
+
+  it 'should retry if datafeed cannot be created', (done) ->
+    nock.datafeedCreateHttp400Count = 1
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use robot
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      robot.on 'received', () ->
+        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
+        adapter.close()
+        done()
+    adapter.run()
+
+describe 'Adapter test suite', () ->
+  nock = null
+  symphony = null
+
+  beforeEach ->
+    nock = new NockServer('https://foundation.symphony.com', 'https://foundation.symphony.com', false)
+
+  afterEach ->
+    nock.close()
 
   it 'should send with no adornment', (done) ->
     robot = new FakeRobot
@@ -120,30 +154,6 @@ describe 'Adapter test suite', () ->
       done()
     adapter.run()
 
-  it 'should ignore http 400 errors when reading datafeed', (done) ->
-    nock.datafeedReadHttp400Count = 1
-    robot = new FakeRobot
-    adapter = SymphonyAdapter.use(robot)
-    adapter.on 'connected', () ->
-      assert.isDefined(adapter.symphony)
-      robot.on 'received', () ->
-        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
-        adapter.close()
-        done()
-    adapter.run()
-
-  it 'should retry if datafeed cannot be created', (done) ->
-    nock.datafeedCreateHttp400Count = 1
-    robot = new FakeRobot
-    adapter = SymphonyAdapter.use robot
-    adapter.on 'connected', () ->
-      assert.isDefined(adapter.symphony)
-      robot.on 'received', () ->
-        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
-        adapter.close()
-        done()
-    adapter.run()
-
   it 'should exit datafeed cannot be created', (done) ->
     nock.datafeedCreateHttp400Count = 1
     robot = new FakeRobot
@@ -151,4 +161,28 @@ describe 'Adapter test suite', () ->
       shutdownFunc: -> done()
       failConnectAfter: 1
     }
+    adapter.run()
+
+  it 'should send direct message to username', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      adapter.sendDirectMessageToUsername(nock.realUserName, 'username message')
+      adapter.close()
+    nock.on 'received', () ->
+      assert.isAtLeast((m for m in nock.messages when m.message is 'username message').length, 1)
+      done()
+    adapter.run()
+
+  it 'should send direct message to email', (done) ->
+    robot = new FakeRobot
+    adapter = SymphonyAdapter.use(robot)
+    adapter.on 'connected', () ->
+      assert.isDefined(adapter.symphony)
+      adapter.sendDirectMessageToEmail(nock.realUserEmail, 'email message')
+      adapter.close()
+    nock.on 'received', () ->
+      assert.isAtLeast((m for m in nock.messages when m.message is 'email message').length, 1)
+      done()
     adapter.run()

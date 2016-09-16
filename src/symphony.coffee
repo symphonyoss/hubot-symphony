@@ -33,7 +33,7 @@ class Symphony
     weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
     @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
     @keyAuth = => weeklyRefresh @keyManagerHost, '/keyauth/v1/authenticate'
-    Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
+    Q.all([@sessionAuth(), @keyAuth()]).then (values) ->
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
   echo: (body) =>
@@ -42,8 +42,15 @@ class Symphony
   whoAmI: =>
     @_httpPodGet('/pod/v1/sessioninfo', true)
 
-  getUser: (userId) =>
-    @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true", true)
+  getUser: ({userId, userName, emailAddress}) =>
+    if userId?
+      @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true", true)
+    else if userName?
+      @_httpPodGet("/pod/v2/user?username=#{userName}&local=true", true)
+    else if emailAddress?
+      @_httpPodGet("/pod/v2/user?email=#{emailAddress}&local=true", true)
+    else
+      Q.reject('No user arguement supplied')
 
   sendMessage: (streamId, message, format) =>
     body = {
@@ -61,12 +68,22 @@ class Symphony
   readDatafeed: (datafeedId) =>
     @_httpAgentGet("/agent/v2/datafeed/#{datafeedId}/read",  false)
 
+  createIM: (userId) =>
+    @_httpPodPost('/pod/v1/im/create', true, [userId])
+
   _httpPodGet: (path, failUnlessHttp200) =>
     @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
       @_httpGet(@host, path, headers, failUnlessHttp200)
+
+  _httpPodPost: (path, failUnlessHttp200, body) =>
+    @sessionAuth().then (value) =>
+      headers = {
+        sessionToken: value.token
+      }
+      @_httpPost(@host, path, headers, failUnlessHttp200, body)
 
   _httpAgentGet: (path, failUnlessHttp200) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
@@ -105,7 +122,7 @@ class Symphony
     if body?
       options.body = body
 
-    request(options, (err, res, data) =>
+    request(options, (err, res, data) ->
       if err?
         logger.warning "received #{res?.statusCode} error response from #{path}: #{err}"
         deferred.reject(new Error(err))

@@ -62,14 +62,31 @@ class SymphonyAdapter extends Adapter
     @expBackoff.failAfter(failAfter)
 
   send: (envelope, messages...) ->
-    @robot.logger.debug "Send"
+    @robot.logger.debug "Send #{messages.length} messages to #{envelope.room}"
     for message in messages
       format = message.format ? 'TEXT'
       text = message.text ? message
       @symphony.sendMessage(envelope.room, text, format)
 
+  sendDirectMessageToUsername: (username, messages...) ->
+    @robot.logger.debug "Sending direct message to username: #{username}"
+    @_userLookup({userName: username})
+      .then (response) =>
+        @_sendDirectMessageToUserId(response.id, messages...)
+
+  sendDirectMessageToEmail: (email, messages...) ->
+    @robot.logger.debug "Sending direct message to email: #{email}"
+    @_userLookup({emailAddress: email})
+      .then (response) =>
+        @_sendDirectMessageToUserId(response.id, messages...)
+
+  _sendDirectMessageToUserId: (userId, messages...) ->
+    @symphony.createIM(userId)
+      .then (response) =>
+        @send({room: response.id}, messages...)
+
   reply: (envelope, messages...) ->
-    @robot.logger.debug "Reply"
+    @robot.logger.debug "Reply #{messages.length} messages to #{envelope.user.emailAddress} in #{envelope.room}"
     for message in messages
       @symphony.sendMessage(envelope.room, "<messageML><mention email=\"#{envelope.user.emailAddress}\"/> #{entities.encode(message)}</messageML>", 'MESSAGEML')
 
@@ -84,14 +101,14 @@ class SymphonyAdapter extends Adapter
     @symphony.whoAmI()
       .then (response) =>
         @robot.userId = response.userId
-        @symphony.getUser(response.userId)
+        @symphony.getUser({userId: response.userId})
         .then (response) =>
           @robot.displayName = response.displayName
           @robot.logger.info "Connected as #{response.displayName}"
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @_getUser, {maxAge: 3600000, length: 2}
-    @userLookup = (userId, streamId) => hourlyRefresh userId, streamId
+    @_userLookup = (query, streamId) -> hourlyRefresh query, streamId
     @_createDatafeed()
     return
 
@@ -118,7 +135,7 @@ class SymphonyAdapter extends Adapter
 
   _receiveMessage: (message) =>
     if message.fromUserId != @robot.userId
-      @userLookup(message.fromUserId, message.streamId)
+      @_userLookup({userId: message.fromUserId}, message.streamId)
         .then (response) =>
           v2 = new V2Message(response, message)
           @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
@@ -126,15 +143,17 @@ class SymphonyAdapter extends Adapter
         .fail (err) =>
           @robot.emit 'error', new Error("Unable to fetch user details: #{err}")
 
-  _getUser: (userId, streamId) =>
-    @symphony.getUser(userId)
+  _getUser: (query, streamId) =>
+    @symphony.getUser(query)
       .then (response) =>
         # record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
+        userId = response.id
         existing = @robot.brain.userForId(userId)
         existing['name'] = response.userName
         existing['displayName'] = response.displayName
         existing['emailAddress'] = response.emailAddress
-        existing['room'] = streamId
+        if streamId?
+          existing['room'] = streamId
         @robot.brain.userForId(userId, existing)
         existing
 

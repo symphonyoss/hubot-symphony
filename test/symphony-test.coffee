@@ -67,12 +67,40 @@ describe 'REST API test suite', () ->
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
-  it 'getUser should expose user details', () ->
-    symphony.getUser(nock.realUserId)
+  it 'getUser by userId should expose user details', () ->
+    symphony.getUser({userId: nock.realUserId})
       .then (response) ->
-        assert.equal('johndoe@symphony.com', response.emailAddress)
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser by email should expose user details', () ->
+    symphony.getUser({emailAddress: nock.realUserEmail})
+      .then (response) ->
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser by username should expose user details', () ->
+    symphony.getUser({userName: nock.realUserName})
+      .then (response) ->
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser should fail if called with just a string arg', (done) ->
+    symphony.getUser(nock.realUserId)
+      .then (response) ->
+        assert.fail(0, 1,"Expecting failure")
+      .fail (error) ->
+        done()
+    return
 
   it 'sendMessage should obtain session and key tokens and get message ack', () ->
     msg = '<messageML>Testing 123...</messageML>'
@@ -141,6 +169,13 @@ describe 'REST API test suite', () ->
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
+  it 'createIM should generate a stream id', () ->
+    symphony.createIM(nock.realUserId)
+      .then (response) ->
+        assert.equal(nock.streamId, response.id)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
 describe 'Object model test suite', () ->
   for text in ['<messageML>Hello World</messageML>', 'Hello World']
     it "parse a V2Message containing '#{text}'", () ->
@@ -178,7 +213,7 @@ describe 'Object model test suite', () ->
       displayName: 'John Doe'
     }
     robot = new FakeRobot
-    callback = (response) =>
+    callback = (response) ->
       done()
     listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback)
     listener.call new V2Message(user, msg)
