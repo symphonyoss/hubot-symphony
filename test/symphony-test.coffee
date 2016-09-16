@@ -67,12 +67,39 @@ describe 'REST API test suite', () ->
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
-  it 'getUser should expose user details', () ->
-    symphony.getUser(nock.realUserId)
+  it 'getUser by userId should expose user details', () ->
+    symphony.getUser({userId: nock.realUserId})
       .then (response) ->
-        assert.equal('johndoe@symphony.com', response.emailAddress)
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser by email should expose user details', () ->
+    symphony.getUser({emailAddress: nock.realUserEmail})
+      .then (response) ->
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser by username should expose user details', () ->
+    symphony.getUser({userName: nock.realUserName})
+      .then (response) ->
+        assert.equal(nock.realUserId, response.id)
+        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserEmail, response.emailAddress)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'getUser should fail if called with just a string arg', (done) ->
+    symphony.getUser(nock.realUserId)
+      .then (response) ->
+        assert.fail(0, 1,"Expecting failure")
+      .fail (error) ->
+        done()
 
   it 'sendMessage should obtain session and key tokens and get message ack', () ->
     msg = '<messageML>Testing 123...</messageML>'
@@ -138,6 +165,13 @@ describe 'REST API test suite', () ->
           symphony.readDatafeed(initialResponse.id)
         .then (response) ->
           assert.isUndefined(response)
+      .fail (error) ->
+        assert.fail(0, 1,"Failed with error #{error}")
+
+  it 'createIM should generate a stream id', () ->
+    symphony.createIM(nock.realUserId)
+      .then (response) ->
+        assert.equal(nock.streamId, response.id)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
