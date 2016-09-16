@@ -100,6 +100,7 @@ describe 'REST API test suite', () ->
         assert.fail(0, 1,"Expecting failure")
       .fail (error) ->
         done()
+    return
 
   it 'sendMessage should obtain session and key tokens and get message ack', () ->
     msg = '<messageML>Testing 123...</messageML>'
