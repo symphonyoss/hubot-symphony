@@ -33,7 +33,7 @@ class Symphony
     weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
     @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
     @keyAuth = => weeklyRefresh @keyManagerHost, '/keyauth/v1/authenticate'
-    Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
+    Q.all([@sessionAuth(), @keyAuth()]).then (values) ->
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
   echo: (body) =>
@@ -105,7 +105,7 @@ class Symphony
     if body?
       options.body = body
 
-    request(options, (err, res, data) =>
+    request(options, (err, res, data) ->
       if err?
         logger.warning "received #{res?.statusCode} error response from #{path}: #{err}"
         deferred.reject(new Error(err))

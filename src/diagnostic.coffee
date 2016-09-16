@@ -39,39 +39,39 @@ logger.info 'Connection initiated, starting tests...'
 
 # check tokens
 symphony.sessionAuth()
-  .then (response) =>
+  .then (response) ->
     logger.info "Session token: #{response.token}"
-  .fail (err) =>
+  .fail (err) ->
     logger.error "Failed to fetch session token: #{err}"
   .done
 symphony.keyAuth()
-  .then (response) =>
+  .then (response) ->
     logger.info "Key manager token: #{response.token}"
-  .fail (err) =>
+  .fail (err) ->
     logger.error "Failed to fetch key manager token: #{err}"
   .done
 
 # who am i
 userId = symphony.whoAmI()
-  .then (response) =>
+  .then (response) ->
     logger.info "UserId: #{response.userId}"
     symphony.getUser(response.userId)
-  .then (response) =>
+  .then (response) ->
     logger.info "My name is #{response.displayName} [#{response.emailAddress}]"
-  .fail (err) =>
+  .fail (err) ->
     logger.error "Failed to fetch userId: #{err}"
   .done
 
 # read a message...
 symphony.createDatafeed()
-  .then (response) =>
+  .then (response) ->
     logger.info "Created datafeed: #{response.id}"
     logger.info "You should send me a message..."
     symphony.readDatafeed(response.id)
-  .then (response) =>
+  .then (response) ->
     logger.info "Received '#{msg.message}'" for msg in response when msg.v2messageType = 'V2Message'
     if argv.runOffline?
       nock.close()
     process.exit(0)
-  .fail (err) =>
+  .fail (err) ->
     logger.error "Failed to receive a message: #{err}"

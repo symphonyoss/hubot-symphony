@@ -91,7 +91,7 @@ class SymphonyAdapter extends Adapter
       .fail (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @_getUser, {maxAge: 3600000, length: 2}
-    @userLookup = (userId, streamId) => hourlyRefresh userId, streamId
+    @userLookup = (userId, streamId) -> hourlyRefresh userId, streamId
     @_createDatafeed()
     return
 

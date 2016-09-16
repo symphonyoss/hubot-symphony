@@ -178,7 +178,7 @@ describe 'Object model test suite', () ->
       displayName: 'John Doe'
     }
     robot = new FakeRobot
-    callback = (response) =>
+    callback = (response) ->
       done()
     listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback)
     listener.call new V2Message(user, msg)
