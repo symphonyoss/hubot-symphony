@@ -36,7 +36,7 @@ class SymphonyAdapter extends Adapter
     @expBackoff.on 'backoff', (num, delay) =>
       if num > 0
         @robot.logger.info "Re-attempting to create datafeed - attempt #{num} after #{delay}ms"
-    @expBackoff.on 'ready', (num, delay) =>
+    @expBackoff.on 'ready', () =>
       @symphony.createDatafeed()
         .then (response) =>
           if response.id?

@@ -59,7 +59,7 @@ class Symphony
     }
     @_httpAgentPost("/agent/v2/stream/#{streamId}/message/create", true, body)
 
-  getMessages: (streamId, since, limit = 100) =>
+  getMessages: (streamId) =>
     @_httpAgentGet("/agent/v2/stream/#{streamId}/message", true)
 
   createDatafeed: =>
