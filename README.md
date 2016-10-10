@@ -59,14 +59,18 @@ module.exports = (robot) ->
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:
 
 ```
-npm install hubot-symphony
+git clone https://github.com/symphonyoss/hubot-symphony.git
+cd hubot-symphony
+npm install
 npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]
 ```
 
 If you are running an on-premise key manager you can add an optional fifth argument
 
 ```
-npm install hubot-symphony
+git clone https://github.com/symphonyoss/hubot-symphony.git
+cd hubot-symphony
+npm install
 npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com]
 ```
 
