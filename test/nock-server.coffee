@@ -23,9 +23,10 @@ uuid = require 'node-uuid'
 
 class NockServer extends EventEmitter
 
-  constructor: (@host, @kmHost, startWithHelloWorldMessage = true) ->
+  constructor: ({@host, @kmHost, @agentHost, startWithHelloWorldMessage = true}) ->
     @kmHost = @kmHost ? @host
-    logger.info "Setting up mocks for #{@host}"
+    @agentHost = @agentHost ? @host
+    logger.info "Setting up mocks for #{@host} / #{@kmHost} / #{@agentHost}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
 
@@ -97,7 +98,7 @@ class NockServer extends EventEmitter
         token: 'KEY_MANAGER_TOKEN'
       })
 
-    @podScope = nock(@host)
+    @podScope = nock(@agentHost)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', (val) -> !val?)
@@ -122,7 +123,7 @@ class NockServer extends EventEmitter
         id: @streamId
       })
 
-    @agentScope = nock(@host)
+    @agentScope = nock(@agentHost)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')

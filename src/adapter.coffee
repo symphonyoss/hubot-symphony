@@ -97,7 +97,8 @@ class SymphonyAdapter extends Adapter
     publicKey = process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     passprhase = process.env.HUBOT_SYMPHONY_PASSPHRASE
     keyManagerHost = process.env.HUBOT_SYMPHONY_KM_HOST ? host
-    @symphony = new Symphony(host, privateKey, publicKey, passprhase, keyManagerHost)
+    agentHost = process.env.HUBOT_SYMPHONY_AGENT_HOST ? host
+    @symphony = new Symphony({host: host, privateKey: privateKey, publicKey: publicKey, passphrase: passprhase, keyManagerHost: keyManagerHost, agentHost: agentHost})
     @symphony.whoAmI()
       .then (response) =>
         @robot.userId = response.userId
