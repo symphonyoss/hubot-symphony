@@ -22,8 +22,9 @@ You must pass the following environment variables to hubot
 * `HUBOT_SYMPHONY_PRIVATE_KEY` set to the location of your bot account .pem private key file
 * `HUBOT_SYMPHONY_PASSPHRASE` set to the passphrase associated with your bot account private key
 
-There is also an optional argument which should be used if you are running an on-premise key manager
+There are also optional arguments which should be used if you are running an on-premise key manager / agent
 * `HUBOT_SYMPHONY_KM_HOST` set to the url of your key manager without the https:// prefix
+* `HUBOT_SYMPHONY_AGENT_HOST` set to the url of your agent without the https:// prefix
 
 These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
 
@@ -59,15 +60,19 @@ module.exports = (robot) ->
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:
 
 ```
-npm install hubot-symphony
+git clone https://github.com/symphonyoss/hubot-symphony.git
+cd hubot-symphony
+npm install
 npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]
 ```
 
-If you are running an on-premise key manager you can add an optional fifth argument
+If you are running an on-premise key manager / agent you can add an optional fifth / sixth argument
 
 ```
-npm install hubot-symphony
-npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com]
+git clone https://github.com/symphonyoss/hubot-symphony.git
+cd hubot-symphony
+npm install
+npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com]
 ```
 
 If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.

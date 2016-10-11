@@ -24,11 +24,14 @@ memoize = require 'memoizee'
 
 class Symphony
 
-  constructor: (@host, @privateKey, @publicKey, @passphrase, @keyManagerHost) ->
+  constructor: ({@host, @privateKey, @publicKey, @passphrase, @keyManagerHost, @agentHost}) ->
     @keyManagerHost = @keyManagerHost ? @host
+    @agentHost = @agentHost ? @host
     logger.info "Connecting to #{@host}"
     if @keyManagerHost isnt @host
       logger.info "Using separate KeyManager #{@keyManagerHost}"
+    if @agentHost isnt @host
+      logger.info "Using separate Agent #{@agentHost}"
     # refresh tokens on a weekly basis
     weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
     @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
@@ -59,7 +62,7 @@ class Symphony
     }
     @_httpAgentPost("/agent/v2/stream/#{streamId}/message/create", true, body)
 
-  getMessages: (streamId, since, limit = 100) =>
+  getMessages: (streamId) =>
     @_httpAgentGet("/agent/v2/stream/#{streamId}/message", true)
 
   createDatafeed: =>
@@ -76,14 +79,14 @@ class Symphony
       headers = {
         sessionToken: value.token
       }
-      @_httpGet(@host, path, headers, failUnlessHttp200)
+      @_httpGet(@agentHost, path, headers, failUnlessHttp200)
 
   _httpPodPost: (path, failUnlessHttp200, body) =>
     @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
-      @_httpPost(@host, path, headers, failUnlessHttp200, body)
+      @_httpPost(@agentHost, path, headers, failUnlessHttp200, body)
 
   _httpAgentGet: (path, failUnlessHttp200) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
@@ -91,7 +94,7 @@ class Symphony
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpGet(@host, path, headers, failUnlessHttp200)
+      @_httpGet(@agentHost, path, headers, failUnlessHttp200)
 
   _httpAgentPost: (path, failUnlessHttp200, body) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
@@ -99,7 +102,7 @@ class Symphony
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpPost(@host, path, headers, failUnlessHttp200, body)
+      @_httpPost(@agentHost, path, headers, failUnlessHttp200, body)
 
   _httpGet: (host, path, headers = {}, failUnlessHttp200) =>
     @_httpRequest('GET', host, path, headers, failUnlessHttp200)
@@ -124,15 +127,15 @@ class Symphony
 
     request(options, (err, res, data) ->
       if err?
-        logger.warning "received #{res?.statusCode} error response from #{path}: #{err}"
+        logger.warning "received #{res?.statusCode} error response from https://#{host}#{path}: #{err}"
         deferred.reject(new Error(err))
       else
         if failUnlessHttp200 && Math.floor(res?.statusCode / 100) != 2
-          err = "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
+          err = "received #{res?.statusCode} response from https://#{host}#{path}: #{JSON.stringify(data)}"
           logger.warning err
           deferred.reject new Error(err)
         else
-          logger.debug "received #{res?.statusCode} response from #{path}: #{JSON.stringify(data)}"
+          logger.debug "received #{res?.statusCode} response from https://#{host}#{path}: #{JSON.stringify(data)}"
           deferred.resolve data
     )
     deferred.promise

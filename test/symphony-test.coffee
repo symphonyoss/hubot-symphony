@@ -21,18 +21,25 @@ Symphony = require '../src/symphony'
 NockServer = require './nock-server'
 {FakeRobot} = require './fakes'
 
-describe 'On-premise key manager', () ->
+describe 'On-premise key manager / agent', () ->
   nock = null
   symphony = null
 
   beforeEach ->
-    nock = new NockServer('https://foundation.symphony.com', 'https://keymanager.notsymphony.com')
-    symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit', 'keymanager.notsymphony.com')
+    nock = new NockServer({host: 'https://foundation.symphony.com', kmHost: 'https://keymanager.notsymphony.com', agentHost: 'https://agent.alsonotsymphony.com'})
+    symphony = new Symphony({
+      host: 'foundation.symphony.com',
+      privateKey: './test/resources/privateKey.pem',
+      publicKey: './test/resources/publicKey.pem',
+      passphrase: 'changeit',
+      keyManagerHost: 'keymanager.notsymphony.com',
+      agentHost: 'agent.alsonotsymphony.com'
+    })
 
   afterEach ->
     nock.close()
 
-  it 'should connect to separate key manager url', () ->
+  it 'should connect to separate key manager / agent url', () ->
     msg = { foo: 'bar' }
     symphony.echo(msg)
       .then (response) ->
@@ -46,8 +53,13 @@ describe 'REST API test suite', () ->
   symphony = null
 
   beforeEach ->
-    nock = new NockServer('https://foundation.symphony.com')
-    symphony = new Symphony('foundation.symphony.com', './test/resources/privateKey.pem', './test/resources/publicKey.pem', 'changeit')
+    nock = new NockServer({host: 'https://foundation.symphony.com'})
+    symphony = new Symphony({
+      host: 'foundation.symphony.com',
+      privateKey: './test/resources/privateKey.pem',
+      publicKey: './test/resources/publicKey.pem',
+      passphrase: 'changeit'
+    })
 
   afterEach ->
     nock.close()

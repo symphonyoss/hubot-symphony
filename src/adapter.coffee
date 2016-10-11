@@ -36,7 +36,7 @@ class SymphonyAdapter extends Adapter
     @expBackoff.on 'backoff', (num, delay) =>
       if num > 0
         @robot.logger.info "Re-attempting to create datafeed - attempt #{num} after #{delay}ms"
-    @expBackoff.on 'ready', (num, delay) =>
+    @expBackoff.on 'ready', () =>
       @symphony.createDatafeed()
         .then (response) =>
           if response.id?
@@ -97,7 +97,8 @@ class SymphonyAdapter extends Adapter
     publicKey = process.env.HUBOT_SYMPHONY_PUBLIC_KEY
     passprhase = process.env.HUBOT_SYMPHONY_PASSPHRASE
     keyManagerHost = process.env.HUBOT_SYMPHONY_KM_HOST ? host
-    @symphony = new Symphony(host, privateKey, publicKey, passprhase, keyManagerHost)
+    agentHost = process.env.HUBOT_SYMPHONY_AGENT_HOST ? host
+    @symphony = new Symphony({host: host, privateKey: privateKey, publicKey: publicKey, passphrase: passprhase, keyManagerHost: keyManagerHost, agentHost: agentHost})
     @symphony.whoAmI()
       .then (response) =>
         @robot.userId = response.userId

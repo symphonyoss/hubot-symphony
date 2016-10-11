@@ -39,7 +39,7 @@ describe 'Adapter test suite with helloWorld message', () ->
   symphony = null
 
   beforeEach ->
-    nock = new NockServer('https://foundation.symphony.com')
+    nock = new NockServer({host: 'https://foundation.symphony.com'})
 
   afterEach ->
     nock.close()
@@ -84,7 +84,7 @@ describe 'Adapter test suite', () ->
   symphony = null
 
   beforeEach ->
-    nock = new NockServer('https://foundation.symphony.com', 'https://foundation.symphony.com', false)
+    nock = new NockServer({host: 'https://foundation.symphony.com', startWithHelloWorldMessage: false})
 
   afterEach ->
     nock.close()
