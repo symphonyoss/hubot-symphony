@@ -45,11 +45,11 @@ class Symphony
   whoAmI: =>
     @_httpPodGet('/pod/v1/sessioninfo', true)
 
-  getUser: ({userId, userName, emailAddress}) =>
+  getUser: ({userId, username, emailAddress}) =>
     if userId?
       @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true", true)
-    else if userName?
-      @_httpPodGet("/pod/v2/user?username=#{userName}&local=true", true)
+    else if username?
+      @_httpPodGet("/pod/v2/user?username=#{username}&local=true", true)
     else if emailAddress?
       @_httpPodGet("/pod/v2/user?email=#{emailAddress}&local=true", true)
     else
