@@ -70,7 +70,7 @@ class SymphonyAdapter extends Adapter
 
   sendDirectMessageToUsername: (username, messages...) ->
     @robot.logger.debug "Sending direct message to username: #{username}"
-    @_userLookup({userName: username})
+    @_userLookup({username: username})
       .then (response) =>
         @_sendDirectMessageToUserId(response.id, messages...)
 
@@ -150,7 +150,7 @@ class SymphonyAdapter extends Adapter
         # record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
         userId = response.id
         existing = @robot.brain.userForId(userId)
-        existing['name'] = response.userName
+        existing['name'] = response.username
         existing['displayName'] = response.displayName
         existing['emailAddress'] = response.emailAddress
         if streamId?

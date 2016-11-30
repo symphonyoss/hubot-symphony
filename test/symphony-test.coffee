@@ -83,7 +83,7 @@ describe 'REST API test suite', () ->
     symphony.getUser({userId: nock.realUserId})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
@@ -92,16 +92,16 @@ describe 'REST API test suite', () ->
     symphony.getUser({emailAddress: nock.realUserEmail})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
   it 'getUser by username should expose user details', () ->
-    symphony.getUser({userName: nock.realUserName})
+    symphony.getUser({username: nock.realUserName})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")

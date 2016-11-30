@@ -19,7 +19,7 @@ Log = require('log')
 logger = new Log process.env.HUBOT_LOG_LEVEL or process.env.HUBOT_SYMPHONY_LOG_LEVEL or 'info'
 
 nock = require 'nock'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 class NockServer extends EventEmitter
 
@@ -41,7 +41,7 @@ class NockServer extends EventEmitter
       emailAddress: @realUserEmail
       firstName: 'John'
       lastName: 'Doe'
-      userName: @realUserName
+      username: @realUserName
       displayName: 'John Doe'
     }
 
@@ -54,7 +54,7 @@ class NockServer extends EventEmitter
       emailAddress: @botUserEmail
       firstName: 'Wolfgang Amadeus'
       lastName: 'Mozart'
-      userName: @botUserName
+      username: @botUserName
       displayName: 'Mozart'
     }
 
