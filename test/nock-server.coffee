@@ -41,7 +41,7 @@ class NockServer extends EventEmitter
       emailAddress: @realUserEmail
       firstName: 'John'
       lastName: 'Doe'
-      userName: @realUserName
+      username: @realUserName
       displayName: 'John Doe'
     }
 
@@ -54,7 +54,7 @@ class NockServer extends EventEmitter
       emailAddress: @botUserEmail
       firstName: 'Wolfgang Amadeus'
       lastName: 'Mozart'
-      userName: @botUserName
+      username: @botUserName
       displayName: 'Mozart'
     }
 
