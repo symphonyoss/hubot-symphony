@@ -24,17 +24,20 @@ memoize = require 'memoizee'
 
 class Symphony
 
-  constructor: ({@host, @privateKey, @publicKey, @passphrase, @keyManagerHost, @agentHost}) ->
+  constructor: ({@host, @privateKey, @publicKey, @passphrase, @keyManagerHost, @sessionAuthHost, @agentHost}) ->
     @keyManagerHost = @keyManagerHost ? @host
+    @sessionAuthHost = @sessionAuthHost ? @host
     @agentHost = @agentHost ? @host
     logger.info "Connecting to #{@host}"
     if @keyManagerHost isnt @host
       logger.info "Using separate KeyManager #{@keyManagerHost}"
+    if @sessionAuthHost isnt @host
+      logger.info "Using separate SessionAuth #{@sessionAuthHost}"
     if @agentHost isnt @host
       logger.info "Using separate Agent #{@agentHost}"
     # refresh tokens on a weekly basis
     weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
-    @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
+    @sessionAuth = => weeklyRefresh @sessionAuthHost, '/sessionauth/v1/authenticate'
     @keyAuth = => weeklyRefresh @keyManagerHost, '/keyauth/v1/authenticate'
     Q.all([@sessionAuth(), @keyAuth()]).then (values) ->
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
