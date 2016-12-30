@@ -40,6 +40,7 @@ symphony = new Symphony({
   passphrase: argv.passphrase,
   keyManagerHost: argv.kmhost ? argv.host,
   agentHost: argv.agenthost ? argv.host
+  sessionAuthHost: argv.sessionhost ? argv.host
 })
 
 logger.info 'Connection initiated, starting tests...'
