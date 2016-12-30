@@ -63,7 +63,7 @@ symphony.keyAuth()
 userId = symphony.whoAmI()
   .then (response) ->
     logger.info "UserId: #{response.userId}"
-    symphony.getUser(response.userId)
+    symphony.getUser({userId: response.userId})
   .then (response) ->
     logger.info "My name is #{response.displayName} [#{response.emailAddress}]"
   .fail (err) ->
