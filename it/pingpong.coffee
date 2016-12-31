@@ -18,6 +18,7 @@ Log = require('log')
 logger = new Log 'info'
 
 Symphony = require '../src/symphony'
+Q = require 'q'
 
 throw new Error('BOT_USER_CERT undefined') unless process.env.BOT_USER_CERT
 throw new Error('BOT_USER_KEY undefined') unless process.env.BOT_USER_KEY
@@ -54,23 +55,24 @@ userConnection = new Symphony({
 
 logger.info 'Connections initiated, starting tests...'
 
-# print bot user diagnostics and send a message from user account
-botConnection.whoAmI()
+# print bot & user account diagnostics, send message from user -> bot and verify receipt
+userConnection.whoAmI()
+  .then (response) ->
+    userConnection.getUser({userId: response.userId})
+  .then (response) ->
+    logger.info "User name is #{response.displayName} [#{response.emailAddress}]"
+    botConnection.whoAmI()
   .then (response) ->
     botConnection.getUser({userId: response.userId})
   .then (response) ->
     logger.info "Bot name is #{response.displayName} [#{response.emailAddress}]"
     # get conversation between user & bot
     userConnection.createIM(response.id)
-  .then (response) =>
+  .then (response) ->
     # send ping from user to bot
     userConnection.sendMessage(response.id, "ping", "TEXT")
-  .fail (err) ->
-    logger.error "Failed to get bot details and send message from user: #{err}"
-    process.exit(1)
-  .done
-
-botConnection.createDatafeed()
+  .then (response) ->
+    botConnection.createDatafeed()
   .then (response) ->
     logger.info "Created datafeed: #{response.id}"
     botConnection.readDatafeed(response.id)
@@ -78,5 +80,6 @@ botConnection.createDatafeed()
     logger.info "Received '#{msg.message}'" for msg in response when msg.v2messageType = 'V2Message'
     process.exit(0)
   .fail (err) ->
-    logger.error "Failed to receive a message: #{err}"
-    process.exit(2)
+    logger.error "Ping integration test failure: #{err}"
+    process.exit(1)
+  .done
