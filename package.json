@@ -8,6 +8,7 @@
     "diagnostic": "coffee src/diagnostic.coffee",
     "test": "mocha test/*.coffee",
     "test-cov": "mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report text-summary lcov",
+    "it": "coffee it/pingpong.coffee",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {

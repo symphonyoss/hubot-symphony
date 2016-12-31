@@ -1,4 +1,4 @@
 .codeclimate.yml
 .travis.yml
 coffeelint.json
-run-odp.sh
+it/*
