@@ -18,7 +18,6 @@ Log = require('log')
 logger = new Log 'info'
 
 Symphony = require '../src/symphony'
-Q = require 'q'
 
 throw new Error('BOT_USER_CERT undefined') unless process.env.BOT_USER_CERT
 throw new Error('BOT_USER_KEY undefined') unless process.env.BOT_USER_KEY
