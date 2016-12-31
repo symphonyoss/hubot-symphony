@@ -14,6 +14,8 @@
 #    limitations under the License.
 #
 
+### !pragma coverage-skip-block ###
+
 Log = require('log')
 logger = new Log 'info'
 
