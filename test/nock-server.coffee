@@ -23,10 +23,11 @@ uuid = require 'uuid'
 
 class NockServer extends EventEmitter
 
-  constructor: ({@host, @kmHost, @agentHost, startWithHelloWorldMessage = true}) ->
+  constructor: ({@host, @kmHost, @agentHost, @sessionAuthHost, startWithHelloWorldMessage = true}) ->
     @kmHost = @kmHost ? @host
     @agentHost = @agentHost ? @host
-    logger.info "Setting up mocks for #{@host} / #{@kmHost} / #{@agentHost}"
+    @sessionAuthHost = @sessionAuthHost ? @agentHost
+    logger.info "Setting up mocks for #{@host} / #{@kmHost} / #{@agentHost} / #{@sessionAuthHost}"
 
     @streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA'
 
@@ -76,18 +77,21 @@ class NockServer extends EventEmitter
       })
 
     nock.disableNetConnect()
-    @authScope = nock(@host)
+    @defaultScope = nock(@host)
+    .matchHeader('sessionToken', (val) -> !val?)
+    .matchHeader('keyManagerToken', (val) -> !val?)
+    .post('/agent/v1/util/echo')
+    .reply(401, {
+      code: 401
+      message: 'Invalid session'
+    })
+    @authScope = nock(@sessionAuthHost)
       .matchHeader('sessionToken', (val) -> !val?)
       .matchHeader('keyManagerToken', (val) -> !val?)
       .post('/sessionauth/v1/authenticate')
       .reply(200, {
         name: 'sessionToken'
         token: 'SESSION_TOKEN'
-      })
-      .post('/agent/v1/util/echo')
-      .reply(401, {
-        code: 401
-        message: 'Invalid session'
       })
     @keyAuthScope = nock(@kmHost)
       .matchHeader('sessionToken', (val) -> !val?)
@@ -98,7 +102,7 @@ class NockServer extends EventEmitter
         token: 'KEY_MANAGER_TOKEN'
       })
 
-    @podScope = nock(@agentHost)
+    @podScope = nock(@host)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', (val) -> !val?)

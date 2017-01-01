@@ -20,7 +20,7 @@ Log = require('log')
 logger = new Log process.env.HUBOT_SYMPHONY_LOG_LEVEL or process.env.HUBOT_LOG_LEVEL or 'info'
 
 argv = require('yargs')
-  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com]')
+  .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com] --sessionhost [session.host.com]')
   .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
   .argv
 
@@ -40,6 +40,7 @@ symphony = new Symphony({
   passphrase: argv.passphrase,
   keyManagerHost: argv.kmhost ? argv.host,
   agentHost: argv.agenthost ? argv.host
+  sessionAuthHost: argv.sessionhost ? argv.host
 })
 
 logger.info 'Connection initiated, starting tests...'
@@ -62,7 +63,7 @@ symphony.keyAuth()
 userId = symphony.whoAmI()
   .then (response) ->
     logger.info "UserId: #{response.userId}"
-    symphony.getUser(response.userId)
+    symphony.getUser({userId: response.userId})
   .then (response) ->
     logger.info "My name is #{response.displayName} [#{response.emailAddress}]"
   .fail (err) ->
