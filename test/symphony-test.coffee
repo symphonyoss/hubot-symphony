@@ -26,14 +26,15 @@ describe 'On-premise key manager / agent', () ->
   symphony = null
 
   beforeEach ->
-    nock = new NockServer({host: 'https://foundation.symphony.com', kmHost: 'https://keymanager.notsymphony.com', agentHost: 'https://agent.alsonotsymphony.com'})
+    nock = new NockServer({host: 'https://foundation.symphony.com', kmHost: 'https://keymanager.notsymphony.com', agentHost: 'https://agent.alsonotsymphony.com', sessionAuthHost: 'https://foundation-api.symphony.com'})
     symphony = new Symphony({
       host: 'foundation.symphony.com',
       privateKey: './test/resources/privateKey.pem',
       publicKey: './test/resources/publicKey.pem',
       passphrase: 'changeit',
       keyManagerHost: 'keymanager.notsymphony.com',
-      agentHost: 'agent.alsonotsymphony.com'
+      agentHost: 'agent.alsonotsymphony.com',
+      sessionAuthHost: 'foundation-api.symphony.com'
     })
 
   afterEach ->
