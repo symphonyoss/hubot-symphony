@@ -1,4 +1,4 @@
-verbose: true
+verbose: false
 instrumentation:
   root: .
   extensions:
