@@ -35,7 +35,7 @@ describe 'Foundation Open Developer Platform integration tests', () ->
   throw new Error('SYMPHONY_SESSIONAUTH_HOST undefined') unless process.env.SYMPHONY_SESSIONAUTH_HOST
   throw new Error('SYMPHONY_AGENT_HOST undefined') unless process.env.SYMPHONY_AGENT_HOST
 
-  it 'should send a message from user account and receive it on bot account', (done) ->
+  it 'should send a message from user account and receive it on bot account', () ->
     this.timeout(10000)
 
     # create two separate connections so we can send a message from one account to another
@@ -86,7 +86,4 @@ describe 'Foundation Open Developer Platform integration tests', () ->
           .then (response) ->
             botConnection.readDatafeed(datafeedId)
       .then (response) ->
-        logger.info "Received '#{msg.message}'" for msg in response when msg.v2messageType = 'V2Message'
-        done()
-      .fail (err) ->
-        done new Error "Ping integration test failure: #{err}"
+        assert.equal('<messageML>ping</messageML>', msg.message) for msg in response when msg.v2messageType = 'V2Message'
