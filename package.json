@@ -5,10 +5,11 @@
   "scripts": {
     "precommit": "npm test",
     "prepush": "npm test",
+    "commit-msg": "validate-commit-msg",
     "diagnostic": "coffee src/diagnostic.coffee",
     "test": "mocha test/*.coffee",
-    "test-cov": "mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report text-summary lcov",
-    "it": "coffee it/pingpong.coffee",
+    "test-cov": "mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
+    "it": "mocha it/*.coffee",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
@@ -54,9 +55,6 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    },
-    "ghooks": {
-      "commit-msg": "validate-commit-msg"
     },
     "validate-commit-msg": {
       "helpMessage": "This repo is Commitizen friendly, commit using git cz or see https://github.com/stevemao/conventional-changelog-angular/blob/master/convention.md"

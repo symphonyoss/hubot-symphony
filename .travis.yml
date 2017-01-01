@@ -2,6 +2,15 @@ language: node_js
 node_js:
   - node
 
+env:
+  # setup for integration tests
+  SYMPHONY_HOST=foundation-dev.symphony.com
+  SYMPHONY_KM_HOST=foundation-dev-api.symphony.com
+  SYMPHONY_SESSIONAUTH_HOST=foundation-dev-api.symphony.com
+  SYMPHONY_AGENT_HOST=foundation-dev-api.symphony.com
+  # turn off any internal logging in tests
+  HUBOT_SYMPHONY_LOG_LEVEL=alert
+
 before_script:
   # ensure we only have declared dependencies
   - npm prune
@@ -12,7 +21,7 @@ script:
   # execute tests with coverage instrumentation
   - npm run-script test-cov
   # execute integration tests against foundation-dev pod
-  - ./it/run-odp.sh
+  - npm run-script it
 
 after_success:
   # publish coverage results to coveralls

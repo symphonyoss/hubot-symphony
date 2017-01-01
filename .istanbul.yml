@@ -1,0 +1,12 @@
+verbose: true
+instrumentation:
+  root: .
+  extensions:
+    - .coffee
+  excludes: ['**/it/**']
+  include-all-sources: true
+reporting:
+  print: summary
+  reports:
+    - text-summary
+    - lcov
