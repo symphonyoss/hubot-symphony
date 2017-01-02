@@ -65,12 +65,14 @@ describe 'Foundation Open Developer Platform integration tests', () ->
       .then (response) ->
         userConnection.getUser({userId: response.userId})
       .then (response) ->
-        logger.info "User name is #{response.displayName} [#{response.emailAddress}]"
+        # Avoid emails to be printed out on build logs
+        # logger.info "User name is #{response.displayName} [#{response.emailAddress}]"
         botConnection.whoAmI()
       .then (response) ->
         botConnection.getUser({userId: response.userId})
       .then (response) ->
-        logger.info "Bot name is #{response.displayName} [#{response.emailAddress}]"
+        # Avoid emails to be printed out on build logs
+        # logger.info "Bot name is #{response.displayName} [#{response.emailAddress}]"
         botUserId = response.id
         botConnection.createDatafeed()
         .then (response) ->
