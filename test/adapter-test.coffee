@@ -55,22 +55,24 @@ describe 'Adapter test suite with helloWorld message', () ->
         done()
     adapter.run()
 
-  it 'should ignore http 400 errors when reading datafeed', (done) ->
+  it 'should retry on http 400 errors when reading datafeed', (done) ->
     nock.datafeedReadHttp400Count = 1
     robot = new FakeRobot
     adapter = SymphonyAdapter.use(robot)
     adapter.on 'connected', () ->
       assert.isDefined(adapter.symphony)
-      robot.on 'received', () ->
-        assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
-        adapter.close()
-        done()
+      robot.on 'error', () ->
+        adapter.on 'connected', () ->
+          robot.on 'received', () ->
+            assert.isAtLeast((m for m in robot.received when m.text is 'Hello World').length, 1)
+            adapter.close()
+            done()
     adapter.run()
 
   it 'should retry if datafeed cannot be created', (done) ->
     nock.datafeedCreateHttp400Count = 1
     robot = new FakeRobot
-    adapter = SymphonyAdapter.use robot
+    adapter = SymphonyAdapter.use(robot)
     adapter.on 'connected', () ->
       assert.isDefined(adapter.symphony)
       robot.on 'received', () ->
