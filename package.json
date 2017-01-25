@@ -54,7 +54,7 @@
     "semantic-release": "6.3.2",
     "uuid": "3.0.1",
     "validate-commit-msg": "2.8.2",
-    "yargs": "6.5.0"
+    "yargs": "6.6.0"
   },
   "config": {
     "commitizen": {
