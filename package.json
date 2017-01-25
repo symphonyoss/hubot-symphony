@@ -10,7 +10,8 @@
     "test": "mocha test/*.coffee",
     "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
     "it": "mocha it/*.coffee",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "license-check": "node-license-validator -c node-license-validator.json"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "istanbul": "0.4.5",
     "mocha": "3.2.0",
     "nock": "9.0.2",
+    "node-license-validator": "1.3.0",
     "semantic-release": "6.3.2",
     "uuid": "3.0.1",
     "validate-commit-msg": "2.8.2",

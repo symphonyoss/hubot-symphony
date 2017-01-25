@@ -1,0 +1,21 @@
+{
+  "deep": true,
+  "production": true,
+  "allow-licenses": [
+    "ISC",
+    "WTFPL",
+    "Unlicense",
+    "MIT",
+    "BSD",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSD-4-Clause",
+    "Apache-2.0",
+    "CC-BY-3.0"
+  ],
+  "allow-packages": [
+    "extsprintf",
+    "precond",
+    "verror"
+  ]
+}

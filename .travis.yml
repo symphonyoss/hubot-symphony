@@ -13,6 +13,8 @@ before_script:
   - "curl -s https://raw.githubusercontent.com/symphonyoss/contrib-toolbox/master/scripts/download-files.sh | bash"
 
 script:
+  # check licenses
+  - npm run-script license-check
   # execute tests with coverage instrumentation
   - npm run-script test-cov
   # execute integration tests against foundation-dev pod
