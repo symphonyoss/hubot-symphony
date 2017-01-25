@@ -10,7 +10,7 @@ before_script:
   # ensure we only have declared dependencies
   - npm prune
   # fetch certificates for integration tests against foundation-dev pod
-  - "curl -s https://raw.githubusercontent.com/symphonyoss/contrib-toolbox/master/scripts/download-files.sh | bash"
+  - "if [[ $TRAVIS_PULL_REQUEST = master ]]; then curl -s https://raw.githubusercontent.com/symphonyoss/contrib-toolbox/master/scripts/download-files.sh | bash fi;"
 
 script:
   # Fail if license violations are found
@@ -20,7 +20,7 @@ script:
   # execute tests with coverage instrumentation
   - npm run-script test-cov
   # execute integration tests against foundation-dev pod
-  - npm run-script it
+  - "if [[ $TRAVIS_BRANCH =~ master ]]; then npm run-script it fi;"
 
 after_success:
   # publish coverage results to coveralls
