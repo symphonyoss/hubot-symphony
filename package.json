@@ -11,7 +11,8 @@
     "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
     "it": "mocha it/*.coffee",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "license-check": "node-license-validator -c node-license-validator.json"
+    "license-violations": "node-license-validator -c node-license-violations.json",
+    "license-notice-warns": "node-license-validator -c node-license-notice-warns.json || true"
   },
   "repository": {
     "type": "git",
