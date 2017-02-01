@@ -10,7 +10,8 @@
     "BSD-3-Clause",
     "Apache-2.0",
     "Unlicense",
-    "CC-BY-3.0"
+    "CC-BY-3.0",
+    "Public domain"
   ],
   "allow-packages": [
     "extsprintf",
