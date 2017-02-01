@@ -1,5 +1,3 @@
-"dependencies": {
-  "unused-ignores": [
-    "sshpk"
-  ]
-}
+"ignore": [
+   "**/node_modules/sshpk/**"
+ ]
