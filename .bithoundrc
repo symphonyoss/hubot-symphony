@@ -1,3 +1,5 @@
-"ignore": [
-   "**/node_modules/sshpk/**"
- ]
+{
+  "ignore": [
+     "**/sshpk/**"
+   ]
+}
