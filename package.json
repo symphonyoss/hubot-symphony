@@ -36,8 +36,7 @@
     "log": "1.4.0",
     "memoizee": "0.4.1",
     "q": "1.4.1",
-    "request": "2.79.0",
-    "sshpk" : "1.9.2"
+    "request": "2.79.0"
   },
   "devDependencies": {
     "chai": "3.5.0",
