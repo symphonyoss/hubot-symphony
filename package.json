@@ -10,6 +10,7 @@
     "test": "mocha test/*.coffee",
     "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
     "it": "mocha it/*.coffee",
+    "yarninstall": "yarn install",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "license-violations": "node-license-validator -c node-license-violations.json",
     "license-notice-warns": "node-license-validator -c node-license-notice-warns.json || true"
@@ -54,7 +55,8 @@
     "semantic-release": "6.3.2",
     "uuid": "3.0.1",
     "validate-commit-msg": "2.10.1",
-    "yargs": "6.6.0"
+    "yargs": "6.6.0",
+    "yarn": "0.19.1"
   },
   "config": {
     "commitizen": {
