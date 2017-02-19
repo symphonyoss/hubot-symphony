@@ -10,6 +10,7 @@
     "test": "mocha test/*.coffee",
     "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
     "it": "mocha it/*.coffee",
+    "generate-yarn-lockfile": "npm install -g yarn && npm install --production && yarn install",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
@@ -50,8 +51,8 @@
     "nock": "9.0.2",
     "semantic-release": "6.3.2",
     "uuid": "3.0.1",
-    "validate-commit-msg": "2.8.2",
-    "yargs": "6.5.0"
+    "validate-commit-msg": "2.10.1",
+    "yargs": "6.6.0"
   },
   "config": {
     "commitizen": {
