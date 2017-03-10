@@ -1,0 +1,5 @@
+.codeclimate.yml
+.istanbul.yml
+.travis.yml
+coffeelint.json
+it/*

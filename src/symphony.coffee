@@ -24,34 +24,37 @@ memoize = require 'memoizee'
 
 class Symphony
 
-  constructor: ({@host, @privateKey, @publicKey, @passphrase, @keyManagerHost, @agentHost}) ->
+  constructor: ({@host, @privateKey, @publicKey, @passphrase, @keyManagerHost, @sessionAuthHost, @agentHost}) ->
     @keyManagerHost = @keyManagerHost ? @host
+    @sessionAuthHost = @sessionAuthHost ? @host
     @agentHost = @agentHost ? @host
     logger.info "Connecting to #{@host}"
     if @keyManagerHost isnt @host
       logger.info "Using separate KeyManager #{@keyManagerHost}"
+    if @sessionAuthHost isnt @host
+      logger.info "Using separate SessionAuth #{@sessionAuthHost}"
     if @agentHost isnt @host
       logger.info "Using separate Agent #{@agentHost}"
     # refresh tokens on a weekly basis
     weeklyRefresh = memoize @_httpPost, {maxAge: 604800000, length: 2}
-    @sessionAuth = => weeklyRefresh @host, '/sessionauth/v1/authenticate'
+    @sessionAuth = => weeklyRefresh @sessionAuthHost, '/sessionauth/v1/authenticate'
     @keyAuth = => weeklyRefresh @keyManagerHost, '/keyauth/v1/authenticate'
     Q.all([@sessionAuth(), @keyAuth()]).then (values) ->
       logger.info "Initialising with sessionToken: #{values[0].token} and keyManagerToken: #{values[1].token}"
 
   echo: (body) =>
-    @_httpAgentPost('/agent/v1/util/echo', true, body)
+    @_httpAgentPost('/agent/v1/util/echo', body)
 
   whoAmI: =>
-    @_httpPodGet('/pod/v1/sessioninfo', true)
+    @_httpPodGet('/pod/v1/sessioninfo')
 
-  getUser: ({userId, userName, emailAddress}) =>
+  getUser: ({userId, username, emailAddress}) =>
     if userId?
-      @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true", true)
-    else if userName?
-      @_httpPodGet("/pod/v2/user?username=#{userName}&local=true", true)
+      @_httpPodGet("/pod/v2/user?uid=#{userId}&local=true")
+    else if username?
+      @_httpPodGet("/pod/v2/user?username=#{username}&local=true")
     else if emailAddress?
-      @_httpPodGet("/pod/v2/user?email=#{emailAddress}&local=true", true)
+      @_httpPodGet("/pod/v2/user?email=#{emailAddress}&local=true")
     else
       Q.reject('No user arguement supplied')
 
@@ -60,57 +63,57 @@ class Symphony
       message: message
       format: format
     }
-    @_httpAgentPost("/agent/v2/stream/#{streamId}/message/create", true, body)
+    @_httpAgentPost("/agent/v2/stream/#{streamId}/message/create", body)
 
   getMessages: (streamId) =>
-    @_httpAgentGet("/agent/v2/stream/#{streamId}/message", true)
+    @_httpAgentGet("/agent/v2/stream/#{streamId}/message")
 
   createDatafeed: =>
-    @_httpAgentPost('/agent/v1/datafeed/create', true)
+    @_httpAgentPost('/agent/v1/datafeed/create')
 
   readDatafeed: (datafeedId) =>
-    @_httpAgentGet("/agent/v2/datafeed/#{datafeedId}/read",  false)
+    @_httpAgentGet("/agent/v2/datafeed/#{datafeedId}/read")
 
   createIM: (userId) =>
-    @_httpPodPost('/pod/v1/im/create', true, [userId])
+    @_httpPodPost('/pod/v1/im/create', [userId])
 
-  _httpPodGet: (path, failUnlessHttp200) =>
+  _httpPodGet: (path) =>
     @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
-      @_httpGet(@agentHost, path, headers, failUnlessHttp200)
+      @_httpGet(@agentHost, path, headers)
 
-  _httpPodPost: (path, failUnlessHttp200, body) =>
+  _httpPodPost: (path, body) =>
     @sessionAuth().then (value) =>
       headers = {
         sessionToken: value.token
       }
-      @_httpPost(@agentHost, path, headers, failUnlessHttp200, body)
+      @_httpPost(@agentHost, path, headers, body)
 
-  _httpAgentGet: (path, failUnlessHttp200) =>
+  _httpAgentGet: (path) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpGet(@agentHost, path, headers, failUnlessHttp200)
+      @_httpGet(@agentHost, path, headers)
 
-  _httpAgentPost: (path, failUnlessHttp200, body) =>
+  _httpAgentPost: (path, body) =>
     Q.all([@sessionAuth(), @keyAuth()]).then (values) =>
       headers = {
         sessionToken: values[0].token
         keyManagerToken: values[1].token
       }
-      @_httpPost(@agentHost, path, headers, failUnlessHttp200, body)
+      @_httpPost(@agentHost, path, headers, body)
 
-  _httpGet: (host, path, headers = {}, failUnlessHttp200) =>
-    @_httpRequest('GET', host, path, headers, failUnlessHttp200)
+  _httpGet: (host, path, headers = {}) =>
+    @_httpRequest('GET', host, path, headers)
 
-  _httpPost: (host, path, headers = {}, failUnlessHttp200, body) =>
-    @_httpRequest('POST', host, path, headers, failUnlessHttp200, body)
+  _httpPost: (host, path, headers = {}, body) =>
+    @_httpRequest('POST', host, path, headers, body)
 
-  _httpRequest: (method, host, path, headers, failUnlessHttp200, body) =>
+  _httpRequest: (method, host, path, headers, body) =>
     deferred = Q.defer()
     options = {
       baseUrl: 'https://' + host
@@ -130,7 +133,7 @@ class Symphony
         logger.warning "received #{res?.statusCode} error response from https://#{host}#{path}: #{err}"
         deferred.reject(new Error(err))
       else
-        if failUnlessHttp200 && Math.floor(res?.statusCode / 100) != 2
+        if Math.floor(res?.statusCode / 100) != 2
           err = "received #{res?.statusCode} response from https://#{host}#{path}: #{JSON.stringify(data)}"
           logger.warning err
           deferred.reject new Error(err)

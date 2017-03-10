@@ -26,14 +26,15 @@ describe 'On-premise key manager / agent', () ->
   symphony = null
 
   beforeEach ->
-    nock = new NockServer({host: 'https://foundation.symphony.com', kmHost: 'https://keymanager.notsymphony.com', agentHost: 'https://agent.alsonotsymphony.com'})
+    nock = new NockServer({host: 'https://foundation.symphony.com', kmHost: 'https://keymanager.notsymphony.com', agentHost: 'https://agent.alsonotsymphony.com', sessionAuthHost: 'https://foundation-api.symphony.com'})
     symphony = new Symphony({
       host: 'foundation.symphony.com',
       privateKey: './test/resources/privateKey.pem',
       publicKey: './test/resources/publicKey.pem',
       passphrase: 'changeit',
       keyManagerHost: 'keymanager.notsymphony.com',
-      agentHost: 'agent.alsonotsymphony.com'
+      agentHost: 'agent.alsonotsymphony.com',
+      sessionAuthHost: 'foundation-api.symphony.com'
     })
 
   afterEach ->
@@ -83,7 +84,7 @@ describe 'REST API test suite', () ->
     symphony.getUser({userId: nock.realUserId})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
@@ -92,16 +93,16 @@ describe 'REST API test suite', () ->
     symphony.getUser({emailAddress: nock.realUserEmail})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")
 
   it 'getUser by username should expose user details', () ->
-    symphony.getUser({userName: nock.realUserName})
+    symphony.getUser({username: nock.realUserName})
       .then (response) ->
         assert.equal(nock.realUserId, response.id)
-        assert.equal(nock.realUserName, response.userName)
+        assert.equal(nock.realUserName, response.username)
         assert.equal(nock.realUserEmail, response.emailAddress)
       .fail (error) ->
         assert.fail(0, 1,"Failed with error #{error}")

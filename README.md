@@ -4,7 +4,10 @@
 
 Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHub, with this adapator you can get up and running with a programmable bot written in JavaScript/Coffescript [in a few minutes](http://blog.symphony.foundation/run-a-symphony-bot-in-less-than-three-minutes-on-docker).  This project wraps a small number of the Symphoyn REST APIs required for two-way bot communication and user lookup together with offline test cases, the adaptor is in use both by Symphony clients and by Symphony themselves.
 
+[![Symphony Software Foundation - Active](https://cdn.rawgit.com/symphonyoss/contrib-toolbox/master/images/ssf-badge-active.svg)](https://symphonyoss.atlassian.net/wiki/display/FM/Active)
+
 [![Build Status](https://travis-ci.org/symphonyoss/hubot-symphony.svg?branch=master)](https://travis-ci.org/symphonyoss/hubot-symphony)
+[![Versioneye dependencies](https://www.versioneye.com/user/projects/588f611d683c11003d991381/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/588f611d683c11003d991381)
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
 [![Dependency Status](https://www.versioneye.com/user/projects/57991bd627629700333f615c/badge)](https://www.versioneye.com/user/projects/57991bd627629700333f615c)
@@ -24,9 +27,10 @@ You must pass the following environment variables to hubot
 * `HUBOT_SYMPHONY_PRIVATE_KEY` set to the location of your bot account .pem private key file
 * `HUBOT_SYMPHONY_PASSPHRASE` set to the passphrase associated with your bot account private key
 
-There are also optional arguments which should be used if you are running an on-premise key manager / agent
+There are also optional arguments which should be used if you are running on-premise
 * `HUBOT_SYMPHONY_KM_HOST` set to the url of your key manager without the https:// prefix
 * `HUBOT_SYMPHONY_AGENT_HOST` set to the url of your agent without the https:// prefix
+* `HUBOT_SYMPHONY_SESSIONAUTH_HOST` set to the url of your session auth without the https:// prefix
 
 These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
 
@@ -68,13 +72,13 @@ npm install
 npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]
 ```
 
-If you are running an on-premise key manager / agent you can add an optional fifth / sixth argument
+If you are running on-premise you can add optional fifth / sixth / seventh arguments
 
 ```
 git clone https://github.com/symphonyoss/hubot-symphony.git
 cd hubot-symphony
 npm install
-npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com]
+npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com] --sessionhost [session.host.com]
 ```
 
 If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.

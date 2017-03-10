@@ -2,15 +2,24 @@ language: node_js
 node_js:
   - node
 
-# before_install:
-#   - npm -i -g npm@^2.0.0
+env:
+  # setup for integration tests & turn off any internal logging in tests
+  - SYMPHONY_HOST=foundation-dev.symphony.com SYMPHONY_KM_HOST=foundation-dev-api.symphony.com SYMPHONY_SESSIONAUTH_HOST=foundation-dev-api.symphony.com SYMPHONY_AGENT_HOST=foundation-dev-api.symphony.com HUBOT_SYMPHONY_LOG_LEVEL=alert
 
 before_script:
+  # ensure we only have declared dependencies
   - npm prune
+  # fetch certificates for integration tests against foundation-dev pod
+  - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then curl -s https://raw.githubusercontent.com/symphonyoss/contrib-toolbox/master/scripts/download-files.sh | bash; fi;"
 
 script:
+  # execute tests with coverage instrumentation
   - npm run-script test-cov
+  # execute integration tests against foundation-dev pod
+  - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then npm run-script it; fi;"
 
 after_success:
+  # publish coverage results to coveralls
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+  # deploy to npm if required
   - npm run semantic-release
