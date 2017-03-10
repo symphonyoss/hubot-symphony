@@ -2,6 +2,8 @@
 
 [Hubot](http://hubot.github.com/) adapter for [Symphony](https://symphony.com) developed by the [Symphony Foundation](http://symphony.foundation/)
 
+Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHub, with this adapator you can get up and running with a programmable bot written in JavaScript/Coffescript [in a few minutes](http://blog.symphony.foundation/run-a-symphony-bot-in-less-than-three-minutes-on-docker).  This project wraps a small number of the Symphoyn REST APIs required for two-way bot communication and user lookup together with offline test cases, the adaptor is in use both by Symphony clients and by Symphony themselves.
+
 [![Build Status](https://travis-ci.org/symphonyoss/hubot-symphony.svg?branch=master)](https://travis-ci.org/symphonyoss/hubot-symphony)
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
@@ -76,6 +78,10 @@ npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphras
 ```
 
 If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.
+
+### Contribute
+
+Contributions are accepted via GitHub pull requests. All contributors must be covered by contributor license agreements to comply with the [Code Contribution Process](https://symphonyoss.atlassian.net/wiki/display/FM/Code+Contribution+Process).
 
 #### Note
 The privateKey.pem and publicKey.pem files under test/resources have been generated at random and are not real keys.
