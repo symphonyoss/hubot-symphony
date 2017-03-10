@@ -2,7 +2,7 @@
 
 [Hubot](http://hubot.github.com/) adapter for [Symphony](https://symphony.com) developed by the [Symphony Foundation](http://symphony.foundation/)
 
-Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHub, with this adapator you can get up and running with a programmable bot written in JavaScript/Coffescript [in a few minutes](http://blog.symphony.foundation/run-a-symphony-bot-in-less-than-three-minutes-on-docker).  This project wraps a small number of the Symphoyn REST APIs required for two-way bot communication and user lookup together with offline test cases, the adaptor is in use both by Symphony clients and by Symphony themselves.
+Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHub, with this adapator you can get up and running with a programmable bot written in JavaScript/Coffescript [in a few minutes](http://blog.symphony.foundation/run-a-symphony-bot-in-less-than-three-minutes-on-docker).  This project wraps a small number of the Symphony REST APIs required for two-way bot communication and user lookup together with offline test cases, the adaptor is in use both by Symphony clients and by Symphony themselves.
 
 [![Symphony Software Foundation - Active](https://cdn.rawgit.com/symphonyoss/contrib-toolbox/master/images/ssf-badge-active.svg)](https://symphonyoss.atlassian.net/wiki/display/FM/Active)
 
