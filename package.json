@@ -1,7 +1,7 @@
 {
   "name": "hubot-symphony",
   "description": "Hubot adapter for Symphony",
-  "main": "lib/adapter-compiled.js",
+  "main": "lib/adapter.js",
   "scripts": {
     "precommit": "npm test",
     "prepush": "npm test",
