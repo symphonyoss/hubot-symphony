@@ -2,6 +2,7 @@ node_modules
 .idea
 npm-debug.log
 cov-int
+.nyc_output
 coverage
 hubot-symphony.iml
 certs
