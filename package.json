@@ -9,7 +9,7 @@
     "diagnostic": "coffee src/diagnostic.coffee",
     "flow": "flow",
     "test": "mocha test/*.coffee test/*.js",
-    "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
+    "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee test/*.js && istanbul report",
     "it": "mocha it/*.coffee it/*.js",
     "generate-yarn-lockfile": "npm install -g yarn && npm install --production && yarn install",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
