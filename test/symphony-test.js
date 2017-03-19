@@ -20,7 +20,7 @@ let assert = require('chai').assert;
 import {describe, it, beforeEach, afterEach} from 'mocha';
 import {TextListener} from 'hubot';
 import Symphony from '../src/symphony';
-import {V2Message} from '../src/message';
+import V2Message from '../src/message';
 import NockServer from './nock-server';
 import FakeRobot from './fakes';
 
@@ -57,7 +57,7 @@ describe('On-premise key manager / agent', () => {
                 assert.deepEqual(msg, response);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -88,7 +88,7 @@ describe('REST API test suite', () => {
                 assert.deepEqual(msg, response);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -99,7 +99,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.botUserId, response.userId);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -112,7 +112,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.realUserEmail, response.emailAddress);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -125,7 +125,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.realUserEmail, response.emailAddress);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -138,7 +138,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.realUserEmail, response.emailAddress);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -148,7 +148,7 @@ describe('REST API test suite', () => {
             .then((response) => {
                 done('Expecting failure')
             })
-            .fail((error) => {
+            .catch((error) => {
                 done()
             });
     });
@@ -161,7 +161,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.botUserId, response.fromUserId);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -179,7 +179,7 @@ describe('REST API test suite', () => {
                 assert.include(response.map(m => m.message), msg);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -190,7 +190,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.datafeedId, response.id)
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -224,7 +224,7 @@ describe('REST API test suite', () => {
                         done();
                     })
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -242,7 +242,7 @@ describe('REST API test suite', () => {
                         done();
                     })
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });
@@ -253,7 +253,7 @@ describe('REST API test suite', () => {
                 assert.equal(nock.streamId, response.id);
                 done();
             })
-            .fail((error) => {
+            .catch((error) => {
                 done(`Failed with error ${error}`)
             });
     });

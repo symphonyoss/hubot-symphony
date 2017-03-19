@@ -58,7 +58,7 @@ class FakeRobot extends EventEmitter {
         // save user details in brain
         this.users = new Map();
         this.brain = {
-            userForId: function (id: string, options: object) {
+            userForId: function (id: string, options: Object) {
                 let user = self.users.get(id);
                 if (user === undefined) {
                     logger.debug(`Creating userId ${id} = ${JSON.stringify(options)}`);

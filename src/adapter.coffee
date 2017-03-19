@@ -17,7 +17,7 @@
 {Adapter} = require 'hubot'
 
 Symphony = require './symphony'
-{V2Message} = require './message'
+V2Message = require './message'
 memoize = require 'memoizee'
 backoff = require 'backoff'
 Entities = require('html-entities').XmlEntities
@@ -51,7 +51,7 @@ class SymphonyAdapter extends Adapter
           else
             @robot.emit 'error', new Error("Unable to create datafeed: #{response}")
             @expBackoff.backoff()
-        .fail (err) =>
+        .catch (err) =>
           @robot.emit 'error', new Error("Unable to create datafeed: #{err}")
           @expBackoff.backoff()
     @expBackoff.on 'fail', () =>
@@ -107,7 +107,7 @@ class SymphonyAdapter extends Adapter
         .then (response) =>
           @robot.displayName = response.displayName
           @robot.logger.info "Connected as #{response.displayName}"
-      .fail (err) =>
+      .catch (err) =>
         @robot.emit 'error', new Error("Unable to resolve identity: #{err}")
     hourlyRefresh = memoize @_getUser, {maxAge: 3600000, length: 2}
     @_userLookup = (query, streamId) -> hourlyRefresh query, streamId
@@ -131,7 +131,7 @@ class SymphonyAdapter extends Adapter
             @robot.logger.debug "Received #{response.length ? 0} datafeed messages"
             @_receiveMessage msg for msg in response when msg.v2messageType is 'V2Message'
           @emit 'poll', id
-        .fail (err) =>
+        .catch (err) =>
           @robot.emit 'error', new Error("Unable to read datafeed #{id}: #{err}")
           @_createDatafeed()
 
@@ -142,7 +142,7 @@ class SymphonyAdapter extends Adapter
           v2 = new V2Message(response, message)
           @robot.logger.debug "Received '#{v2.text}' from #{v2.user.name}"
           @receive v2
-        .fail (err) =>
+        .catch (err) =>
           @robot.emit 'error', new Error("Unable to fetch user details: #{err}")
 
   _getUser: (query, streamId) =>
