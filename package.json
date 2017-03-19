@@ -65,6 +65,9 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     },
+    "ghooks": {
+      "commit-msg": "validate-commit-msg"
+    },
     "validate-commit-msg": {
       "helpMessage": "This repo is Commitizen friendly, commit using git cz or see https://github.com/stevemao/conventional-changelog-angular/blob/master/convention.md"
     }
