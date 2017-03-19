@@ -20,13 +20,14 @@ import {Response, User} from 'hubot';
 import EventEmitter from 'events';
 import Log from 'log';
 
-const logger = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
+const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
 class FakeRobot extends EventEmitter {
     logs: Map<string, Array<string>>;
-    logger: (string, string) => void;
+    logger: Object;
     users: Map<string, User>;
-    received: Array<string>;
+    brain: Object;
+    received: Array<Object>;
 
     constructor() {
         super();
@@ -78,7 +79,7 @@ class FakeRobot extends EventEmitter {
         this.Response = Response;
     }
 
-    _log(level: String, message: String) {
+    _log(level: string, message: string) {
         let messages = this.logs.get(level);
         if (messages === undefined) {
             messages = [];
@@ -88,7 +89,7 @@ class FakeRobot extends EventEmitter {
         logger[level](message);
     }
 
-    receive(msg: String) {
+    receive(msg: object) {
         this.received.push(msg);
         super.emit('received');
     }

@@ -21,20 +21,21 @@ import nock from 'nock';
 import uuid from 'uuid';
 import Log from 'log';
 
-const logger = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
+const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
 type ConstructorArgs = {
     host: string,
-    kmHost: string,
-    agentHost: string,
-    sessionAuthHost: string,
-    startWithHelloWorldMessage: boolean
+    kmHost: ?string,
+    agentHost: ?string,
+    sessionAuthHost: ?string,
+    startWithHelloWorldMessage: ?boolean
 }
 
 class NockServer extends EventEmitter {
     messages: Array<object>;
     host: string;
     streamId: string;
+    firstMessageTimestamp: number;
     datafeedId: string;
     realUserId: number;
     realUserName: string;
@@ -60,7 +61,7 @@ class NockServer extends EventEmitter {
 
         this.streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA';
 
-        let firstMessageTimestamp = 1461808889185;
+        this.firstMessageTimestamp = 1461808889185;
 
         this.realUserId = 7215545078229;
         this.realUserName = 'johndoe';
@@ -93,7 +94,7 @@ class NockServer extends EventEmitter {
         if (args.startWithHelloWorldMessage || args.startWithHelloWorldMessage === undefined) {
             this.messages.push({
                 id: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA',
-                timestamp: firstMessageTimestamp,
+                timestamp: self.firstMessageTimestamp,
                 v2messageType: 'V2Message',
                 streamId: self.streamId,
                 message: '<messageML>Hello World</messageML>',

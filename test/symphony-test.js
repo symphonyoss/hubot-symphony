@@ -17,6 +17,7 @@
 //@flow
 
 let assert = require('chai').assert;
+import {describe, it, beforeEach, afterEach} from 'mocha';
 import {TextListener} from 'hubot';
 import Symphony from '../src/symphony';
 import {V2Message} from '../src/message';
@@ -24,8 +25,8 @@ import NockServer from './nock-server';
 import {FakeRobot} from './fakes';
 
 describe('On-premise key manager / agent', () => {
-    let nock: NockServer = null;
-    let symphony: Symphony = null;
+    let nock: NockServer;
+    let symphony: Symphony;
 
     beforeEach(() => {
         nock = new NockServer({
@@ -63,8 +64,8 @@ describe('On-premise key manager / agent', () => {
 });
 
 describe('REST API test suite', () => {
-    let nock: NockServer = null;
-    let symphony: Symphony = null;
+    let nock: NockServer;
+    let symphony: Symphony;
 
     beforeEach(() => {
         nock = new NockServer({host: 'https://foundation.symphony.com'});

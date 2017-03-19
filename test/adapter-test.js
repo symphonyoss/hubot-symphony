@@ -17,6 +17,7 @@
 //@flow
 
 let assert = require('chai').assert;
+import {describe, it, beforeEach, afterEach} from 'mocha';
 import SymphonyAdapter from '../src/adapter';
 import NockServer from './nock-server';
 import {FakeRobot} from './fakes';
@@ -38,7 +39,7 @@ describe('Constructor test', () => {
 });
 
 describe('Adapter test suite with helloWorld message', () => {
-    let nock: NockServer = null;
+    let nock: NockServer;
 
     beforeEach(() => {
         nock = new NockServer({host: 'https://foundation.symphony.com'})
@@ -96,7 +97,7 @@ describe('Adapter test suite with helloWorld message', () => {
 });
 
 describe('Adapter test suite', () => {
-    let nock: NockServer = null;
+    let nock: NockServer;
 
     beforeEach(() => {
         nock = new NockServer({host: 'https://foundation.symphony.com', startWithHelloWorldMessage: false})
