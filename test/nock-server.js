@@ -25,14 +25,14 @@ const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.
 
 type ConstructorArgs = {
     host: string,
-    kmHost: ?string,
-    agentHost: ?string,
-    sessionAuthHost: ?string,
-    startWithHelloWorldMessage: ?boolean
+    kmHost?: string,
+    agentHost?: string,
+    sessionAuthHost?: string,
+    startWithHelloWorldMessage?: boolean
 }
 
 class NockServer extends EventEmitter {
-    messages: Array<object>;
+    messages: Array<Object>;
     host: string;
     streamId: string;
     firstMessageTimestamp: number;
@@ -218,7 +218,7 @@ class NockServer extends EventEmitter {
         nock.cleanAll();
     }
 
-    _receiveMessage(msg: String) {
+    _receiveMessage(msg: Object) {
         logger.debug(`Received ${JSON.stringify(msg)}`);
         this.messages.push(msg);
         super.emit('received');

@@ -20,7 +20,7 @@ let assert = require('chai').assert;
 import {describe, it, beforeEach, afterEach} from 'mocha';
 import SymphonyAdapter from '../src/adapter';
 import NockServer from './nock-server';
-import {FakeRobot} from './fakes';
+import FakeRobot from './fakes';
 
 process.env['HUBOT_SYMPHONY_HOST'] = 'foundation.symphony.com';
 process.env['HUBOT_SYMPHONY_PUBLIC_KEY'] = './test/resources/publicKey.pem';

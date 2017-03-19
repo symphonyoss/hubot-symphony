@@ -28,6 +28,7 @@ class FakeRobot extends EventEmitter {
     users: Map<string, User>;
     brain: Object;
     received: Array<Object>;
+    Response: Response;
 
     constructor() {
         super();
@@ -89,12 +90,10 @@ class FakeRobot extends EventEmitter {
         logger[level](message);
     }
 
-    receive(msg: object) {
+    receive(msg: Object) {
         this.received.push(msg);
         super.emit('received');
     }
 }
 
-module.exports = {
-    FakeRobot
-};
+module.exports = FakeRobot;
