@@ -51,6 +51,7 @@
     "cross-env": "3.1.4",
     "cz-conventional-changelog": "1.2.0",
     "flow-bin": "0.42.0",
+    "ghooks": "2.0.0",
     "hubot": "2.19.0",
     "husky": "0.12.0",
     "istanbul": "0.4.5",
