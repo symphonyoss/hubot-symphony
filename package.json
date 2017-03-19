@@ -1,15 +1,16 @@
 {
   "name": "hubot-symphony",
   "description": "Hubot adapter for Symphony",
-  "main": "src/adapter.coffee",
+  "main": "src/adapter.js",
   "scripts": {
     "precommit": "npm test",
     "prepush": "npm test",
-    "commit-msg": "validate-commit-msg",
-    "diagnostic": "coffee src/diagnostic.coffee",
-    "test": "mocha test/*.coffee",
-    "test-cov": "cross-env COFFEECOV_INIT_ALL=false mocha --require coffee-coverage/register-istanbul test/*.coffee && istanbul report",
-    "it": "mocha it/*.coffee",
+    "commitmsg": "validate-commit-msg",
+    "diagnostic": "babel-node src/diagnostic.js",
+    "flow": "flow",
+    "test": "mocha test/*.js",
+    "test-cov": "nyc npm test",
+    "it": "mocha it/*.coffee it/*.js",
     "generate-yarn-lockfile": "npm install -g yarn && npm install --production && yarn install",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
@@ -38,17 +39,23 @@
     "request": "2.79.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-class-properties": "6.23.0",
+    "babel-plugin-transform-flow-strip-types": "6.22.0",
+    "babel-preset-env": "1.2.2",
+    "babel-preset-es2016": "6.22.0",
+    "babel-register": "6.24.0",
     "chai": "3.5.0",
-    "coffee-coverage": "1.0.1",
-    "coffee-script": "1.12.2",
+    "coffee-script": "1.12.4",
     "coveralls": "2.11.15",
     "cross-env": "3.1.4",
     "cz-conventional-changelog": "1.2.0",
+    "flow-bin": "0.42.0",
+    "ghooks": "2.0.0",
     "hubot": "2.19.0",
     "husky": "0.12.0",
-    "istanbul": "0.4.5",
     "mocha": "3.2.0",
     "nock": "9.0.2",
+    "nyc": "10.1.2",
     "semantic-release": "6.3.2",
     "uuid": "3.0.1",
     "validate-commit-msg": "2.10.1",
@@ -58,8 +65,29 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     },
+    "ghooks": {
+      "commit-msg": "validate-commit-msg"
+    },
     "validate-commit-msg": {
       "helpMessage": "This repo is Commitizen friendly, commit using git cz or see https://github.com/stevemao/conventional-changelog-angular/blob/master/convention.md"
     }
+  },
+  "nyc": {
+    "include": [
+      "src/*.js"
+    ],
+    "exclude": [
+      "**/*-compiled.js",
+      "**/*-compiled.js.map"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "sourceMap": true,
+    "instrument": true
   }
 }

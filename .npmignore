@@ -1,5 +1,5 @@
 .codeclimate.yml
-.istanbul.yml
+.flowconfig
 .travis.yml
 coffeelint.json
 it/*

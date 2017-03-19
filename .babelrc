@@ -1,0 +1,10 @@
+{
+  "presets": [
+    "env",
+    "es2016"
+  ],
+  "plugins": [
+    "transform-class-properties",
+    "transform-flow-strip-types"
+  ]
+}

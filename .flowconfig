@@ -1,0 +1,12 @@
+[ignore]
+.*/node_modules/config-chain/.*
+.*/node_modules/findup/.*
+.*/node_modules/npmconf/.*
+
+[include]
+
+[libs]
+
+[options]
+module.use_strict=true
+unsafe.enable_getters_and_setters=true
