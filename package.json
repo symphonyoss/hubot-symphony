@@ -8,6 +8,7 @@
     "commitmsg": "validate-commit-msg",
     "diagnostic": "babel-node src/diagnostic.js",
     "flow": "flow",
+    "eslint": "eslint src/*.js",
     "test": "mocha test/*.js",
     "test-cov": "nyc npm test",
     "it": "mocha it/*.coffee it/*.js",
@@ -38,6 +39,7 @@
     "request": "2.81.0"
   },
   "devDependencies": {
+    "babel-eslint": "7.1.1",
     "babel-plugin-transform-class-properties": "6.23.0",
     "babel-plugin-transform-flow-strip-types": "6.22.0",
     "babel-preset-env": "1.2.2",
@@ -48,6 +50,8 @@
     "coveralls": "2.12.0",
     "cross-env": "3.2.4",
     "cz-conventional-changelog": "2.0.0",
+    "eslint": "3.18.0",
+    "eslint-plugin-flowtype": "2.30.3",
     "flow-bin": "0.42.0",
     "ghooks": "2.0.0",
     "hubot": "2.19.0",

@@ -1,5 +1,5 @@
 .codeclimate.yml
+.eslintrc
 .flowconfig
 .travis.yml
-coffeelint.json
 it/*
