@@ -157,7 +157,7 @@ describe('Adapter test suite', () => {
             adapter.close();
         });
         nock.on('received', () => {
-            assert.include(nock.messages.map(m => m.message), '<messageML><mention email="johndoe@symphony.com"/> foo bar baz</messageML>');
+            assert.include(nock.messages.map(m => m.message), '<messageML><mention email="johndoe@symphony.com"/>foo bar baz</messageML>');
             done();
         });
         adapter.run()
@@ -178,7 +178,7 @@ describe('Adapter test suite', () => {
             adapter.close();
         });
         nock.on('received', () => {
-            assert.include(nock.messages.map(m => m.message), '<messageML><mention email="johndoe@symphony.com"/> &lt;&amp;&gt;</messageML>');
+            assert.include(nock.messages.map(m => m.message), '<messageML><mention email="johndoe@symphony.com"/>&lt;&amp;&gt;</messageML>');
             done();
         });
         adapter.run()

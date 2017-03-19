@@ -5,5 +5,5 @@ cov-int
 coverage
 hubot-symphony.iml
 certs
-test/**/*-compiled.js
-test/**/*-compiled.js.map
+**/*-compiled.js
+**/*-compiled.js.map
