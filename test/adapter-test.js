@@ -27,9 +27,7 @@ process.env['HUBOT_SYMPHONY_PRIVATE_KEY'] = './test/resources/privateKey.pem';
 process.env['HUBOT_SYMPHONY_PASSPHRASE'] = 'changeit';
 
 describe('Constructor test', () => {
-    let constructorProps = ['HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE'];
-
-    for (const constructorProp of constructorProps) {
+    for (const constructorProp of ['HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE']) {
         it(`should throw on construction if ${constructorProp} missing`, () => {
             let prop = process.env[constructorProp];
             delete process.env[constructorProp];
