@@ -4,6 +4,7 @@ npm-debug.log
 cov-int
 .nyc_output
 coverage
+lib
 hubot-symphony.iml
 certs
 **/*-compiled.js

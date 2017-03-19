@@ -17,6 +17,7 @@ script:
   - npm run-script test-cov
   # execute integration tests against foundation-dev pod
   - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then npm run-script it; fi;"
+  - npm run build
 
 after_success:
   # publish coverage results to coveralls
