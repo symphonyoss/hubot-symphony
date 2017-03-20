@@ -33,7 +33,7 @@ type BrainType = {
 
 type UserPropertiesType = {
     room: string
-}
+};
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
@@ -42,7 +42,7 @@ class FakeRobot extends EventEmitter {
     logger: LoggerType;
     users: Map<string, User>;
     brain: BrainType;
-    received: Array<Object>;
+    received: Array<V2Message>;
     Response: Response;
 
     constructor() {
