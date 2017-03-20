@@ -20,13 +20,23 @@ import {Response, User} from 'hubot';
 import EventEmitter from 'events';
 import Log from 'log';
 
+type LoggerType = {
+    error: (string) => void,
+    info: (string) => void,
+    debug: (string) => void,
+};
+
+type BrainType = {
+    userForId: (string, Object) => User
+};
+
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
 class FakeRobot extends EventEmitter {
     logs: Map<string, Array<string>>;
-    logger: Object;
+    logger: LoggerType;
     users: Map<string, User>;
-    brain: Object;
+    brain: BrainType;
     received: Array<Object>;
     Response: Response;
 
@@ -58,7 +68,7 @@ class FakeRobot extends EventEmitter {
         // save user details in brain
         this.users = new Map();
         this.brain = {
-            userForId: function (id: string, options: Object) {
+            userForId: function (id: string, options: Object): User {
                 let user = self.users.get(id);
                 if (user === undefined) {
                     logger.debug(`Creating userId ${id} = ${JSON.stringify(options)}`);
