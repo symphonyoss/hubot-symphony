@@ -175,7 +175,7 @@ class Symphony {
     }
 
     _httpPodGet(path: string): Promise<Object> {
-        return this.sessionAuth().then((sessionToken) => {
+        return this.sessionAuth().then((sessionToken: AuthenticateResponseType): Promise<Object> => {
             let headers = {
                 sessionToken: sessionToken.token
             };
@@ -184,7 +184,7 @@ class Symphony {
     }
 
     _httpPodPost(path: string, body: Object): Promise<Object> {
-        return this.sessionAuth().then((sessionToken) => {
+        return this.sessionAuth().then((sessionToken: AuthenticateResponseType): Promise<Object> => {
             let headers = {
                 sessionToken: sessionToken.token
             };
@@ -193,7 +193,7 @@ class Symphony {
     }
 
     _httpAgentGet(path: string): Promise<Object> {
-        return Promise.all([this.sessionAuth(), this.keyAuth()]).then((values) => {
+        return Promise.all([this.sessionAuth(), this.keyAuth()]).then((values: Array<AuthenticateResponseType>): Promise<Object> => {
             const [sessionToken, keyManagerToken] = values;
             let headers = {
                 sessionToken: sessionToken.token,
@@ -204,7 +204,7 @@ class Symphony {
     }
 
     _httpAgentPost(path: string, body: ?Object): Promise<Object> {
-        return Promise.all([this.sessionAuth(), this.keyAuth()]).then((values) => {
+        return Promise.all([this.sessionAuth(), this.keyAuth()]).then((values: Array<AuthenticateResponseType>): Promise<Object> => {
             const [sessionToken, keyManagerToken] = values;
             let headers = {
                 sessionToken: sessionToken.token,
