@@ -17,27 +17,23 @@
 //@flow
 
 import {TextMessage} from 'hubot';
+import type {SymphonyMessageType} from './symphony';
 
-type SymphonyMessage = {
-    id: string,
-    timestamp: number,
-    v2messageType: string,
-    streamId: string,
-    message: string,
-    fromUserId: number
-}
+type HubotUserType = {
+    room: string
+};
 
 class V2Message extends TextMessage {
-    symphonyMessage: SymphonyMessage;
+    symphonyMessage: SymphonyMessageType;
     room: string;
 
-    constructor(user: Object, symphonyMessage: SymphonyMessage) {
+    constructor(user: HubotUserType, symphonyMessage: SymphonyMessageType) {
         super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
         this.symphonyMessage = symphonyMessage;
         this.room = symphonyMessage.streamId
     }
 
-    static _getMessageText(symphonyMessage: SymphonyMessage): string {
+    static _getMessageText(symphonyMessage: SymphonyMessageType): string {
         let match =  /<messageML>(.*)<\/messageML>/i.exec(symphonyMessage.message);
         if (match === undefined || match === null) {
             return symphonyMessage.message;

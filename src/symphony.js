@@ -23,7 +23,7 @@ import Log from 'log';
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
-type ConstructorArgs = {
+type ConstructorArgsType = {
     host: string,
     privateKey: string,
     publicKey: string,
@@ -31,13 +31,60 @@ type ConstructorArgs = {
     keyManagerHost?: string,
     sessionAuthHost?: string,
     agentHost?: string
-}
+};
 
-type GetUserArgs = {
+export type AuthenticateResponseType = {
+    name: string,
+    token: string
+};
+
+export type EchoType = {
+    message: string
+};
+
+export type SymphonyUserIdType = {
+    userId: number
+};
+
+export type GetUserArgsType = {
     userId?: number,
     username?: string,
     emailAddress?: string
-}
+};
+
+export type SymphonyUserType = {
+    id: number,
+    emailAddress: string,
+    firstName: string,
+    lastName: string,
+    displayName: string,
+    company: string,
+    username: string
+};
+
+export type SymphonyAttachmentType = {
+    id: string,
+    name: string,
+    size: number
+};
+
+export type SymphonyMessageType = {
+    id: string,
+    timestamp: string,
+    v2messageType: string,
+    streamId: string,
+    message: string,
+    attachments: Array<SymphonyAttachmentType>,
+    fromUserId: number
+};
+
+export type CreateDatafeedResponseType = {
+    id: string
+};
+
+export type CreateIMResponseType = {
+    id: string
+};
 
 class Symphony {
     host: string;
@@ -47,10 +94,10 @@ class Symphony {
     privateKey: string;
     publicKey: string;
     passphrase: string;
-    sessionAuth: () => Promise<Object>;
-    keyAuth: () => Promise<Object>;
+    sessionAuth: () => Promise<AuthenticateResponseType>;
+    keyAuth: () => Promise<AuthenticateResponseType>;
 
-    constructor(args: ConstructorArgs) {
+    constructor(args: ConstructorArgsType) {
         this.host = args.host;
         this.keyManagerHost = args.keyManagerHost || args.host;
         this.sessionAuthHost = args.sessionAuthHost || args.host;
@@ -70,27 +117,27 @@ class Symphony {
         }
         // refresh tokens on a weekly basis
         let weeklyRefresh = memoize(this._httpPost.bind(this), {maxAge: 604800000, length: 2});
-        this.sessionAuth = function (): Promise<Object> {
+        this.sessionAuth = function (): Promise<AuthenticateResponseType> {
             return weeklyRefresh(this.sessionAuthHost, '/sessionauth/v1/authenticate');
         };
-        this.keyAuth = function (): Promise<Object> {
+        this.keyAuth = function (): Promise<AuthenticateResponseType> {
             return weeklyRefresh(this.keyManagerHost, '/keyauth/v1/authenticate');
         };
-        Promise.all([this.sessionAuth(), this.keyAuth()]).then((values: Array<Object>) => {
+        Promise.all([this.sessionAuth(), this.keyAuth()]).then((values: Array<AuthenticateResponseType>) => {
             const [sessionToken, keyManagerToken] = values;
             logger.info(`Initialising with sessionToken: ${sessionToken.token} and keyManagerToken: ${keyManagerToken.token}`);
         })
     }
 
-    echo(body: Object): Promise<Object> {
+    echo(body: EchoType): Promise<EchoType> {
         return this._httpAgentPost('/agent/v1/util/echo', body);
     }
 
-    whoAmI(): Promise<Object> {
+    whoAmI(): Promise<SymphonyUserIdType> {
         return this._httpPodGet('/pod/v1/sessioninfo');
     }
 
-    getUser(args: GetUserArgs): Promise<Object> {
+    getUser(args: GetUserArgsType): Promise<SymphonyUserType> {
         if (args.userId !== undefined && args.userId !== null) {
             return this._httpPodGet(`/pod/v2/user?uid=${args.userId}&local=true`);
         }
@@ -103,7 +150,7 @@ class Symphony {
         return Promise.reject('No valid user argument supplied');
     }
 
-    sendMessage(streamId: string, message: string, format: string): Promise<Object> {
+    sendMessage(streamId: string, message: string, format: string): Promise<SymphonyMessageType> {
         let body = {
             message: message,
             format: format
@@ -111,19 +158,19 @@ class Symphony {
         return this._httpAgentPost(`/agent/v2/stream/${streamId}/message/create`, body)
     }
 
-    getMessages(streamId: string): Promise<Object> {
+    getMessages(streamId: string): Promise<Array<SymphonyMessageType>> {
         return this._httpAgentGet(`/agent/v2/stream/${streamId}/message`);
     }
 
-    createDatafeed(): Promise<Object> {
+    createDatafeed(): Promise<CreateDatafeedResponseType> {
         return this._httpAgentPost('/agent/v1/datafeed/create', undefined);
     }
 
-    readDatafeed(datafeedId: string): Promise<Object> {
+    readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageType>> {
         return this._httpAgentGet(`/agent/v2/datafeed/${datafeedId}/read`);
     }
 
-    createIM(userId: number): Promise<Object> {
+    createIM(userId: number): Promise<CreateIMResponseType> {
         return this._httpPodPost('/pod/v1/im/create', [userId])
     }
 
@@ -156,7 +203,7 @@ class Symphony {
         })
     }
 
-    _httpAgentPost(path: string, body: Object): Promise<Object> {
+    _httpAgentPost(path: string, body: ?Object): Promise<Object> {
         return Promise.all([this.sessionAuth(), this.keyAuth()]).then((values) => {
             const [sessionToken, keyManagerToken] = values;
             let headers = {
@@ -171,11 +218,11 @@ class Symphony {
         return this._httpRequest('GET', host, path, headers, undefined);
     }
 
-    _httpPost(host: string, path: string, headers: Object = {}, body: Object): Promise<Object> {
+    _httpPost(host: string, path: string, headers: Object = {}, body: ?Object): Promise<Object> {
         return this._httpRequest('POST', host, path, headers, body);
     }
 
-    _httpRequest(method: string, host: string, path: string, headers: Object, body: Object): Promise<Object> {
+    _httpRequest(method: string, host: string, path: string, headers: Object, body: ?Object): Promise<Object> {
         let self = this;
         return new Promise(function (resolve, reject) {
             let options = {

@@ -17,9 +17,8 @@
 //@flow
 
 import {Adapter} from 'hubot';
-import type GetUserArgs from './symphony';
+import type {GetUserArgsType, SymphonyMessageType} from './symphony';
 import Symphony from './symphony';
-import type SymphonyMessage from './message';
 import V2Message from './message';
 import memoize from 'memoizee';
 import backoff from 'backoff';
@@ -27,12 +26,11 @@ import backoff from 'backoff';
 let Entities = require('html-entities').XmlEntities;
 const entities = new Entities();
 
-
 class SymphonyAdapter extends Adapter {
     robot: Robot;
     symphony: Symphony;
     expBackoff: Backoff;
-    _userLookup: (GetUserArgs, string) => Promise<Object>;
+    _userLookup: (GetUserArgs, ?string) => Promise<Object>;
 
     constructor(robot: Robot, options: Object = {}) {
         super(robot);
@@ -153,7 +151,7 @@ class SymphonyAdapter extends Adapter {
             });
         // cache user details for an hour
         let hourlyRefresh = memoize(this._getUser.bind(this), {maxAge: 3600000, length: 2});
-        this._userLookup = function (query: GetUserArgs, streamId?: string): Promise<Object> {
+        this._userLookup = function (query: GetUserArgs, streamId: ?string): Promise<Object> {
             var result = hourlyRefresh(query, streamId);
             return result;
         };
@@ -193,7 +191,7 @@ class SymphonyAdapter extends Adapter {
         });
     }
 
-    _receiveMessage(message: SymphonyMessage): void {
+    _receiveMessage(message: SymphonyMessageType): void {
         // ignore anything the bot said
         if (message.fromUserId !== this.robot.userId) {
             this._userLookup({userId: message.fromUserId}, message.streamId)
