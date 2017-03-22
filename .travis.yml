@@ -13,6 +13,8 @@ before_script:
   - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then curl -s https://raw.githubusercontent.com/symphonyoss/contrib-toolbox/master/scripts/download-files.sh | bash; fi;"
 
 script:
+  # run flow typing
+  - npm run-script flow
   # execute tests with coverage instrumentation
   - npm run-script test-cov
   # execute integration tests against foundation-dev pod
