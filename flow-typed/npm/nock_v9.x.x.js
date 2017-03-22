@@ -5,7 +5,7 @@ import EventEmitter from 'eventemitter';
 
 declare module 'nock' {
   declare type Path = string|RegExp|((url: string) => bool);
-  declare type Parameter = string|RegExp|Object|((body: Object) => bool);
+  declare type Parameter = string|RegExp|Object|Array<mixed>|((body: Object) => bool);
 
   declare type RecordedCall = {
     scope: string,
