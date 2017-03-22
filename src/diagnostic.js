@@ -14,12 +14,13 @@
  *    limitations under the License.
  */
 
-//@flow
+// @flow
 
-/// !pragma coverage-skip-block ///
+// / !pragma coverage-skip-block ///
 
-import Symphony from './symphony';
 import Log from 'log';
+import Symphony from './symphony';
+import NockServer from '../test/nock-server';
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
@@ -28,84 +29,85 @@ let argv = require('yargs')
     .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
     .argv;
 
+let nock: NockServer;
+
 if (argv.runOffline) {
-    logger.info('Instantiating nock server...');
-    NockServer = require('../test/nock-server');
-    let nock = new NockServer({host: 'https://foundation.symphony.com'});
+  logger.info('Instantiating nock server...');
+  nock = new NockServer({host: 'https://foundation.symphony.com'});
 }
 
 logger.info(`Running diagnostics against https://${argv.host}`);
 
 let symphony = new Symphony({
-    host: argv.host,
-    privateKey: argv.privateKey,
-    publicKey: argv.publicKey,
-    passphrase: argv.passphrase,
-    keyManagerHost: argv.kmhost || argv.host,
-    agentHost: argv.agenthost || argv.host,
-    sessionAuthHost: argv.sessionhost || argv.host
+  host: argv.host,
+  privateKey: argv.privateKey,
+  publicKey: argv.publicKey,
+  passphrase: argv.passphrase,
+  keyManagerHost: argv.kmhost || argv.host,
+  agentHost: argv.agenthost || argv.host,
+  sessionAuthHost: argv.sessionhost || argv.host
 });
 
 logger.info('Connection initiated, starting tests...');
 
 Promise.prototype.done = function (onFulfilled, onRejected) {
-    this.then(onFulfilled, onRejected)
-        .catch(function (reason) {
-            setTimeout(() => { throw reason }, 0);
-        });
+  this.then(onFulfilled, onRejected)
+    .catch(function (reason) {
+      setTimeout(() => { throw reason; }, 0);
+    });
 };
 
 // check tokens
 symphony.sessionAuth()
-    .then((response) => {
-        logger.info(`Session token: ${response.token}`);
-    })
-    .catch((err) => {
-        logger.error(`Failed to fetch session token: ${err}`);
-    })
-    .done();
+  .then((response) => {
+    logger.info(`Session token: ${response.token}`);
+  })
+  .catch((err) => {
+    logger.error(`Failed to fetch session token: ${err}`);
+  })
+  .done();
 symphony.keyAuth()
-    .then((response) => {
-        logger.info(`Key manager token: ${response.token}`);
-    })
-    .catch((err) => {
-        logger.error(`Failed to fetch key manager token: ${err}`);
-    })
-    .done();
+  .then((response) => {
+    logger.info(`Key manager token: ${response.token}`);
+  })
+  .catch((err) => {
+    logger.error(`Failed to fetch key manager token: ${err}`);
+  })
+  .done();
 
 // who am i
 symphony.whoAmI()
-    .then((response) => {
-        logger.info(`UserId: ${response.userId}`);
-        return symphony.getUser({userId: response.userId});
-    })
-    .then((response) => {
-        logger.info(`My name is ${response.displayName} [${response.emailAddress}]`);
-    })
-    .catch((err) => {
-        logger.error(`Failed to fetch userId: ${err}`);
-    })
-    .done();
+  .then((response) => {
+    logger.info(`UserId: ${response.userId}`);
+    return symphony.getUser({userId: response.userId});
+  })
+  .then((response) => {
+    logger.info(`My name is ${response.displayName} [${response.emailAddress}]`);
+  })
+  .catch((err) => {
+    logger.error(`Failed to fetch userId: ${err}`);
+  })
+  .done();
 
 // read message...
 symphony.createDatafeed()
-    .then((response) => {
-        logger.info(`Created datafeed: ${response.id}`);
-        logger.info('You should send me a message...');
-        return symphony.readDatafeed(response.id);
-    })
-    .then((response) => {
-        for (const msg of response) {
-            if (msg.v2messageType === 'V2Message') {
-                logger.info(`Received '${msg.message}'`)
-            }
-        }
-        if (argv.runOffline) {
-            nock.close()
-        }
-        process.exit(0)
-    })
-    .catch((err) => {
-        logger.error(`Failed to fetch key manager token: ${err}`);
-    })
-    .done();
+  .then((response) => {
+    logger.info(`Created datafeed: ${response.id}`);
+    logger.info('You should send me a message...');
+    return symphony.readDatafeed(response.id);
+  })
+  .then((response) => {
+    for (const msg of response) {
+      if (msg.v2messageType === 'V2Message') {
+        logger.info(`Received '${msg.message}'`);
+      }
+    }
+    if (argv.runOffline) {
+      nock.close();
+    }
+    process.exit(0);
+  })
+  .catch((err) => {
+    logger.error(`Failed to fetch key manager token: ${err}`);
+  })
+  .done();

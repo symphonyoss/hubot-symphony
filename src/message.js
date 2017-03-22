@@ -14,32 +14,28 @@
  *    limitations under the License.
  */
 
-//@flow
+// @flow
 
 import {TextMessage} from 'hubot';
 import type {SymphonyMessageType} from './symphony';
 
-type HubotUserType = {
-    room: string
-};
-
 class V2Message extends TextMessage {
-    symphonyMessage: SymphonyMessageType;
-    room: string;
+  symphonyMessage: SymphonyMessageType;
+  room: string;
 
-    constructor(user: HubotUserType, symphonyMessage: SymphonyMessageType) {
-        super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
-        this.symphonyMessage = symphonyMessage;
-        this.room = symphonyMessage.streamId
-    }
+  constructor (user: Object, symphonyMessage: SymphonyMessageType) {
+    super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
+    this.symphonyMessage = symphonyMessage;
+    this.room = symphonyMessage.streamId;
+  }
 
-    static _getMessageText(symphonyMessage: SymphonyMessageType): string {
-        let match =  /<messageML>(.*)<\/messageML>/i.exec(symphonyMessage.message);
-        if (match === undefined || match === null) {
-            return symphonyMessage.message;
-        }
-        return match[1];
+  static _getMessageText (symphonyMessage: SymphonyMessageType): string {
+    const match = /<messageML>(.*)<\/messageML>/i.exec(symphonyMessage.message);
+    if (match === undefined || match === null) {
+      return symphonyMessage.message;
     }
+    return match[1];
+  }
 }
 
 module.exports = V2Message;
