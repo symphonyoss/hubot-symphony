@@ -141,15 +141,26 @@ class SymphonyAdapter extends Adapter {
 
   run () {
     this.robot.logger.info('Initialising...');
-    const host: string = process.env.HUBOT_SYMPHONY_HOST;
+
+    const getEnv = function(key: string, defaultVal: ?string): string {
+      const value = process.env[key]
+      if (value) {
+        return value;
+      }
+      if (defaultVal) {
+        return defaultVal;
+      }
+      throw new Error(`${key} undefined`);
+    };
+    const host: string = getEnv('HUBOT_SYMPHONY_HOST');
     this.symphony = new Symphony({
       host: host,
-      privateKey: process.env.HUBOT_SYMPHONY_PRIVATE_KEY,
-      publicKey: process.env.HUBOT_SYMPHONY_PUBLIC_KEY,
-      passphrase: process.env.HUBOT_SYMPHONY_PASSPHRASE,
-      keyManagerHost: process.env.HUBOT_SYMPHONY_KM_HOST || host,
-      sessionAuthHost: process.env.HUBOT_SYMPHONY_SESSIONAUTH_HOST || host,
-      agentHost: process.env.HUBOT_SYMPHONY_AGENT_HOST || host
+      privateKey: getEnv('HUBOT_SYMPHONY_PRIVATE_KEY'),
+      publicKey: getEnv('HUBOT_SYMPHONY_PUBLIC_KEY'),
+      passphrase: getEnv('HUBOT_SYMPHONY_PASSPHRASE'),
+      keyManagerHost: getEnv('HUBOT_SYMPHONY_KM_HOST', host),
+      sessionAuthHost: getEnv('HUBOT_SYMPHONY_SESSIONAUTH_HOST', host),
+      agentHost: getEnv('HUBOT_SYMPHONY_AGENT_HOST', host)
     });
     this.symphony.whoAmI()
       .then((response) => {

@@ -143,16 +143,6 @@ describe('REST API test suite', () => {
       });
   });
 
-  it('getUser should fail if called with just a string arg', (done) => {
-    symphony.getUser(nock.realUserId)
-      .then((response) => {
-        done('Expecting failure');
-      })
-      .catch((error) => {
-        done();
-      });
-  });
-
   it('sendMessage should obtain session and key tokens and get message ack', (done) => {
     let msg = '<messageML>Testing 123...</messageML>';
     symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
