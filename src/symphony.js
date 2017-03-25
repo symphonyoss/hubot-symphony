@@ -166,6 +166,11 @@ export type RoomMembershipType = {
   joinDate: number
 };
 
+export type RoomMemberActionType = {
+  format: string,
+  message: string
+}
+
 type HttpHeaderType = {
   [key: string]: string
 };
@@ -322,6 +327,22 @@ class Symphony {
 
   getMembers (roomId: string): Promise<Array<RoomMembershipType>> {
     return this._httpPodGet(`/pod/v2/room/${roomId}/membership/list`);
+  }
+
+  addMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/add`, {id: userId})
+  }
+
+  removeMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/remove`, {id: userId})
+  }
+
+  promoteMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/promoteOwner`, {id: userId})
+  }
+
+  demoteMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/demoteOwner`, {id: userId})
   }
 
   _httpPodGet<T> (path: string): Promise<T> {

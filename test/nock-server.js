@@ -280,7 +280,27 @@ class NockServer extends EventEmitter {
           owner: false,
           joinDate: 1461430710531
         }
-      ]);
+      ])
+      .post(`/pod/v1/room/${self.streamId}/membership/add`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member added'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/remove`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member removed'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/promoteOwner`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member promoted to owner'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/demoteOwner`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member demoted to participant'
+      });
 
     const agentScope = nock(agentHost)
       .persist()

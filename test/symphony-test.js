@@ -349,6 +349,25 @@ describe('REST API test suite', () => {
         done(`Failed with error ${error}`);
       });
   });
+
+  for (const [label, func, message] of [
+    ['addMember should acknowledge addition', () => symphony.addMember(nock.streamId, nock.realUserId), 'Member added'],
+    ['removeMember should acknowledge removal', () => symphony.removeMember(nock.streamId, nock.realUserId), 'Member removed'],
+    ['promoteMember should acknowledge promotion', () => symphony.promoteMember(nock.streamId, nock.realUserId), 'Member promoted to owner'],
+    ['demoteMember should acknowledge demotion', () => symphony.demoteMember(nock.streamId, nock.realUserId), 'Member demoted to participant']
+  ]) {
+    it(label, (done) => {
+      func()
+        .then((response) => {
+          assert.equal(response.format, 'TEXT');
+          assert.equal(response.message, message);
+          done();
+        })
+        .catch((error) => {
+          done(`Failed with error ${error}`);
+        });
+    });
+  }
 });
 
 describe('Object model test suite', () => {
