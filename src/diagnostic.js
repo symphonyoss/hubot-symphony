@@ -50,13 +50,6 @@ let symphony = new Symphony({
 
 logger.info('Connection initiated, starting tests...');
 
-Promise.prototype.done = function (onFulfilled, onRejected) {
-  this.then(onFulfilled, onRejected)
-    .catch(function (reason) {
-      setTimeout(() => { throw reason; }, 0);
-    });
-};
-
 // check tokens
 symphony.sessionAuth()
   .then((response) => {
@@ -64,16 +57,14 @@ symphony.sessionAuth()
   })
   .catch((err) => {
     logger.error(`Failed to fetch session token: ${err}`);
-  })
-  .done();
+  });
 symphony.keyAuth()
   .then((response) => {
     logger.info(`Key manager token: ${response.token}`);
   })
   .catch((err) => {
     logger.error(`Failed to fetch key manager token: ${err}`);
-  })
-  .done();
+  });
 
 // who am i
 symphony.whoAmI()
@@ -86,8 +77,7 @@ symphony.whoAmI()
   })
   .catch((err) => {
     logger.error(`Failed to fetch userId: ${err}`);
-  })
-  .done();
+  });
 
 // read message...
 symphony.createDatafeed()
@@ -109,5 +99,4 @@ symphony.createDatafeed()
   })
   .catch((err) => {
     logger.error(`Failed to fetch key manager token: ${err}`);
-  })
-  .done();
+  });
