@@ -1,9 +1,13 @@
 [ignore]
-.*/node_modules/.*
+.*/node_modules/config-chain/.*
+.*/node_modules/findup/.*
+.*/node_modules/nock/.*
+.*/node_modules/npmconf/.*
 
 [include]
 
 [libs]
+flow-typed
 
 [options]
 module.use_strict=true

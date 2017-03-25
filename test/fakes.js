@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-//@flow
+// @flow
 
 import {Response, User} from 'hubot';
 import EventEmitter from 'events';
@@ -38,77 +38,77 @@ type UserPropertiesType = {
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
 class FakeRobot extends EventEmitter {
-    logs: Map<string, Array<string>>;
-    logger: LoggerType;
-    users: Map<string, User>;
-    brain: BrainType;
-    received: Array<V2Message>;
-    Response: Response;
+  logs: Map<string, Array<string>>;
+  logger: LoggerType;
+  users: Map<string, User>;
+  brain: BrainType;
+  received: Array<V2Message>;
+  Response: Response;
 
-    constructor() {
-        super();
+  constructor () {
+    super();
 
         // echo any errors
-        this.on('error', function (err: Error) {
-            logger.error(err);
-        });
+    this.on('error', function (err: Error) {
+      logger.error(err);
+    });
 
         // required to allow nested functions to access robot state
-        let self = this;
+    let self = this;
 
         // no-op the logging
-        this.logs = new Map();
-        this.logger = {
-            error: function (message: string) {
-                self._log('error', message);
-            },
-            info: function (message: string) {
-                self._log('info', message);
-            },
-            debug: function (message: string) {
-                self._log('debug', message);
-            }
-        };
+    this.logs = new Map();
+    this.logger = {
+      error: function (message: string) {
+        self._log('error', message);
+      },
+      info: function (message: string) {
+        self._log('info', message);
+      },
+      debug: function (message: string) {
+        self._log('debug', message);
+      }
+    };
 
         // save user details in brain
-        this.users = new Map();
-        this.brain = {
-            userForId: function (id: string, options: UserPropertiesType): User {
-                let user = self.users.get(id);
-                if (user === undefined) {
-                    logger.debug(`Creating userId ${id} = ${JSON.stringify(options)}`);
-                    user = new User(id, options);
-                    self.users.set(id, user);
-                }
-                if (options && options.room && (!user.room || user.room !== options.room)) {
-                    logger.debug(`Updating userId ${id} = ${JSON.stringify(options)}`);
-                    user = new User(id, options);
-                    self.users.set(id, user);
-                }
-                return user;
-            }
-        };
+    this.users = new Map();
+    this.brain = {
+      userForId: function (id: string, options: UserPropertiesType): User {
+        let user = self.users.get(id);
+        if (user === undefined) {
+          logger.debug(`Creating userId ${id} = ${JSON.stringify(options)}`);
+          user = new User(id, options);
+          self.users.set(id, user);
+        }
+        if (options && options.room && (!user.room || user.room !== options.room)) {
+          logger.debug(`Updating userId ${id} = ${JSON.stringify(options)}`);
+          user = new User(id, options);
+          self.users.set(id, user);
+        }
+        return user;
+      }
+    };
 
         // record all received messages
-        this.received = [];
+    this.received = [];
 
-        this.Response = Response;
-    }
+    this.Response = Response;
+  }
 
-    _log(level: string, message: string) {
-        let messages = this.logs.get(level);
-        if (messages === undefined) {
-            messages = [];
-            this.logs.set(level, messages);
-        }
-        messages.push(message);
-        logger[level](message);
+  _log (level: string, message: string) {
+    let messages = this.logs.get(level);
+    if (messages === undefined) {
+      messages = [];
+      this.logs.set(level, messages);
     }
+    messages.push(message);
+    logger[level](message);
+  }
 
-    receive(msg: V2Message) {
-        this.received.push(msg);
-        super.emit('received');
-    }
+  receive (msg: V2Message) {
+    this.received.push(msg);
+    super.emit('received');
+  }
 }
 
 module.exports = FakeRobot;
