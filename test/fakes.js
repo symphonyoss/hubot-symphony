@@ -18,7 +18,7 @@
 
 import {Response, User} from 'hubot';
 import EventEmitter from 'events';
-import V2Message from '../src/message';
+import {V2Message} from '../src/message';
 import Log from 'log';
 
 type LoggerType = {

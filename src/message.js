@@ -19,17 +19,30 @@
 import {TextMessage} from 'hubot';
 import type {SymphonyMessageType} from './symphony';
 
-class V2Message extends TextMessage {
+/**
+ * Represents a V2Message received from Symphony for use within Hubot
+ */
+export class V2Message extends TextMessage {
   symphonyMessage: SymphonyMessageType;
   room: string;
 
-  constructor (user: Object, symphonyMessage: SymphonyMessageType) {
+  /**
+   * @param user Hubot user
+   * @param {SymphonyMessageType} symphonyMessage Message from Symphony
+   * @constructor
+   */
+  constructor(user: Object, symphonyMessage: SymphonyMessageType) {
     super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
     this.symphonyMessage = symphonyMessage;
     this.room = symphonyMessage.streamId;
   }
 
-  static _getMessageText (symphonyMessage: SymphonyMessageType): string {
+  /**
+   * @param {SymphonyMessageType} symphonyMessage Message from Symphony
+   * @returns {string} message text contained within messageML tag
+   * @private
+   */
+  static _getMessageText(symphonyMessage: SymphonyMessageType): string {
     const match = /<messageML>(.*)<\/messageML>/i.exec(symphonyMessage.message);
     if (match === undefined || match === null) {
       return symphonyMessage.message;
@@ -37,5 +50,3 @@ class V2Message extends TextMessage {
     return match[1];
   }
 }
-
-module.exports = V2Message;

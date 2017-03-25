@@ -22,7 +22,7 @@ import backoff from 'backoff';
 import Backoff from 'backoff/lib/backoff';
 import type {GetUserArgsType, SymphonyMessageType} from './symphony';
 import Symphony from './symphony';
-import V2Message from './message';
+import {V2Message} from './message';
 
 const Entities = require('html-entities').XmlEntities;
 const entities = new Entities();

@@ -21,7 +21,7 @@ import {describe, it, beforeEach, afterEach} from 'mocha';
 import {TextListener} from 'hubot';
 import type {RoomMembershipType} from '../src/symphony';
 import Symphony from '../src/symphony';
-import V2Message from '../src/message';
+import {V2Message} from '../src/message';
 import NockServer from './nock-server';
 import FakeRobot from './fakes';
 
