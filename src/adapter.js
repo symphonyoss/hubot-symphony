@@ -143,7 +143,7 @@ class SymphonyAdapter extends Adapter {
     this.robot.logger.info('Initialising...');
 
     const getEnv = function(key: string, defaultVal: ?string): string {
-      const value = process.env[key]
+      const value = process.env[key];
       if (value) {
         return value;
       }
