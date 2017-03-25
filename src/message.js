@@ -27,7 +27,7 @@ export class V2Message extends TextMessage {
   room: string;
 
   /**
-   * @param user Hubot user
+   * @param {Object} user Hubot user
    * @param {SymphonyMessageType} symphonyMessage Message from Symphony
    * @constructor
    */
@@ -39,7 +39,7 @@ export class V2Message extends TextMessage {
 
   /**
    * @param {SymphonyMessageType} symphonyMessage Message from Symphony
-   * @returns {string} message text contained within messageML tag
+   * @return {string} message text contained within messageML tag
    * @private
    */
   static _getMessageText(symphonyMessage: SymphonyMessageType): string {
