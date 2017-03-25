@@ -18,6 +18,7 @@
 
 import fs from 'fs';
 import request from 'request';
+import querystring from 'querystring';
 import memoize from 'memoizee';
 import Log from 'log';
 
@@ -86,13 +87,97 @@ export type CreateIMResponseType = {
   id: string
 };
 
+type KeyValuePairType = {
+  key: string,
+  value: string
+};
+
+type CreateRoomFeaturesType = {
+  membersCanInvite?: boolean,
+  discoverable?: boolean,
+  public?: boolean,
+  readOnly?: boolean,
+  copyProtected?: boolean
+};
+
+export type CreateRoomType = {
+  name: string,
+  description: string,
+  keywords: Map<string, string>,
+  features?: CreateRoomFeaturesType
+};
+
+type UpdateRoomFeaturesType = {
+  membersCanInvite?: boolean,
+  discoverable?: boolean,
+  copyProtected?: boolean
+};
+
+export type UpdateRoomType = {
+  name: string,
+  description: string,
+  keywords: Map<string, string>,
+  features?: UpdateRoomFeaturesType
+};
+
+export type RoomInfoType = {
+  roomAttributes: {
+    name: string,
+    keywords: Array<KeyValuePairType>,
+    description: string,
+    membersCanInvite: boolean,
+    discoverable: boolean,
+    readOnly: boolean,
+    copyProtected: boolean,
+    public: boolean
+  },
+  roomSystemInfo: {
+    id: string,
+    creationDate: number,
+    createdByUserId: number,
+    active: boolean
+  }
+};
+
+export type RoomInfoAlternateType = {
+  roomAttributes: {
+    name: string,
+    keywords: Array<KeyValuePairType>,
+    description: string,
+    membersCanInvite: boolean,
+    discoverable: boolean
+  },
+  roomSystemInfo: {
+    id: string,
+    creationDate: number,
+    createdByUserId: number,
+    active: boolean
+  },
+  immutableRoomAttributes: {
+    readOnly: boolean,
+    copyProtected: boolean,
+    public: boolean
+  }
+};
+
+export type RoomMembershipType = {
+  id: number,
+  owner: boolean,
+  joinDate: number
+};
+
+export type RoomMemberActionType = {
+  format: string,
+  message: string
+}
+
 type HttpHeaderType = {
-  [key:string]: string
+  [key: string]: string
 };
 
 type HttpResponseType = {
   statusCode: number
-}
+};
 
 class Symphony {
   host: string;
@@ -180,6 +265,84 @@ class Symphony {
 
   createIM (userId: number): Promise<CreateIMResponseType> {
     return this._httpPodPost('/pod/v1/im/create', [userId]);
+  }
+
+  createRoom (roomInfo: CreateRoomType): Promise<RoomInfoType> {
+    const getFeature = function(feature: string): boolean {
+      if (roomInfo.features) {
+        return roomInfo.features[feature] || false;
+      }
+      return false;
+    };
+    const body = {
+      name: roomInfo.name,
+      description: roomInfo.description,
+      keywords: [],
+      membersCanInvite: getFeature('membersCanInvite'),
+      discoverable: getFeature('discoverable'),
+      public: getFeature('public'),
+      readOnly: getFeature('readOnly'),
+      copyProtected: getFeature('copyProtected')
+    };
+    for (const [key, value] of roomInfo.keywords.entries()) {
+      body.keywords.push({
+        key: key,
+        value: value
+      });
+    }
+    return this._httpPodPost('/pod/v2/room/create', body);
+  }
+
+  getRoomInfo (roomId: string): Promise<RoomInfoType> {
+    return this._httpPodGet(`/pod/v2/room/${roomId}/info`)
+  }
+
+  updateRoom (roomId: string, roomInfo: UpdateRoomType): Promise<RoomInfoType> {
+    const getFeature = function(feature: string): boolean {
+      if (roomInfo.features) {
+        return roomInfo.features[feature] || false;
+      }
+      return false;
+    };
+    const body = {
+      name: roomInfo.name,
+      description: roomInfo.description,
+      keywords: [],
+      membersCanInvite: getFeature('membersCanInvite'),
+      discoverable: getFeature('discoverable'),
+      copyProtected: getFeature('copyProtected')
+    };
+    for (const [key, value] of roomInfo.keywords.entries()) {
+      body.keywords.push({
+        key: key,
+        value: value
+      });
+    }
+    return this._httpPodPost(`/pod/v2/room/${roomId}/update`, body);
+  }
+
+  setRoomActiveStatus (roomId: string, status: boolean): Promise<RoomInfoAlternateType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/setActive?${querystring.stringify({active: status})}`);
+  }
+
+  getMembers (roomId: string): Promise<Array<RoomMembershipType>> {
+    return this._httpPodGet(`/pod/v2/room/${roomId}/membership/list`);
+  }
+
+  addMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/add`, {id: userId})
+  }
+
+  removeMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/remove`, {id: userId})
+  }
+
+  promoteMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/promoteOwner`, {id: userId})
+  }
+
+  demoteMember (roomId: string, userId: number): Promise<RoomMemberActionType> {
+    return this._httpPodPost(`/pod/v1/room/${roomId}/membership/demoteOwner`, {id: userId})
   }
 
   _httpPodGet<T> (path: string): Promise<T> {

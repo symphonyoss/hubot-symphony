@@ -17,10 +17,11 @@
 // @flow
 
 import EventEmitter from 'events';
+import querystring from 'querystring';
 import nock from 'nock';
 import uuid from 'uuid';
 import Log from 'log';
-import type {EchoType, SymphonyMessageType} from '../src/symphony';
+import type {EchoType, SymphonyMessageType, RoomInfoType, RoomInfoAlternateType} from '../src/symphony';
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
@@ -35,7 +36,32 @@ type ConstructorArgsType = {
 type SymphonyCreateMessagePayloadType = {
   message: string,
   format: string
-}
+};
+
+type KeyValuePairType = {
+  key: string,
+  value: string
+};
+
+type SymphonyCreateRoomPayloadType = {
+  name: string,
+  description: string,
+  keywords: Array<KeyValuePairType>,
+  membersCanInvite: boolean,
+  discoverable: boolean,
+  public: boolean,
+  readOnly: boolean,
+  copyProtected: boolean
+};
+
+type SymphonyUpdateRoomPayloadType = {
+  name: string,
+  description: string,
+  keywords: Array<KeyValuePairType>,
+  membersCanInvite: boolean,
+  discoverable: boolean,
+  copyProtected: boolean
+};
 
 class NockServer extends EventEmitter {
   messages: Array<SymphonyMessageType>;
@@ -50,7 +76,7 @@ class NockServer extends EventEmitter {
   _datafeedCreateHttp400Count: number;
   _datafeedReadHttp400Count: number;
 
-  constructor (args: ConstructorArgsType) {
+  constructor(args: ConstructorArgsType) {
     super();
 
     this.messages = [];
@@ -114,7 +140,7 @@ class NockServer extends EventEmitter {
       return val === undefined || val === null;
     };
 
-    let defaultScope = nock(this.host)
+    const defaultScope = nock(this.host)
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/agent/v1/util/echo')
@@ -122,7 +148,7 @@ class NockServer extends EventEmitter {
         code: 401,
         message: 'Invalid session'
       });
-    let authScope = nock(sessionAuthHost)
+    const authScope = nock(sessionAuthHost)
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/sessionauth/v1/authenticate')
@@ -130,7 +156,7 @@ class NockServer extends EventEmitter {
         name: 'sessionToken',
         token: 'SESSION_TOKEN'
       });
-    let keyAuthScope = nock(kmHost)
+    const keyAuthScope = nock(kmHost)
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/keyauth/v1/authenticate')
@@ -139,7 +165,7 @@ class NockServer extends EventEmitter {
         token: 'KEY_MANAGER_TOKEN'
       });
 
-    let podScope = nock(this.host)
+    const podScope = nock(this.host)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', checkHeaderMissing)
@@ -162,9 +188,121 @@ class NockServer extends EventEmitter {
       .post('/pod/v1/im/create', [self.realUserId])
       .reply(200, {
         id: self.streamId
+      })
+      .post('/pod/v2/room/create')
+      .reply(200, function (uri: string, requestBody: SymphonyCreateRoomPayloadType): RoomInfoType {
+        return {
+          roomAttributes: requestBody,
+          roomSystemInfo: {
+            id: self.streamId,
+            creationDate: 1464448273802,
+            createdByUserId: self.botUserId,
+            active: true
+          }
+        };
+      })
+      .get(`/pod/v2/room/${self.streamId}/info`)
+      .reply(200, {
+        roomAttributes: {
+          name: 'foo',
+          description: 'bar',
+          keywords: [{key: 'x', value: 'y'}],
+          membersCanInvite: false,
+          discoverable: false,
+          readOnly: false,
+          copyProtected: false,
+          public: false
+        },
+        roomSystemInfo: {
+          id: self.streamId,
+          creationDate: 1464448273802,
+          createdByUserId: self.botUserId,
+          active: true
+        }
+      })
+      .post(`/pod/v1/room/${self.streamId}/setActive`)
+      .query(function (query): boolean {
+        return query.hasOwnProperty('active')
+      })
+      .reply(200, function (uri: string, requestBody: mixed): RoomInfoAlternateType {
+        const query = querystring.parse(uri.substring(uri.indexOf('?') + 1));
+        return {
+          roomAttributes: {
+            name: 'foo',
+            description: 'bar',
+            keywords: [{key: 'x', value: 'y'}],
+            membersCanInvite: false,
+            discoverable: false
+          },
+          roomSystemInfo: {
+            id: self.streamId,
+            creationDate: 1464448273802,
+            createdByUserId: self.botUserId,
+            active: query.active == 'true'
+          },
+          immutableRoomAttributes: {
+            readOnly: false,
+            copyProtected: false,
+            public: false
+          }
+        };
+      })
+      .post(`/pod/v2/room/${self.streamId}/update`)
+      .reply(200, function (uri: string, requestBody: SymphonyUpdateRoomPayloadType): RoomInfoType {
+        return {
+          roomAttributes: {
+            name: requestBody.name,
+            description: requestBody.description,
+            keywords: requestBody.keywords,
+            membersCanInvite: requestBody.membersCanInvite,
+            discoverable: requestBody.discoverable,
+            copyProtected: requestBody.copyProtected,
+            readOnly: false,
+            public: false
+          },
+          roomSystemInfo: {
+            id: self.streamId,
+            creationDate: 1464448273802,
+            createdByUserId: self.botUserId,
+            active: true
+          }
+        };
+      })
+      .get(`/pod/v2/room/${self.streamId}/membership/list`)
+      .reply(200, [
+        {
+          id: self.botUserId,
+          owner: true,
+          joinDate: 1461426797875
+        },
+        {
+          id: self.realUserId,
+          owner: false,
+          joinDate: 1461430710531
+        }
+      ])
+      .post(`/pod/v1/room/${self.streamId}/membership/add`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member added'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/remove`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member removed'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/promoteOwner`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member promoted to owner'
+      })
+      .post(`/pod/v1/room/${self.streamId}/membership/demoteOwner`)
+      .reply(200, {
+        format: 'TEXT',
+        message: 'Member demoted to participant'
       });
 
-    let agentScope = nock(agentHost)
+    const agentScope = nock(agentHost)
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
@@ -174,7 +312,7 @@ class NockServer extends EventEmitter {
       })
       .post(`/agent/v2/stream/${self.streamId}/message/create`)
       .reply(200, function (uri: string, requestBody: SymphonyCreateMessagePayloadType): SymphonyMessageType {
-        let message = {
+        const message = {
           id: uuid.v1(),
           timestamp: new Date().valueOf().toString(),
           v2messageType: 'V2Message',
@@ -211,20 +349,20 @@ class NockServer extends EventEmitter {
       });
   }
 
-  set datafeedCreateHttp400Count (count: number) {
+  set datafeedCreateHttp400Count(count: number) {
     this._datafeedCreateHttp400Count = count;
   }
 
-  set datafeedReadHttp400Count (count: number) {
+  set datafeedReadHttp400Count(count: number) {
     this._datafeedReadHttp400Count = count;
   }
 
-  close () {
+  close() {
     logger.info(`Cleaning up nock for ${this.host}`);
     nock.cleanAll();
   }
 
-  _receiveMessage (msg: SymphonyMessageType) {
+  _receiveMessage(msg: SymphonyMessageType) {
     logger.debug(`Received ${JSON.stringify(msg)}`);
     this.messages.push(msg);
     super.emit('received');
