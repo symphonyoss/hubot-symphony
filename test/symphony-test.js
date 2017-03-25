@@ -105,44 +105,24 @@ describe('REST API test suite', () => {
       });
   });
 
-  it('getUser by userId should expose user details', (done) => {
-    symphony.getUser({userId: nock.realUserId})
-      .then((response) => {
-        assert.equal(nock.realUserId, response.id);
-        assert.equal(nock.realUserName, response.username);
-        assert.equal(nock.realUserEmail, response.emailAddress);
-        done();
-      })
-      .catch((error) => {
-        done(`Failed with error ${error}`);
-      });
-  });
-
-  it('getUser by email should expose user details', (done) => {
-    symphony.getUser({emailAddress: nock.realUserEmail})
-      .then((response) => {
-        assert.equal(nock.realUserId, response.id);
-        assert.equal(nock.realUserName, response.username);
-        assert.equal(nock.realUserEmail, response.emailAddress);
-        done();
-      })
-      .catch((error) => {
-        done(`Failed with error ${error}`);
-      });
-  });
-
-  it('getUser by username should expose user details', (done) => {
-    symphony.getUser({username: nock.realUserName})
-      .then((response) => {
-        assert.equal(nock.realUserId, response.id);
-        assert.equal(nock.realUserName, response.username);
-        assert.equal(nock.realUserEmail, response.emailAddress);
-        done();
-      })
-      .catch((error) => {
-        done(`Failed with error ${error}`);
-      });
-  });
+  for (const [label, func] of [
+    ['getUser by email should expose user details', () => symphony.getUser({emailAddress: nock.realUserEmail})],
+    ['getUser by username should expose user details', () => symphony.getUser({username: nock.realUserName})],
+    ['getUser by userId should expose user details', () => symphony.getUser({userId: nock.realUserId})]
+  ]) {
+    it(label, (done) => {
+      func()
+        .then((response) => {
+          assert.equal(nock.realUserId, response.id);
+          assert.equal(nock.realUserName, response.username);
+          assert.equal(nock.realUserEmail, response.emailAddress);
+          done();
+        })
+        .catch((error) => {
+          done(`Failed with error ${error}`);
+        });
+    });
+  }
 
   it('sendMessage should obtain session and key tokens and get message ack', (done) => {
     let msg = '<messageML>Testing 123...</messageML>';
@@ -191,7 +171,7 @@ describe('REST API test suite', () => {
     let msg2 = '<messageML>bar</messageML>';
     symphony.createDatafeed()
       .then((initialResponse) => {
-          // ensure that any previous message state is drained
+        // ensure that any previous message state is drained
         return symphony.readDatafeed(initialResponse.id)
           .then((response) => {
             return symphony.sendMessage(nock.streamId, msg1, 'MESSAGEML');
@@ -223,7 +203,7 @@ describe('REST API test suite', () => {
   it('readDatafeed should not fail if no messages are available', (done) => {
     symphony.createDatafeed()
       .then((initialResponse) => {
-          // ensure that any previous message state is drained
+        // ensure that any previous message state is drained
         symphony.readDatafeed(initialResponse.id)
           .then(() => {
             return symphony.readDatafeed(initialResponse.id);
@@ -253,14 +233,17 @@ describe('REST API test suite', () => {
     const roomInfo = {
       name: 'foo',
       description: 'bar',
-      keywords: new Map([['x', 'y']])
+      keywords: new Map([['x', 'y']]),
+      features: {
+        membersCanInvite: true
+      }
     };
     symphony.createRoom(roomInfo)
       .then((response) => {
         assert.equal('foo', response.roomAttributes.name);
         assert.equal('bar', response.roomAttributes.description);
         assert.deepEqual([{key: 'x', value: 'y'}], response.roomAttributes.keywords);
-        assert.isFalse(response.roomAttributes.membersCanInvite);
+        assert.isTrue(response.roomAttributes.membersCanInvite);
         assert.isFalse(response.roomAttributes.discoverable);
         assert.isFalse(response.roomAttributes.readOnly);
         assert.isFalse(response.roomAttributes.copyProtected);

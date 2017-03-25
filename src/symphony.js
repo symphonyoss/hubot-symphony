@@ -167,7 +167,7 @@ export type RoomMembershipType = {
 };
 
 type HttpHeaderType = {
-  [key:string]: string
+  [key: string]: string
 };
 
 type HttpResponseType = {

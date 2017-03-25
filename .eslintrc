@@ -1,7 +1,13 @@
 {
+  "parser": "babel-eslint",
   "extends": [
-    "canonical",
-    "canonical/flowtype",
-    "canonical/mocha"
+    "eslint:recommended",
+    "google",
+    "plugin:flowtype/recommended",
+    "plugin:mocha/recommended"
+  ],
+  "plugins": [
+    "flowtype",
+    "mocha"
   ]
 }
