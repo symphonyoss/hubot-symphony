@@ -8,3 +8,5 @@ ratings:
     - it/**
     - src/**
     - test/**
+exclude_paths:
+  - flow-typed/**
