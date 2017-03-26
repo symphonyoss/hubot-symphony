@@ -34,7 +34,7 @@ describe('On-premise key manager / agent', () => {
       host: 'https://foundation.symphony.com',
       kmHost: 'https://keymanager.notsymphony.com',
       agentHost: 'https://agent.alsonotsymphony.com',
-      sessionAuthHost: 'https://foundation-api.symphony.com'
+      sessionAuthHost: 'https://foundation-api.symphony.com',
     });
     symphony = new Symphony({
       host: 'foundation.symphony.com',
@@ -43,7 +43,7 @@ describe('On-premise key manager / agent', () => {
       passphrase: 'changeit',
       keyManagerHost: 'keymanager.notsymphony.com',
       agentHost: 'agent.alsonotsymphony.com',
-      sessionAuthHost: 'foundation-api.symphony.com'
+      sessionAuthHost: 'foundation-api.symphony.com',
     });
   });
 
@@ -74,7 +74,7 @@ describe('REST API test suite', () => {
       host: 'foundation.symphony.com',
       privateKey: './test/resources/privateKey.pem',
       publicKey: './test/resources/publicKey.pem',
-      passphrase: 'changeit'
+      passphrase: 'changeit',
     });
   });
 
@@ -108,7 +108,7 @@ describe('REST API test suite', () => {
   for (const [label, func] of [
     ['getUser by email should expose user details', () => symphony.getUser({emailAddress: nock.realUserEmail})],
     ['getUser by username should expose user details', () => symphony.getUser({username: nock.realUserName})],
-    ['getUser by userId should expose user details', () => symphony.getUser({userId: nock.realUserId})]
+    ['getUser by userId should expose user details', () => symphony.getUser({userId: nock.realUserId})],
   ]) {
     it(label, (done) => {
       func()
@@ -235,8 +235,8 @@ describe('REST API test suite', () => {
       description: 'bar',
       keywords: new Map([['x', 'y']]),
       features: {
-        membersCanInvite: true
-      }
+        membersCanInvite: true,
+      },
     };
     symphony.createRoom(roomInfo)
       .then((response) => {
@@ -285,8 +285,8 @@ describe('REST API test suite', () => {
       description: 'bar2',
       keywords: new Map([['x', 'y3']]),
       features: {
-        discoverable: true
-      }
+        discoverable: true,
+      },
     };
     symphony.updateRoom(nock.streamId, roomInfo)
       .then((response) => {
@@ -336,12 +336,12 @@ describe('REST API test suite', () => {
         assert.include(response, {
           id: nock.botUserId,
           owner: true,
-          joinDate: 1461426797875
+          joinDate: 1461426797875,
         });
         assert.include(response, {
           id: nock.realUserId,
           owner: false,
-          joinDate: 1461430710531
+          joinDate: 1461430710531,
         });
         done();
       })
@@ -351,10 +351,22 @@ describe('REST API test suite', () => {
   });
 
   for (const [label, func, message] of [
-    ['addMember should acknowledge addition', () => symphony.addMember(nock.streamId, nock.realUserId), 'Member added'],
-    ['removeMember should acknowledge removal', () => symphony.removeMember(nock.streamId, nock.realUserId), 'Member removed'],
-    ['promoteMember should acknowledge promotion', () => symphony.promoteMember(nock.streamId, nock.realUserId), 'Member promoted to owner'],
-    ['demoteMember should acknowledge demotion', () => symphony.demoteMember(nock.streamId, nock.realUserId), 'Member demoted to participant']
+    [
+      'addMember should acknowledge addition',
+      () => symphony.addMember(nock.streamId, nock.realUserId), 'Member added',
+    ],
+    [
+      'removeMember should acknowledge removal',
+      () => symphony.removeMember(nock.streamId, nock.realUserId), 'Member removed',
+    ],
+    [
+      'promoteMember should acknowledge promotion',
+      () => symphony.promoteMember(nock.streamId, nock.realUserId), 'Member promoted to owner',
+    ],
+    [
+      'demoteMember should acknowledge demotion',
+      () => symphony.demoteMember(nock.streamId, nock.realUserId), 'Member demoted to participant',
+    ],
   ]) {
     it(label, (done) => {
       func()
@@ -379,12 +391,12 @@ describe('Object model test suite', () => {
         v2messageType: 'V2Message',
         streamId: 'baz',
         message: text,
-        fromUserId: 12345
+        fromUserId: 12345,
       };
       let user = {
         id: 12345,
         name: 'johndoe',
-        displayName: 'John Doe'
+        displayName: 'John Doe',
       };
       let v2 = new V2Message(user, msg);
       assert.equal('Hello World', v2.text);
@@ -403,12 +415,12 @@ describe('Object model test suite', () => {
       v2messageType: 'V2Message',
       streamId: 'baz',
       message: 'butler ping',
-      fromUserId: 12345
+      fromUserId: 12345,
     };
     let user = {
       id: 12345,
       name: 'johndoe',
-      displayName: 'John Doe'
+      displayName: 'John Doe',
     };
     let robot = new FakeRobot();
     let callback = () => {

@@ -15,6 +15,7 @@
  */
 
 // @flow
+/* eslint-disable require-jsdoc */
 
 import {Response, User} from 'hubot';
 import EventEmitter from 'events';
@@ -22,17 +23,17 @@ import {V2Message} from '../src/message';
 import Log from 'log';
 
 type LoggerType = {
-    error: (string) => void,
-    info: (string) => void,
-    debug: (string) => void
+  error: (string) => void,
+  info: (string) => void,
+  debug: (string) => void
 };
 
 type BrainType = {
-    userForId: (string, UserPropertiesType) => User
+  userForId: (string, UserPropertiesType) => User
 };
 
 type UserPropertiesType = {
-    room: string
+  room: string
 };
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
@@ -45,35 +46,35 @@ class FakeRobot extends EventEmitter {
   received: Array<V2Message>;
   Response: Response;
 
-  constructor () {
+  constructor() {
     super();
 
-        // echo any errors
-    this.on('error', function (err: Error) {
+    // echo any errors
+    this.on('error', function(err: Error) {
       logger.error(err);
     });
 
-        // required to allow nested functions to access robot state
+    // required to allow nested functions to access robot state
     let self = this;
 
-        // no-op the logging
+    // no-op the logging
     this.logs = new Map();
     this.logger = {
-      error: function (message: string) {
+      error: function(message: string) {
         self._log('error', message);
       },
-      info: function (message: string) {
+      info: function(message: string) {
         self._log('info', message);
       },
-      debug: function (message: string) {
+      debug: function(message: string) {
         self._log('debug', message);
-      }
+      },
     };
 
-        // save user details in brain
+    // save user details in brain
     this.users = new Map();
     this.brain = {
-      userForId: function (id: string, options: UserPropertiesType): User {
+      userForId: function(id: string, options: UserPropertiesType): User {
         let user = self.users.get(id);
         if (user === undefined) {
           logger.debug(`Creating userId ${id} = ${JSON.stringify(options)}`);
@@ -86,16 +87,16 @@ class FakeRobot extends EventEmitter {
           self.users.set(id, user);
         }
         return user;
-      }
+      },
     };
 
-        // record all received messages
+    // record all received messages
     this.received = [];
 
     this.Response = Response;
   }
 
-  _log (level: string, message: string) {
+  _log(level: string, message: string) {
     let messages = this.logs.get(level);
     if (messages === undefined) {
       messages = [];
@@ -105,7 +106,7 @@ class FakeRobot extends EventEmitter {
     logger[level](message);
   }
 
-  receive (msg: V2Message) {
+  receive(msg: V2Message) {
     this.received.push(msg);
     super.emit('received');
   }

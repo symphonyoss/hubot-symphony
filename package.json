@@ -9,7 +9,7 @@
     "commitmsg": "validate-commit-msg",
     "diagnostic": "babel-node src/diagnostic.js",
     "flow": "flow",
-    "eslint": "eslint src/*.js",
+    "eslint": "eslint src/*.js test/*.js it/*.js",
     "test": "mocha test/*.js",
     "test-cov": "nyc npm test",
     "it": "mocha it/*.coffee it/*.js",

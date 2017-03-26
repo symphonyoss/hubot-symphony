@@ -28,7 +28,9 @@ process.env['HUBOT_SYMPHONY_PRIVATE_KEY'] = './test/resources/privateKey.pem';
 process.env['HUBOT_SYMPHONY_PASSPHRASE'] = 'changeit';
 
 describe('Constructor test', () => {
-  for (const constructorProp of ['HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE']) {
+  for (const constructorProp of [
+    'HUBOT_SYMPHONY_HOST', 'HUBOT_SYMPHONY_PUBLIC_KEY', 'HUBOT_SYMPHONY_PRIVATE_KEY', 'HUBOT_SYMPHONY_PASSPHRASE',
+  ]) {
     it(`should throw on construction if ${constructorProp} missing`, () => {
       let prop = process.env[constructorProp];
       delete process.env[constructorProp];
@@ -131,7 +133,7 @@ describe('Adapter test suite', () => {
       let envelope = {room: nock.streamId};
       adapter.send(envelope, {
         format: 'MESSAGEML',
-        text: '<messageML><b>foo bar</b></messageML>'
+        text: '<messageML><b>foo bar</b></messageML>',
       });
       adapter.close();
     });
@@ -150,14 +152,15 @@ describe('Adapter test suite', () => {
       let envelope = {
         room: nock.streamId,
         user: {
-          emailAddress: 'johndoe@symphony.com'
-        }
+          emailAddress: 'johndoe@symphony.com',
+        },
       };
       adapter.reply(envelope, 'foo bar baz');
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), '<messageML><mention email="johndoe@symphony.com"/>foo bar baz</messageML>');
+      const messageTexts = nock.messages.map((m) => m.message);
+      assert.include(messageTexts, '<messageML><mention email="johndoe@symphony.com"/>foo bar baz</messageML>');
       done();
     });
     adapter.run();
@@ -171,14 +174,15 @@ describe('Adapter test suite', () => {
       let envelope = {
         room: nock.streamId,
         user: {
-          emailAddress: 'johndoe@symphony.com'
-        }
+          emailAddress: 'johndoe@symphony.com',
+        },
       };
       adapter.reply(envelope, '<&>');
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), '<messageML><mention email="johndoe@symphony.com"/>&lt;&amp;&gt;</messageML>');
+      const messageTexts = nock.messages.map((m) => m.message);
+      assert.include(messageTexts, '<messageML><mention email="johndoe@symphony.com"/>&lt;&amp;&gt;</messageML>');
       done();
     });
     adapter.run();
@@ -189,7 +193,7 @@ describe('Adapter test suite', () => {
     let robot = new FakeRobot();
     let adapter = SymphonyAdapter.use(robot, {
       shutdownFunc: () => done(),
-      failConnectAfter: 1
+      failConnectAfter: 1,
     });
     adapter.run();
   });

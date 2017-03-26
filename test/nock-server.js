@@ -15,6 +15,7 @@
  */
 
 // @flow
+/* eslint-disable require-jsdoc */
 
 import EventEmitter from 'events';
 import querystring from 'querystring';
@@ -105,7 +106,7 @@ class NockServer extends EventEmitter {
       firstName: 'John',
       lastName: 'Doe',
       username: self.realUserName,
-      displayName: 'John Doe'
+      displayName: 'John Doe',
     };
 
     this.botUserId = 7696581411197;
@@ -118,7 +119,7 @@ class NockServer extends EventEmitter {
       firstName: 'Wolfgang Amadeus',
       lastName: 'Mozart',
       username: botUserName,
-      displayName: 'Mozart'
+      displayName: 'Mozart',
     };
 
     this.datafeedId = '1234';
@@ -130,48 +131,58 @@ class NockServer extends EventEmitter {
         v2messageType: 'V2Message',
         streamId: self.streamId,
         message: '<messageML>Hello World</messageML>',
-        fromUserId: self.realUserId
+        fromUserId: self.realUserId,
       });
     }
 
     nock.disableNetConnect();
 
-    let checkHeaderMissing = function (val: string): boolean {
+    let checkHeaderMissing = function(val: string): boolean {
       return val === undefined || val === null;
     };
 
+    /* eslint-disable no-unused-vars */
     const defaultScope = nock(this.host)
+    /* eslint-enable no-unused-vars */
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/agent/v1/util/echo')
       .reply(401, {
         code: 401,
-        message: 'Invalid session'
+        message: 'Invalid session',
       });
+
+    /* eslint-disable no-unused-vars */
     const authScope = nock(sessionAuthHost)
+    /* eslint-enable no-unused-vars */
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/sessionauth/v1/authenticate')
       .reply(200, {
         name: 'sessionToken',
-        token: 'SESSION_TOKEN'
+        token: 'SESSION_TOKEN',
       });
+
+    /* eslint-disable no-unused-vars */
     const keyAuthScope = nock(kmHost)
+    /* eslint-enable no-unused-vars */
       .matchHeader('sessionToken', checkHeaderMissing)
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .post('/keyauth/v1/authenticate')
       .reply(200, {
         name: 'keyManagerToken',
-        token: 'KEY_MANAGER_TOKEN'
+        token: 'KEY_MANAGER_TOKEN',
       });
 
+    /* eslint-disable no-unused-vars */
     const podScope = nock(this.host)
+    /* eslint-enable no-unused-vars */
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', checkHeaderMissing)
       .get('/pod/v1/sessioninfo')
       .reply(200, {
-        userId: self.botUserId
+        userId: self.botUserId,
       })
       .get(`/pod/v2/user?uid=${self.realUserId}&local=true`)
       .reply(200, realUserObject)
@@ -187,18 +198,18 @@ class NockServer extends EventEmitter {
       .reply(200, botUserObject)
       .post('/pod/v1/im/create', [self.realUserId])
       .reply(200, {
-        id: self.streamId
+        id: self.streamId,
       })
       .post('/pod/v2/room/create')
-      .reply(200, function (uri: string, requestBody: SymphonyCreateRoomPayloadType): RoomInfoType {
+      .reply(200, function(uri: string, requestBody: SymphonyCreateRoomPayloadType): RoomInfoType {
         return {
           roomAttributes: requestBody,
           roomSystemInfo: {
             id: self.streamId,
             creationDate: 1464448273802,
             createdByUserId: self.botUserId,
-            active: true
-          }
+            active: true,
+          },
         };
       })
       .get(`/pod/v2/room/${self.streamId}/info`)
@@ -211,20 +222,20 @@ class NockServer extends EventEmitter {
           discoverable: false,
           readOnly: false,
           copyProtected: false,
-          public: false
+          public: false,
         },
         roomSystemInfo: {
           id: self.streamId,
           creationDate: 1464448273802,
           createdByUserId: self.botUserId,
-          active: true
-        }
+          active: true,
+        },
       })
       .post(`/pod/v1/room/${self.streamId}/setActive`)
-      .query(function (query): boolean {
-        return query.hasOwnProperty('active')
+      .query(function(query): boolean {
+        return query.hasOwnProperty('active');
       })
-      .reply(200, function (uri: string, requestBody: mixed): RoomInfoAlternateType {
+      .reply(200, function(uri: string, requestBody: mixed): RoomInfoAlternateType {
         const query = querystring.parse(uri.substring(uri.indexOf('?') + 1));
         return {
           roomAttributes: {
@@ -232,23 +243,23 @@ class NockServer extends EventEmitter {
             description: 'bar',
             keywords: [{key: 'x', value: 'y'}],
             membersCanInvite: false,
-            discoverable: false
+            discoverable: false,
           },
           roomSystemInfo: {
             id: self.streamId,
             creationDate: 1464448273802,
             createdByUserId: self.botUserId,
-            active: query.active == 'true'
+            active: query.active == 'true',
           },
           immutableRoomAttributes: {
             readOnly: false,
             copyProtected: false,
-            public: false
-          }
+            public: false,
+          },
         };
       })
       .post(`/pod/v2/room/${self.streamId}/update`)
-      .reply(200, function (uri: string, requestBody: SymphonyUpdateRoomPayloadType): RoomInfoType {
+      .reply(200, function(uri: string, requestBody: SymphonyUpdateRoomPayloadType): RoomInfoType {
         return {
           roomAttributes: {
             name: requestBody.name,
@@ -258,14 +269,14 @@ class NockServer extends EventEmitter {
             discoverable: requestBody.discoverable,
             copyProtected: requestBody.copyProtected,
             readOnly: false,
-            public: false
+            public: false,
           },
           roomSystemInfo: {
             id: self.streamId,
             creationDate: 1464448273802,
             createdByUserId: self.botUserId,
-            active: true
-          }
+            active: true,
+          },
         };
       })
       .get(`/pod/v2/room/${self.streamId}/membership/list`)
@@ -273,45 +284,47 @@ class NockServer extends EventEmitter {
         {
           id: self.botUserId,
           owner: true,
-          joinDate: 1461426797875
+          joinDate: 1461426797875,
         },
         {
           id: self.realUserId,
           owner: false,
-          joinDate: 1461430710531
-        }
+          joinDate: 1461430710531,
+        },
       ])
       .post(`/pod/v1/room/${self.streamId}/membership/add`)
       .reply(200, {
         format: 'TEXT',
-        message: 'Member added'
+        message: 'Member added',
       })
       .post(`/pod/v1/room/${self.streamId}/membership/remove`)
       .reply(200, {
         format: 'TEXT',
-        message: 'Member removed'
+        message: 'Member removed',
       })
       .post(`/pod/v1/room/${self.streamId}/membership/promoteOwner`)
       .reply(200, {
         format: 'TEXT',
-        message: 'Member promoted to owner'
+        message: 'Member promoted to owner',
       })
       .post(`/pod/v1/room/${self.streamId}/membership/demoteOwner`)
       .reply(200, {
         format: 'TEXT',
-        message: 'Member demoted to participant'
+        message: 'Member demoted to participant',
       });
 
+    /* eslint-disable no-unused-vars */
     const agentScope = nock(agentHost)
+    /* eslint-enable no-unused-vars */
       .persist()
       .matchHeader('sessionToken', 'SESSION_TOKEN')
       .matchHeader('keyManagerToken', 'KEY_MANAGER_TOKEN')
       .post('/agent/v1/util/echo')
-      .reply(200, function (uri: string, requestBody: EchoType): EchoType {
+      .reply(200, function(uri: string, requestBody: EchoType): EchoType {
         return requestBody;
       })
       .post(`/agent/v2/stream/${self.streamId}/message/create`)
-      .reply(200, function (uri: string, requestBody: SymphonyCreateMessagePayloadType): SymphonyMessageType {
+      .reply(200, function(uri: string, requestBody: SymphonyCreateMessagePayloadType): SymphonyMessageType {
         const message = {
           id: uuid.v1(),
           timestamp: new Date().valueOf().toString(),
@@ -319,24 +332,24 @@ class NockServer extends EventEmitter {
           streamId: self.streamId,
           message: requestBody.message,
           attachments: [],
-          fromUserId: self.botUserId
+          fromUserId: self.botUserId,
         };
         self._receiveMessage(message);
         return message;
       })
       .get(`/agent/v2/stream/${self.streamId}/message`)
-      .reply(200, function (uri: string, requestBody: mixed) {
+      .reply(200, function(uri: string, requestBody: mixed) {
         return self.messages;
       })
       .post('/agent/v1/datafeed/create')
-      .reply(function (uri: string, requestBody: mixed) {
+      .reply(function(uri: string, requestBody: mixed) {
         if (self._datafeedCreateHttp400Count-- > 0) {
           return [400, null];
         }
         return [200, {id: self.datafeedId}];
       })
       .get(`/agent/v2/datafeed/${self.datafeedId}/read`)
-      .reply(function (uri: string, requestBody: mixed) {
+      .reply(function(uri: string, requestBody: mixed) {
         if (self._datafeedReadHttp400Count-- > 0) {
           return [400, null];
         }
