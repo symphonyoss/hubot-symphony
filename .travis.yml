@@ -24,5 +24,7 @@ script:
 after_success:
   # publish coverage results to coveralls
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+  # publish coverage results to codeclimate
+  - 'cat ./coverage/lcov.info | ./node_modules/.bin/codeclimate-test-reporter'
   # deploy to npm if required
   - npm run semantic-release
