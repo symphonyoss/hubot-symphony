@@ -16,7 +16,7 @@
 
 // @flow
 
-let assert = require('chai').assert;
+const assert = require('chai').assert;
 import {describe, it, beforeEach, afterEach} from 'mocha';
 import {TextListener} from 'hubot';
 import type {RoomMembershipType} from '../src/symphony';
