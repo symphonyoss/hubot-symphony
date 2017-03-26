@@ -20,12 +20,28 @@ import {Adapter, Robot} from 'hubot';
 import memoize from 'memoizee';
 import backoff from 'backoff';
 import Backoff from 'backoff/lib/backoff';
+import XmlEntities from 'html-entities/lib/xml-entities';
 import type {GetUserArgsType, SymphonyMessageType} from './symphony';
 import Symphony from './symphony';
 import {V2Message} from './message';
 
-const Entities = require('html-entities').XmlEntities;
-const entities = new Entities();
+const entities = new XmlEntities();
+
+type AdapterOptionsType = {
+  failConnectAfter?: number,
+  shutdownFunc?: () => void
+};
+
+type SimpleMessageEnvelopeType = {
+  room: string
+};
+
+type MessageEnvelopeType = {
+  room: string,
+  user: {
+    emailAddress: string
+  }
+};
 
 type MessageType = {
     text: string,
@@ -34,13 +50,29 @@ type MessageType = {
 
 type MessageTypeOrString = MessageType | string;
 
+type HubotUserType = {
+  name: string;
+  displayName: string;
+  emailAddress: string;
+  room: string;
+}
+
+/**
+ * Hubot adapter for Symphony
+ * @author Jon Freedman
+ */
 class SymphonyAdapter extends Adapter {
   robot: Robot;
   symphony: Symphony;
   expBackoff: Backoff;
   _userLookup: (GetUserArgsType, ?string) => Promise<Object>;
 
-  constructor (robot: Robot, options: Object = {}) {
+  /**
+   * @param {Robot} robot Hubot robot
+   * @param {AdapterOptionsType} options Configuration options that may be overridden for testing
+   * @constructor
+   */
+  constructor(robot: Robot, options: AdapterOptionsType = {}) {
     super(robot);
     this.robot = robot;
 
@@ -59,7 +91,7 @@ class SymphonyAdapter extends Adapter {
 
     this.expBackoff = backoff.exponential({
       initialDelay: 10,
-      maxDelay: 60000
+      maxDelay: 60000,
     });
     this.expBackoff.on('backoff', (num, delay) => {
       if (num > 0) {
@@ -90,7 +122,9 @@ class SymphonyAdapter extends Adapter {
     });
     this.expBackoff.on('fail', () => {
       this.robot.logger.info('Shutting down...');
-      options.shutdownFunc();
+      if (options.shutdownFunc) {
+        options.shutdownFunc();
+      }
     });
     // will time out reconnecting after ~10min
     const failAfter = options.failConnectAfter || 23;
@@ -98,7 +132,19 @@ class SymphonyAdapter extends Adapter {
     this.expBackoff.failAfter(failAfter);
   }
 
-  send (envelope: Object, ...messages: Array<MessageTypeOrString>) {
+  /**
+   * Send one or more messages to a room in Symphony, can be called with strings or objects of the form
+   * <pre><code>
+   * {
+   *   text: string,
+   *   format: string
+   * }
+   * </code></pre>
+   *
+   * @param {SimpleMessageEnvelopeType} envelope
+   * @param {Array<MessageTypeOrString>} messages
+   */
+  send(envelope: SimpleMessageEnvelopeType, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending ${messages.length} messages to ${envelope.room}`);
     for (const message of messages) {
       if (typeof message === 'string') {
@@ -109,7 +155,20 @@ class SymphonyAdapter extends Adapter {
     }
   }
 
-  sendDirectMessageToUsername (username: string, ...messages: Array<MessageTypeOrString>) {
+  /**
+   * Send one or more messages to a user in Symphony based on their username, can be called with strings or objects of
+   * the form
+   * <pre><code>
+   * {
+   *   text: string,
+   *   format: string
+   * }
+   * </code></pre>
+   *
+   * @param {string} username
+   * @param {Array<MessageTypeOrString>} messages
+   */
+  sendDirectMessageToUsername(username: string, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending direct message to username: ${username}`);
     this._userLookup({username: username}, undefined)
       .then((response) => {
@@ -117,7 +176,20 @@ class SymphonyAdapter extends Adapter {
       });
   }
 
-  sendDirectMessageToEmail (email: string, ...messages: Array<MessageTypeOrString>) {
+  /**
+   * Send one or more messages to a user in Symphony based on their email address, can be called with strings or objects
+   * of the form
+   * <pre><code>
+   * {
+   *   text: string,
+   *   format: string
+   * }
+   * </code></pre>
+   *
+   * @param {string} email
+   * @param {Array<MessageTypeOrString>} messages
+   */
+  sendDirectMessageToEmail(email: string, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending direct message to email: ${email}`);
     this._userLookup({emailAddress: email}, undefined)
       .then((response) => {
@@ -125,21 +197,39 @@ class SymphonyAdapter extends Adapter {
       });
   }
 
-  _sendDirectMessageToUserId (userId: number, ...messages: Array<MessageTypeOrString>) {
+  /**
+   * @param {number} userId Symphony user id
+   * @param {Array<MessageTypeOrString>} messages
+   * @private
+   */
+  _sendDirectMessageToUserId(userId: number, ...messages: Array<MessageTypeOrString>) {
     this.symphony.createIM(userId)
       .then((response) => {
         this.send({room: response.id}, ...messages);
       });
   }
 
-  reply (envelope: Object, ...messages: Array<string>) {
-    this.robot.logger.debug(`Sending ${messages.length} reply messages to ${envelope.user.emailAddress} in ${envelope.room}`);
+  /**
+   * Reply with one or more messages to a room in Symphony, can only be called with strings as each message is prefixed
+   * with an <code>@mention</code>
+   *
+   * @param {MessageEnvelopeType} envelope
+   * @param {Array<MessageTypeOrString>} messages
+   */
+  reply(envelope: MessageEnvelopeType, ...messages: Array<string>) {
+    this.robot.logger.debug(
+      `Sending ${messages.length} reply messages to ${envelope.user.emailAddress} in ${envelope.room}`
+    );
     for (const message of messages) {
-      this.symphony.sendMessage(envelope.room, `<messageML><mention email="${envelope.user.emailAddress}"/>${entities.encode(message)}</messageML>`, 'MESSAGEML');
+      const mml = `<messageML><mention email="${envelope.user.emailAddress}"/>${entities.encode(message)}</messageML>`;
+      this.symphony.sendMessage(envelope.room, mml, 'MESSAGEML');
     }
   }
 
-  run () {
+  /**
+   * Connect to Symphony
+   */
+  run() {
     this.robot.logger.info('Initialising...');
 
     const getEnv = function(key: string, defaultVal: ?string): string {
@@ -160,7 +250,7 @@ class SymphonyAdapter extends Adapter {
       passphrase: getEnv('HUBOT_SYMPHONY_PASSPHRASE'),
       keyManagerHost: getEnv('HUBOT_SYMPHONY_KM_HOST', host),
       sessionAuthHost: getEnv('HUBOT_SYMPHONY_SESSIONAUTH_HOST', host),
-      agentHost: getEnv('HUBOT_SYMPHONY_AGENT_HOST', host)
+      agentHost: getEnv('HUBOT_SYMPHONY_AGENT_HOST', host),
     });
     this.symphony.whoAmI()
       .then((response) => {
@@ -176,22 +266,35 @@ class SymphonyAdapter extends Adapter {
       });
     // cache user details for an hour
     const hourlyRefresh = memoize(this._getUser.bind(this), {maxAge: 3600000, length: 2});
-    this._userLookup = function (query: GetUserArgsType, streamId: ?string): Promise<Object> {
+    this._userLookup = function(query: GetUserArgsType, streamId: ?string): Promise<Object> {
       return hourlyRefresh(query, streamId);
     };
     this._createDatafeed();
   }
 
-  close () {
+  /**
+   * Clean up
+   */
+  close() {
     this.robot.logger.debug('Removing datafeed poller');
     this.removeListener('poll', this._pollDatafeed);
   }
 
-  _createDatafeed () {
+  /**
+   * Attempt to create a new datafeed
+   * @private
+   */
+  _createDatafeed() {
     this.expBackoff.backoff();
   }
 
-  _pollDatafeed (id: string) {
+  /**
+   * Poll datafeed for zero or more messages.  Ignores anything that is not a V2Message.
+   *
+   * @param {string} id Datafeed id
+   * @private
+   */
+  _pollDatafeed(id: string) {
     // defer execution to ensure we don't go into an infinite polling loop
     const self = this;
     process.nextTick(() => {
@@ -215,7 +318,13 @@ class SymphonyAdapter extends Adapter {
     });
   }
 
-  _receiveMessage (message: SymphonyMessageType) {
+  /**
+   * Process a message and convert to a {@link V2Message} for use by Hubot.
+   *
+   * @param {SymphonyMessageType} message
+   * @private
+   */
+  _receiveMessage(message: SymphonyMessageType) {
     // ignore anything the bot said
     if (message.fromUserId !== this.robot.userId) {
       this._userLookup({userId: message.fromUserId}, message.streamId)
@@ -230,10 +339,18 @@ class SymphonyAdapter extends Adapter {
     }
   }
 
-  _getUser (query: GetUserArgsType, streamId: string): Promise<Object> {
+  /**
+   *
+   * @param {GetUserArgsType} query
+   * @param {string} streamId
+   * @return {Promise<HubotUserType>} Hubot user
+   * @private
+   */
+  _getUser(query: GetUserArgsType, streamId: string): Promise<HubotUserType> {
     return this.symphony.getUser(query)
       .then((response) => {
-        // record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen in a new conversation
+        // record basic user details in hubot's brain, setting the room causes the brain to update each time we're seen
+        // in a new conversation
         const userId = response.id;
         const existing = this.robot.brain.userForId(userId);
         existing.name = response.username;
@@ -248,8 +365,8 @@ class SymphonyAdapter extends Adapter {
   }
 }
 
-exports.use = (robot: Robot, options: Object = {}) => {
-  options.shutdownFunc = options.shutdownFunc || function (): void {
+exports.use = (robot: Robot, options: AdapterOptionsType = {}) => {
+  options.shutdownFunc = options.shutdownFunc || function(): void {
     process.exit(1);
   };
   return new SymphonyAdapter(robot, options);
