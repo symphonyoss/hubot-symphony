@@ -142,7 +142,7 @@ class SymphonyAdapter extends Adapter {
    * </code></pre>
    *
    * @param {SimpleMessageEnvelopeType} envelope
-   * @param {Array<MessageTypeOrString>} messages
+   * @param {Array.<MessageTypeOrString>} messages
    */
   send(envelope: SimpleMessageEnvelopeType, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending ${messages.length} messages to ${envelope.room}`);
@@ -166,7 +166,7 @@ class SymphonyAdapter extends Adapter {
    * </code></pre>
    *
    * @param {string} username
-   * @param {Array<MessageTypeOrString>} messages
+   * @param {Array.<MessageTypeOrString>} messages
    */
   sendDirectMessageToUsername(username: string, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending direct message to username: ${username}`);
@@ -187,7 +187,7 @@ class SymphonyAdapter extends Adapter {
    * </code></pre>
    *
    * @param {string} email
-   * @param {Array<MessageTypeOrString>} messages
+   * @param {Array.<MessageTypeOrString>} messages
    */
   sendDirectMessageToEmail(email: string, ...messages: Array<MessageTypeOrString>) {
     this.robot.logger.debug(`Sending direct message to email: ${email}`);
@@ -199,7 +199,7 @@ class SymphonyAdapter extends Adapter {
 
   /**
    * @param {number} userId Symphony user id
-   * @param {Array<MessageTypeOrString>} messages
+   * @param {Array.<MessageTypeOrString>} messages
    * @private
    */
   _sendDirectMessageToUserId(userId: number, ...messages: Array<MessageTypeOrString>) {
@@ -214,7 +214,7 @@ class SymphonyAdapter extends Adapter {
    * with an <code>@mention</code>
    *
    * @param {MessageEnvelopeType} envelope
-   * @param {Array<MessageTypeOrString>} messages
+   * @param {Array.<MessageTypeOrString>} messages
    */
   reply(envelope: MessageEnvelopeType, ...messages: Array<string>) {
     this.robot.logger.debug(
@@ -343,7 +343,7 @@ class SymphonyAdapter extends Adapter {
    *
    * @param {GetUserArgsType} query
    * @param {string} streamId
-   * @return {Promise<HubotUserType>} Hubot user
+   * @return {Promise.<HubotUserType>} Hubot user
    * @private
    */
   _getUser(query: GetUserArgsType, streamId: string): Promise<HubotUserType> {
