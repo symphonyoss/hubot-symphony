@@ -227,4 +227,19 @@ describe('Adapter test suite', () => {
     });
     adapter.run();
   });
+
+  it('should send direct message to id', (done) => {
+    let robot = new FakeRobot();
+    let adapter = SymphonyAdapter.use(robot);
+    adapter.on('connected', () => {
+      assert.isDefined(adapter.symphony);
+      adapter.sendDirectMessageToUserId(nock.realUserId, 'id message');
+      adapter.close();
+    });
+    nock.on('received', () => {
+      assert.include(nock.messages.map((m) => m.message), 'id message');
+      done();
+    });
+    adapter.run();
+  });
 });
