@@ -172,7 +172,7 @@ class SymphonyAdapter extends Adapter {
     this.robot.logger.debug(`Sending direct message to username: ${username}`);
     this._userLookup({username: username}, undefined)
       .then((response) => {
-        this._sendDirectMessageToUserId(response.id, ...messages);
+        this.sendDirectMessageToUserId(response.id, ...messages);
       });
   }
 
@@ -193,16 +193,24 @@ class SymphonyAdapter extends Adapter {
     this.robot.logger.debug(`Sending direct message to email: ${email}`);
     this._userLookup({emailAddress: email}, undefined)
       .then((response) => {
-        this._sendDirectMessageToUserId(response.id, ...messages);
+        this.sendDirectMessageToUserId(response.id, ...messages);
       });
   }
 
   /**
+   * Send one or more messages to a user in Symphony based on their user id, can be called with strings or objects of
+   * the form
+   * <pre><code>
+   * {
+   *   text: string,
+   *   format: string
+   * }
+   * </code></pre>
+   *
    * @param {number} userId Symphony user id
    * @param {Array.<MessageTypeOrString>} messages
-   * @private
    */
-  _sendDirectMessageToUserId(userId: number, ...messages: Array<MessageTypeOrString>) {
+  sendDirectMessageToUserId(userId: number, ...messages: Array<MessageTypeOrString>) {
     this.symphony.createIM(userId)
       .then((response) => {
         this.send({room: response.id}, ...messages);
