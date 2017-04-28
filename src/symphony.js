@@ -636,7 +636,7 @@ class Symphony {
       }
       request(options, (err, res: HttpResponseType, data: T) => {
         if (err !== undefined && err !== null) {
-          const statusCode = res ? 'unknown' : res.statusCode;
+          const statusCode = res ? res.statusCode : 'unknown';
           logger.warning(`received ${statusCode} error response from https://${host}${path}: ${err}`);
           reject(new Error(err));
         } else if (Math.floor(res.statusCode / 100) !== 2) {
