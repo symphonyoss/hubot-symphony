@@ -634,6 +634,7 @@ class Symphony {
       if (body !== undefined && body !== null) {
         options.body = body;
       }
+      logger.debug(`sending ${options.method} to https://${host}${path}: ${JSON.stringify(options.body)}`);
       request(options, (err, res: HttpResponseType, data: T) => {
         if (err !== undefined && err !== null) {
           const statusCode = res ? res.statusCode : 'unknown';
