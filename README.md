@@ -60,7 +60,6 @@ module.exports = (robot) ->
     res.send 'OK'
 ```
 
-
 ### Diagnostics
 A simple diagnostic script is included to help confirm that you have all the necessary pieces to get started.  You can run this as follows:
 
