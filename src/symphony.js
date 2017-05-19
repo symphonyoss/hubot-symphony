@@ -31,7 +31,8 @@ type ConstructorArgsType = {
   passphrase: string,
   keyManagerHost?: string,
   sessionAuthHost?: string,
-  agentHost?: string
+  agentHost?: string,
+  podHost?: string
 };
 
 export type AuthenticateResponseType = {
@@ -203,6 +204,7 @@ class Symphony {
     this.keyManagerHost = args.keyManagerHost || args.host;
     this.sessionAuthHost = args.sessionAuthHost || args.host;
     this.agentHost = args.agentHost || args.host;
+    this.podHost = args.podHost || args.host;
     this.privateKey = args.privateKey;
     this.publicKey = args.publicKey;
     this.passphrase = args.passphrase;
@@ -215,6 +217,9 @@ class Symphony {
     }
     if (this.agentHost !== this.host) {
       logger.info(`Using separate Agent ${this.agentHost}`);
+    }
+    if (this.podHost !== this.host) {
+      logger.info(`Using separate Pod ${this.podHost}`);
     }
     // refresh tokens on a weekly basis
     const weeklyRefresh = memoize(this._httpPost.bind(this), {maxAge: 604800000, length: 2});
@@ -513,7 +518,7 @@ class Symphony {
       let headers = {
         sessionToken: sessionToken.token,
       };
-      return this._httpGet(this.agentHost, path, headers);
+      return this._httpGet(this.podHost, path, headers);
     });
   }
 
@@ -531,7 +536,7 @@ class Symphony {
       let headers = {
         sessionToken: sessionToken.token,
       };
-      return this._httpPost(this.agentHost, path, headers, body);
+      return this._httpPost(this.podHost, path, headers, body);
     });
   }
 

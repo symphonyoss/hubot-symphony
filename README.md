@@ -30,6 +30,7 @@ There are also optional arguments which should be used if you are running on-pre
 * `HUBOT_SYMPHONY_KM_HOST` set to the url of your key manager without the https:// prefix
 * `HUBOT_SYMPHONY_AGENT_HOST` set to the url of your agent without the https:// prefix
 * `HUBOT_SYMPHONY_SESSIONAUTH_HOST` set to the url of your session auth without the https:// prefix
+* `HUBOT_SYMPHONY_POD_HOST` set to the url of your pod without the https:// prefix
 
 These arguments are passed through to the NodeJs request module as described [here](https://github.com/request/request#tlsssl-protocol).
 
@@ -67,7 +68,11 @@ A simple diagnostic script is included to help confirm that you have all the nec
 git clone https://github.com/symphonyoss/hubot-symphony.git
 cd hubot-symphony
 npm install
-npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com]
+npm run diagnostic -- \
+  --publicKey [key1.pem] \
+  --privateKey [key2.pem] \
+  --passphrase [changeit] \
+  --host [host.symphony.com]
 ```
 
 If you are running on-premise you can add optional fifth / sixth / seventh arguments
@@ -76,7 +81,15 @@ If you are running on-premise you can add optional fifth / sixth / seventh argum
 git clone https://github.com/symphonyoss/hubot-symphony.git
 cd hubot-symphony
 npm install
-npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] --host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com] --sessionhost [session.host.com]
+npm run diagnostic -- \
+  --publicKey [key1.pem] \
+  --privateKey [key2.pem] \
+  --passphrase [changeit] \
+  --host [host.symphony.com] \
+  --kmhost [keymanager.host.com] \
+  --agenthost [agent.host.com] \
+  --sessionhost [session.host.com] \
+  --podHost [pod.host.com]
 ```
 
 If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.

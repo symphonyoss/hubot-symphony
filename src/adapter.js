@@ -259,6 +259,7 @@ class SymphonyAdapter extends Adapter {
       keyManagerHost: getEnv('HUBOT_SYMPHONY_KM_HOST', host),
       sessionAuthHost: getEnv('HUBOT_SYMPHONY_SESSIONAUTH_HOST', host),
       agentHost: getEnv('HUBOT_SYMPHONY_AGENT_HOST', host),
+      podHost: getEnv('HUBOT_SYMPHONY_POD_HOST', host),
     });
     this.symphony.whoAmI()
       .then((response) => {

@@ -27,7 +27,7 @@ const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.
 let argv = require('yargs')
     .usage('Usage: $0 --publicKey [key1.pem] --privateKey [key2.pem] --passphrase [changeit] ' +
       '--host [host.symphony.com] --kmhost [keymanager.host.com] --agenthost [agent.host.com] ' +
-      '--sessionhost [session.host.com]')
+      '--sessionhost [session.host.com] --podHost [pod.host.com')
     .demand(['publicKey', 'privateKey', 'host', 'passphrase'])
     .argv;
 
@@ -48,6 +48,7 @@ let symphony = new Symphony({
   keyManagerHost: argv.kmhost || argv.host,
   agentHost: argv.agenthost || argv.host,
   sessionAuthHost: argv.sessionhost || argv.host,
+  podHost: argv.podHost || argv.host
 });
 
 logger.info('Connection initiated, starting tests...');
