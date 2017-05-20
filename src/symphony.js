@@ -513,7 +513,7 @@ class Symphony {
       let headers = {
         sessionToken: sessionToken.token,
       };
-      return this._httpGet(this.agentHost, path, headers);
+      return this._httpGet(this.host, path, headers);
     });
   }
 
@@ -531,7 +531,7 @@ class Symphony {
       let headers = {
         sessionToken: sessionToken.token,
       };
-      return this._httpPost(this.agentHost, path, headers, body);
+      return this._httpPost(this.host, path, headers, body);
     });
   }
 

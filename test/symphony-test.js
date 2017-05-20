@@ -17,7 +17,6 @@
 // @flow
 
 const assert = require('chai').assert;
-import {describe, it, beforeEach, afterEach} from 'mocha';
 import {TextListener} from 'hubot';
 import type {RoomMembershipType} from '../src/symphony';
 import Symphony from '../src/symphony';
@@ -56,6 +55,17 @@ describe('On-premise key manager / agent', () => {
     symphony.echo(msg)
       .then((response) => {
         assert.deepEqual(msg, response);
+        done();
+      })
+      .catch((error) => {
+        done(`Failed with error ${error}`);
+      });
+  });
+
+  it('should connect to separate pod url', (done) => {
+    symphony.whoAmI()
+      .then((response) => {
+        assert.equal(nock.botUserId, response.userId);
         done();
       })
       .catch((error) => {

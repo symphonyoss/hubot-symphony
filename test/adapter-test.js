@@ -17,7 +17,6 @@
 // @flow
 
 const assert = require('chai').assert;
-import {describe, it, beforeEach, afterEach} from 'mocha';
 import SymphonyAdapter from '../src/adapter';
 import NockServer from './nock-server';
 import FakeRobot from './fakes';
