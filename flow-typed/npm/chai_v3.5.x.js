@@ -28,6 +28,7 @@ declare module "chai" {
 
         include: ExpectChain<T> & (value: mixed) => ExpectChain<T>,
         includes: ExpectChain<T> & (value: mixed) => ExpectChain<T>,
+        deepInclude: ExpectChain<T> & (value: mixed) => ExpectChain<T>,
         contain: ExpectChain<T> & (value: mixed) => ExpectChain<T>,
         contains: ExpectChain<T> & (value: mixed) => ExpectChain<T>,
 
@@ -169,6 +170,9 @@ declare module "chai" {
 
       static include(exp: string, inc: mixed, msg?: string): void;
       static include<T>(exp: Array<T>, inc: T, msg?: string): void;
+
+      static deepInclude(exp: string, inc: mixed, msg?: string): void;
+      static deepInclude<T>(exp: Array<T>, inc: T, msg?: string): void;
 
       static notInclude(exp: string, inc: mixed, msg?: string): void;
       static notInclude<T>(exp: Array<T>, inc: T, msg?: string): void;

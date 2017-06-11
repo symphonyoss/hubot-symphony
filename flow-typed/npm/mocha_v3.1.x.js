@@ -1,7 +1,7 @@
 // flow-typed signature: 6b82cf8c1da27b4f0fa7a58e5ed5babf
 // flow-typed version: edf70dde46/mocha_v3.1.x/flow_>=v0.22.x
 
-type TestFunction = ((done: () => void) => void | Promise<mixed>);
+type TestFunction = ((done: (err?: mixed) => void) => void | Promise<mixed>);
 
 declare var describe : {
     (name:string, spec:() => void): void;

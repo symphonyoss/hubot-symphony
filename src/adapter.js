@@ -245,7 +245,7 @@ class SymphonyAdapter extends Adapter {
   run() {
     this.robot.logger.info('Initialising...');
 
-    const getEnv = function (key: string, defaultVal: ?string): string {
+    const getEnv = function(key: string, defaultVal: ?string): string {
       const value = process.env[key];
       if (value) {
         return value;
@@ -279,7 +279,7 @@ class SymphonyAdapter extends Adapter {
       });
     // cache user details for an hour
     const hourlyRefresh = memoize(this._getUser.bind(this), {maxAge: 3600000, length: 2});
-    this._userLookup = function (query: GetUserArgsType, streamId: ?string): Promise<Object> {
+    this._userLookup = function(query: GetUserArgsType, streamId: ?string): Promise<Object> {
       return hourlyRefresh(query, streamId);
     };
     this._createDatafeed();
@@ -389,7 +389,7 @@ exports.use = (robot: Robot, optionsWithNulls: AdapterOptionsTypeWithNulls = {})
       initialDelay: 10,
       maxDelay: 60000,
     }),
-    shutdownFunc: optionsWithNulls.shutdownFunc || function (): void {
+    shutdownFunc: optionsWithNulls.shutdownFunc || function(): void {
       process.exit(1);
     },
   };

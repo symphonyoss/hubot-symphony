@@ -152,7 +152,7 @@ describe('REST API test suite', () => {
     symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
       .then((response) => {
         assert.equal(msg, response.message);
-        return symphony.getMessages(nock.streamId, nock.firstMessageTimestamp);
+        return symphony.getMessages(nock.streamId);
       })
       .then((response) => {
         assert.isAtLeast(response.length, 2);
