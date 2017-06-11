@@ -191,8 +191,8 @@ describe('Adapter test suite', () => {
     nock.datafeedCreateHttp400Count = 1;
     let robot = new FakeRobot();
     let adapter = SymphonyAdapter.use(robot, {
-      shutdownFunc: () => done(),
       failConnectAfter: 1,
+      shutdownFunc: () => done(),
     });
     adapter.run();
   });
