@@ -343,16 +343,16 @@ describe('REST API test suite', () => {
     symphony.getMembers(nock.streamId)
       .then((response: Array<RoomMembershipType>) => {
         assert.lengthOf(response, 2);
-        assert.include(response, {
+        assert.deepInclude(response, {
           id: nock.botUserId,
           owner: true,
           joinDate: 1461426797875,
-        });
-        assert.include(response, {
+        }, 'contains bot user');
+        assert.deepInclude(response, {
           id: nock.realUserId,
           owner: false,
           joinDate: 1461430710531,
-        });
+        }, 'contains real user');
         done();
       })
       .catch((error) => {
