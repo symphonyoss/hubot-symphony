@@ -315,7 +315,7 @@ class Symphony {
    * @return {Promise.<CreateDatafeedResponseType>}
    */
   createDatafeed(): Promise<CreateDatafeedResponseType> {
-    return this._httpAgentPost('/agent/v1/datafeed/create', undefined);
+    return this._httpAgentPost('/agent/v4/datafeed/create', undefined);
   }
 
   /**
@@ -328,7 +328,7 @@ class Symphony {
    * @return {Promise.<Array.<SymphonyMessageType>>}
    */
   readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageType>> {
-    return this._httpAgentGet(`/agent/v2/datafeed/${datafeedId}/read`);
+    return this._httpAgentGet(`/agent/v4/datafeed/${datafeedId}/read`);
   }
 
   /**

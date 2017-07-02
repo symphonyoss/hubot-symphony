@@ -341,14 +341,14 @@ class NockServer extends EventEmitter {
       .reply(200, function(uri: string, requestBody: mixed) {
         return self.messages;
       })
-      .post('/agent/v1/datafeed/create')
+      .post('/agent/v4/datafeed/create')
       .reply(function(uri: string, requestBody: mixed) {
         if (self._datafeedCreateHttp400Count-- > 0) {
           return [400, null];
         }
         return [200, {id: self.datafeedId}];
       })
-      .get(`/agent/v2/datafeed/${self.datafeedId}/read`)
+      .get(`/agent/v4/datafeed/${self.datafeedId}/read`)
       .reply(function(uri: string, requestBody: mixed) {
         if (self._datafeedReadHttp400Count-- > 0) {
           return [400, null];
