@@ -85,12 +85,12 @@ class NockServer extends EventEmitter {
     this._datafeedCreateHttp400Count = 0;
     this._datafeedReadHttp400Count = 0;
 
-    let kmHost = args.kmHost || args.host;
-    let agentHost = args.agentHost || args.host;
-    let sessionAuthHost = args.sessionAuthHost || agentHost;
+    const kmHost = args.kmHost || args.host;
+    const agentHost = args.agentHost || args.host;
+    const sessionAuthHost = args.sessionAuthHost || agentHost;
     logger.info(`Setting up mocks for ${this.host} / ${kmHost} / ${agentHost} / ${sessionAuthHost}`);
 
-    let self = this;
+    const self = this;
 
     this.streamId = 'WLwnGbzxIdU8ZmPUjAs_bn___qulefJUdA';
 
@@ -100,7 +100,7 @@ class NockServer extends EventEmitter {
     this.realUserName = 'johndoe';
     this.realUserEmail = 'johndoe@symphony.com';
 
-    let realUserObject = {
+    const realUserObject = {
       id: self.realUserId,
       emailAddress: self.realUserEmail,
       firstName: 'John',
@@ -110,10 +110,10 @@ class NockServer extends EventEmitter {
     };
 
     this.botUserId = 7696581411197;
-    let botUserName = 'mozart';
-    let botUserEmail = 'mozart@symphony.com';
+    const botUserName = 'mozart';
+    const botUserEmail = 'mozart@symphony.com';
 
-    let botUserObject = {
+    const botUserObject = {
       id: self.realUserId,
       emailAddress: botUserEmail,
       firstName: 'Wolfgang Amadeus',
@@ -126,18 +126,21 @@ class NockServer extends EventEmitter {
 
     if (args.startWithHelloWorldMessage || args.startWithHelloWorldMessage === undefined) {
       this.messages.push({
-        id: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA',
+        messageId: '-sfAvIPTTmyrpORkBuvL_3___qulZoKedA',
         timestamp: self.firstMessageTimestamp,
-        v2messageType: 'V2Message',
-        streamId: self.streamId,
         message: '<messageML>Hello World</messageML>',
-        fromUserId: self.realUserId,
+        user: {
+          userId: self.realUserId,
+        },
+        stream: {
+          streamId: self.streamId,
+        },
       });
     }
 
     nock.disableNetConnect();
 
-    let checkHeaderMissing = function(val: string): boolean {
+    const checkHeaderMissing = function(val: string): boolean {
       return val === undefined || val === null;
     };
 
@@ -323,23 +326,21 @@ class NockServer extends EventEmitter {
       .reply(200, function(uri: string, requestBody: EchoType): EchoType {
         return requestBody;
       })
-      .post(`/agent/v2/stream/${self.streamId}/message/create`)
+      .post(`/agent/v4/stream/${self.streamId}/message/create`)
       .reply(200, function(uri: string, requestBody: SymphonyCreateMessagePayloadType): SymphonyMessageType {
         const message = {
-          id: uuid.v1(),
+          messageId: uuid.v1(),
           timestamp: new Date().valueOf().toString(),
-          v2messageType: 'V2Message',
-          streamId: self.streamId,
           message: requestBody.message,
-          attachments: [],
-          fromUserId: self.botUserId,
+          user: {
+            userId: self.botUserId,
+          },
+          stream: {
+            streamId: self.streamId,
+          },
         };
         self._receiveMessage(message);
         return message;
-      })
-      .get(`/agent/v2/stream/${self.streamId}/message`)
-      .reply(200, function(uri: string, requestBody: mixed) {
-        return self.messages;
       })
       .post('/agent/v4/datafeed/create')
       .reply(function(uri: string, requestBody: mixed) {
@@ -353,12 +354,23 @@ class NockServer extends EventEmitter {
         if (self._datafeedReadHttp400Count-- > 0) {
           return [400, null];
         }
-        if (self.messages.length == 0) {
+        if (self.messages.length === 0) {
           return [204, null];
         }
-        let copy = self.messages;
+        const copy = self.messages;
         self.messages = [];
-        return [200, copy];
+        const wrapped = copy.map(function(msg) {
+          return {
+            id: msg.messageId,
+            timestamp: msg.timestamp,
+            type: 'MESSAGESENT',
+            initiator: msg.user,
+            payload: {
+              messageSent: msg,
+            },
+          }
+        });
+        return [200, wrapped];
       });
   }
 

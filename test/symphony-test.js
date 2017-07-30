@@ -139,25 +139,7 @@ describe('REST API test suite', () => {
     symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
       .then((response) => {
         assert.equal(msg, response.message);
-        assert.equal(nock.botUserId, response.fromUserId);
-        done();
-      })
-      .catch((error) => {
-        done(`Failed with error ${error}`);
-      });
-  });
-
-  it('getMessages should get all messages', (done) => {
-    let msg = '<messageML>Yo!</messageML>';
-    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
-      .then((response) => {
-        assert.equal(msg, response.message);
-        return symphony.getMessages(nock.streamId);
-      })
-      .then((response) => {
-        assert.isAtLeast(response.length, 2);
-        assert.include(response.map((m) => m.message), '<messageML>Hello World</messageML>');
-        assert.include(response.map((m) => m.message), msg);
+        assert.equal(nock.botUserId, response.user.userId);
         done();
       })
       .catch((error) => {
@@ -192,7 +174,7 @@ describe('REST API test suite', () => {
           })
           .then((response) => {
             assert.equal(1, response.length);
-            assert.equal(msg1, response[0].message);
+            assert.equal(msg1, response[0].payload.messageSent.message);
             return symphony.sendMessage(nock.streamId, msg2, 'MESSAGEML');
           })
           .then((response) => {
@@ -201,7 +183,7 @@ describe('REST API test suite', () => {
           })
           .then((response) => {
             assert.equal(1, response.length);
-            assert.equal(msg2, response[0].message);
+            assert.equal(msg2, response[0].payload.messageSent.message);
             done();
           });
       })
@@ -395,15 +377,18 @@ describe('REST API test suite', () => {
 describe('Object model test suite', () => {
   for (const text of ['<messageML>Hello World</messageML>', 'Hello World']) {
     it(`parse a V2Message containing '${text}'`, () => {
-      let msg = {
-        id: 'foobar',
+      const msg = {
+        messageId: 'foobar',
         timestamp: '1464629912263',
-        v2messageType: 'V2Message',
-        streamId: 'baz',
         message: text,
-        fromUserId: 12345,
+        user: {
+          userId: 12345,
+        },
+        stream: {
+          streamId: 'baz',
+        },
       };
-      let user = {
+      const user = {
         id: 12345,
         name: 'johndoe',
         displayName: 'John Doe',
@@ -419,24 +404,27 @@ describe('Object model test suite', () => {
   }
 
   it('regex test', (done) => {
-    let msg = {
-      id: 'foobar',
+    const msg = {
+      messageId: 'foobar',
       timestamp: '1464629912263',
-      v2messageType: 'V2Message',
-      streamId: 'baz',
       message: 'butler ping',
-      fromUserId: 12345,
+      user: {
+        userId: 12345,
+      },
+      stream: {
+        streamId: 'baz',
+      },
     };
-    let user = {
+    const user = {
       id: 12345,
       name: 'johndoe',
       displayName: 'John Doe',
     };
-    let robot = new FakeRobot();
-    let callback = () => {
+    const robot = new FakeRobot();
+    const callback = () => {
       done();
     };
-    let listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback);
+    const listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback);
     listener.call(new V2Message(user, msg));
   });
 });

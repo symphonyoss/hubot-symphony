@@ -32,9 +32,9 @@ export class V2Message extends TextMessage {
    * @constructor
    */
   constructor(user: Object, symphonyMessage: SymphonyMessageType) {
-    super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
+    super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.messageId);
     this.symphonyMessage = symphonyMessage;
-    this.room = symphonyMessage.streamId;
+    this.room = symphonyMessage.stream.streamId;
   }
 
   /**

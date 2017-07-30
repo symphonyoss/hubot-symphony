@@ -63,6 +63,20 @@ export type SymphonyUserType = {
   username: string
 };
 
+export type SymphonyDatafeedType = {
+  id: string,
+  timestamp: number,
+  type: string,
+  initiator: {
+    user: {
+      userId: number
+    }
+  },
+  payload: {
+    messageSent: SymphonyMessageType // this property is actually optional but but as we ignore all message types of than MESSAGESENT this is not currently relevant
+  }
+};
+
 export type SymphonyAttachmentType = {
   id: string,
   name: string,
@@ -70,13 +84,17 @@ export type SymphonyAttachmentType = {
 };
 
 export type SymphonyMessageType = {
-  id: string,
+  messageId: string,
   timestamp: string,
-  v2messageType: string,
-  streamId: string,
   message: string,
+  data?: string,
   attachments?: Array<SymphonyAttachmentType>,
-  fromUserId: number
+  user: {
+    userId: number
+  },
+  stream: {
+    streamId: string
+  }
 };
 
 export type CreateDatafeedResponseType = {
@@ -289,20 +307,7 @@ class Symphony {
       message: message,
       format: format,
     };
-    return this._httpAgentPost(`/agent/v2/stream/${streamId}/message/create`, body);
-  }
-
-  /**
-   * Get messages from an existing stream (IM, MIM, or chatroom).  Additionally returns any attachments associated with
-   * the message.
-   *
-   * See {@link https://rest-api.symphony.com/docs/messages-v2|Messages}
-   *
-   * @param {string} streamId
-   * @return {Promise.<Array.<SymphonyMessageType>>}
-   */
-  getMessages(streamId: string): Promise<Array<SymphonyMessageType>> {
-    return this._httpAgentGet(`/agent/v2/stream/${streamId}/message`);
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, body);
   }
 
   /**
@@ -327,7 +332,7 @@ class Symphony {
    * @param {string} datafeedId
    * @return {Promise.<Array.<SymphonyMessageType>>}
    */
-  readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageType>> {
+  readDatafeed(datafeedId: string): Promise<Array<SymphonyDatafeedType>> {
     return this._httpAgentGet(`/agent/v4/datafeed/${datafeedId}/read`);
   }
 

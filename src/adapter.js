@@ -318,8 +318,8 @@ class SymphonyAdapter extends Adapter {
           if (response) {
             self.robot.logger.debug(`Received ${response.length || 0} datafeed messages`);
             for (const msg of response) {
-              if (msg.v2messageType === 'V2Message') {
-                self._receiveMessage(msg);
+              if (msg.type === 'MESSAGESENT') {
+                self._receiveMessage(msg.payload.messageSent);
               }
             }
           }
@@ -343,8 +343,8 @@ class SymphonyAdapter extends Adapter {
    */
   _receiveMessage(message: SymphonyMessageType) {
     // ignore anything the bot said
-    if (message.fromUserId !== this.robot.userId) {
-      this._userLookup({userId: message.fromUserId}, message.streamId)
+    if (message.user.userId !== this.robot.userId) {
+      this._userLookup({userId: message.user.userId}, message.stream.streamId)
         .then((response) => {
           const v2 = new V2Message(response, message);
           this.robot.logger.debug(`Received '${v2.text}' from ${v2.user.name}`);

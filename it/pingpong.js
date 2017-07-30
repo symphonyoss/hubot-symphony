@@ -17,7 +17,6 @@
 // @flow
 
 const assert = require('chai').assert;
-import {describe, it} from 'mocha';
 import Log from 'log';
 import Symphony from '../src/symphony';
 
@@ -86,7 +85,7 @@ describe('Foundation Open Developer Platform integration tests', () => {
           });
       })
       .then((response) => {
-        assert.include(response.map((m) => m.message), '<messageML>ping</messageML>');
+        assert.include(response.map((m) => m.payload.messageSent.message), '<messageML>ping</messageML>');
       });
   });
 });

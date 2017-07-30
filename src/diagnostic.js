@@ -90,8 +90,8 @@ symphony.createDatafeed()
   })
   .then((response) => {
     for (const msg of response) {
-      if (msg.v2messageType === 'V2Message') {
-        logger.info(`Received '${msg.message}'`);
+      if (msg.type === 'MESSAGESENT') {
+        logger.info(`Received '${msg.payload.messageSent.message}'`);
       }
     }
     if (argv.runOffline) {
