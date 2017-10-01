@@ -21,6 +21,7 @@ import EventEmitter from 'events';
 import querystring from 'querystring';
 import nock from 'nock';
 import uuid from 'uuid';
+import Busboy from 'busboy';
 import Log from 'log';
 import type {EchoType, SymphonyMessageV2Type, SymphonyMessageV4Type, RoomInfoType, RoomInfoAlternateType} from '../src/symphony';
 
@@ -349,37 +350,49 @@ class NockServer extends EventEmitter {
         return message;
       })
       .post(`/agent/v4/stream/${self.streamId}/message/create`)
-      .reply(200, function(uri: string, requestBody: SymphonyCreateMessageV4PayloadType): SymphonyMessageV4Type {
-        let messageML = requestBody.message;
-        const match = /<messageML>(.*)<\/messageML>/i.exec(messageML);
-        if (match === undefined || match === null) {
-          messageML = `<messageML>${messageML}<\/messageML>`;
-        }
-        const message = {
-          messageId: uuid.v1(),
-          timestamp: new Date().valueOf().toString(),
-          message: messageML,
-          attachments: [],
-          user: {
-            userId: self.botUserId,
-            displayName: self.botUserDisplayName,
-            email: self.botUserEmail,
-            username: self.botUserName,
-          },
-          stream: {
-            streamId: self.streamId,
+      .reply(200, function(uri: string, requestBody: string, cb) {
+        new Promise((resolve) => {
+          const busboy = new Busboy({headers: this.req.headers});
+          let parts = {};
+          busboy.on('field', (fieldname, val) => {
+            parts[fieldname] = val;
+          });
+          busboy.on('finish', () => {
+            resolve(parts);
+          });
+          busboy.end(requestBody);
+        }).then((parts) => {
+          let messageML = parts.message;
+          const match = /<messageML>(.*)<\/messageML>/i.exec(messageML);
+          if (match === undefined || match === null) {
+            messageML = `<messageML>${messageML}<\/messageML>`;
           }
-        };
-        self._receiveMessage({
-          id: message.messageId,
-          timestamp: message.timestamp,
-          v2messageType: 'V2Message',
-          streamId: message.stream.streamId,
-          message: message.message,
-          attachments: message.attachments,
-          fromUserId: message.user.userId,
-        });
-        return message;
+          const message = {
+            messageId: uuid.v1(),
+            timestamp: new Date().valueOf().toString(),
+            message: messageML,
+            attachments: [],
+            user: {
+              userId: self.botUserId,
+              displayName: self.botUserDisplayName,
+              email: self.botUserEmail,
+              username: self.botUserName,
+            },
+            stream: {
+              streamId: self.streamId,
+            }
+          };
+          self._receiveMessage({
+            id: message.messageId,
+            timestamp: message.timestamp,
+            v2messageType: 'V2Message',
+            streamId: message.stream.streamId,
+            message: message.message,
+            attachments: message.attachments,
+            fromUserId: message.user.userId,
+          });
+          cb(null, message);
+        })
       })
       .get(`/agent/v2/stream/${self.streamId}/message`)
       .reply(200, function(uri: string, requestBody: mixed) {

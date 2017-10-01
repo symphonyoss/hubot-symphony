@@ -153,7 +153,12 @@ class SymphonyAdapter extends Adapter {
     this.robot.logger.debug(`Sending ${messages.length} messages to ${envelope.room}`);
     for (const message of messages) {
       if (typeof message === 'string') {
-        this.symphony.sendMessage(envelope.room, message);
+        let messageML = message;
+        const match = /<messageML>(.*)<\/messageML>/i.exec(messageML);
+        if (match === undefined || match === null) {
+          messageML = `<messageML>${messageML}<\/messageML>`;
+        }
+        this.symphony.sendMessage(envelope.room, messageML);
       } else {
         this.symphony.sendMessageWithStructuredObjects(envelope.room, message.text, message.data);
       }

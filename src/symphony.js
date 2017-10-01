@@ -301,10 +301,15 @@ class Symphony {
    * @return {Promise.<SymphonyMessageV2Type>}
    */
   sendMessage(streamId: string, message: string): Promise<SymphonyMessageV4Type> {
-    const body = {
-      message: message
+    const formData = {
+      message: {
+        value: message,
+        options: {
+          contentType: 'text/plain'
+        }
+      }
     };
-    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, body);
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, undefined, formData);
   }
 
   /**
@@ -318,11 +323,21 @@ class Symphony {
    * @return {Promise.<SymphonyMessageV2Type>}
    */
   sendMessageWithStructuredObjects(streamId: string, message: string, data: string): Promise<SymphonyMessageV4Type> {
-    const body = {
-      message: message,
-      data: data,
+    const formData = {
+      message: {
+        value: message,
+        options: {
+          contentType: 'text/plain'
+        }
+      },
+      data: {
+        value: data,
+        options: {
+          contentType: 'text/plain'
+        }
+      }
     };
-    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, body);
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, undefined, formData);
   }
 
   /**
@@ -593,11 +608,12 @@ class Symphony {
    *
    * @param {string} path Symphony API path
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpAgentPost<T>(path: string, body: ?mixed): Promise<T> {
+  _httpAgentPost<T>(path: string, body: ?mixed, formData: ?mixed): Promise<T> {
     return Promise.all([this.sessionAuth(), this.keyAuth()])
       .then((values: Array<AuthenticateResponseType>): Promise<T> => {
         const [sessionToken, keyManagerToken] = values;
@@ -605,7 +621,7 @@ class Symphony {
           sessionToken: sessionToken.token,
           keyManagerToken: keyManagerToken.token,
         };
-        return this._httpPost(this.agentHost, path, headers, body);
+        return this._httpPost(this.agentHost, path, headers, body, formData);
       });
   }
 
@@ -630,12 +646,13 @@ class Symphony {
    * @param {string} path Symphony API path
    * @param {HttpHeaderType} headers HTTP headers
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpPost<T>(host: string, path: string, headers: HttpHeaderType = {}, body: ?mixed): Promise<T> {
-    return this._httpRequest('POST', host, path, headers, body);
+  _httpPost<T>(host: string, path: string, headers: HttpHeaderType = {}, body: ?mixed, formData: ?mixed): Promise<T> {
+    return this._httpRequest('POST', host, path, headers, body, formData);
   }
 
   /**
@@ -646,13 +663,14 @@ class Symphony {
    * @param {string} path Symphony API path
    * @param {HttpHeaderType} headers HTTP headers
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpRequest<T>(method: string, host: string, path: string, headers: HttpHeaderType, body: ?mixed): Promise<T> {
+  _httpRequest<T>(method: string, host: string, path: string, headers: HttpHeaderType, body: ?mixed, formData: ?mixed): Promise<T> {
     let self = this;
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       let options = {
         baseUrl: `https://${host}`,
         url: path,
@@ -663,11 +681,15 @@ class Symphony {
         cert: fs.readFileSync(self.publicKey),
         passphrase: self.passphrase,
         body: undefined,
+        formData: undefined,
       };
       if (body !== undefined && body !== null) {
         options.body = body;
       }
-      logger.debug(`sending ${options.method} to https://${host}${path}: ${JSON.stringify(options.body)}`);
+      if (formData !== undefined && formData !== null) {
+        options.formData = formData;
+      }
+      logger.debug(`sending ${options.method} to https://${host}${path} [body: ${JSON.stringify(options.body)}] [formData: ${JSON.stringify(options.formData)}]`);
       request(options, (err, res: HttpResponseType, data: T) => {
         if (err !== undefined && err !== null) {
           const statusCode = res ? res.statusCode : 'unknown';
