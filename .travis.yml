@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 6
+  - 8
 
 env:
   # setup for integration tests & turn off any internal logging in tests
