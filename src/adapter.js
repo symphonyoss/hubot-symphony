@@ -21,7 +21,7 @@ import memoize from 'memoizee';
 import backoff from 'backoff';
 import Backoff from 'backoff/lib/backoff';
 import XmlEntities from 'html-entities/lib/xml-entities';
-import type {GetUserArgsType, SymphonyMessageType} from './symphony';
+import type {GetUserArgsType, SymphonyMessageV2Type} from './symphony';
 import Symphony from './symphony';
 import {V2Message} from './message';
 
@@ -338,10 +338,10 @@ class SymphonyAdapter extends Adapter {
   /**
    * Process a message and convert to a {@link V2Message} for use by Hubot.
    *
-   * @param {SymphonyMessageType} message
+   * @param {SymphonyMessageV2Type} message
    * @private
    */
-  _receiveMessage(message: SymphonyMessageType) {
+  _receiveMessage(message: SymphonyMessageV2Type) {
     // ignore anything the bot said
     if (message.fromUserId !== this.robot.userId) {
       this._userLookup({userId: message.fromUserId}, message.streamId)

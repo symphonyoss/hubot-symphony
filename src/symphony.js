@@ -69,7 +69,7 @@ export type SymphonyAttachmentType = {
   size: number
 };
 
-export type SymphonyMessageType = {
+export type SymphonyMessageV2Type = {
   id: string,
   timestamp: string,
   v2messageType: string,
@@ -77,6 +77,23 @@ export type SymphonyMessageType = {
   message: string,
   attachments?: Array<SymphonyAttachmentType>,
   fromUserId: number
+};
+
+export type SymphonyMessageV4Type = {
+  messageId: string,
+  timestamp: string,
+  message: string,
+  data?: string,
+  attachments?: Array<SymphonyAttachmentType>,
+  user: {
+    userId: number,
+    displayName: string,
+    email: string,
+    username: string
+  },
+  stream: {
+    streamId: string
+  }
 };
 
 export type CreateDatafeedResponseType = {
@@ -282,9 +299,9 @@ class Symphony {
    * @param {string} streamId
    * @param {string} message
    * @param {string} format <code>TEXT</code> or <code>MESSAGEML</code>
-   * @return {Promise.<SymphonyMessageType>}
+   * @return {Promise.<SymphonyMessageV2Type>}
    */
-  sendMessage(streamId: string, message: string, format: string): Promise<SymphonyMessageType> {
+  sendMessage(streamId: string, message: string, format: string): Promise<SymphonyMessageV2Type> {
     const body = {
       message: message,
       format: format,
@@ -299,9 +316,9 @@ class Symphony {
    * See {@link https://rest-api.symphony.com/docs/messages-v2|Messages}
    *
    * @param {string} streamId
-   * @return {Promise.<Array.<SymphonyMessageType>>}
+   * @return {Promise.<Array.<SymphonyMessageV2Type>>}
    */
-  getMessages(streamId: string): Promise<Array<SymphonyMessageType>> {
+  getMessages(streamId: string): Promise<Array<SymphonyMessageV2Type>> {
     return this._httpAgentGet(`/agent/v2/stream/${streamId}/message`);
   }
 
@@ -325,9 +342,9 @@ class Symphony {
    * See {@link https://rest-api.symphony.com/docs/read-messagesevents-stream|Read Messages/Events Stream}
    *
    * @param {string} datafeedId
-   * @return {Promise.<Array.<SymphonyMessageType>>}
+   * @return {Promise.<Array.<SymphonyMessageV2Type>>}
    */
-  readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageType>> {
+  readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageV2Type>> {
     return this._httpAgentGet(`/agent/v2/datafeed/${datafeedId}/read`);
   }
 

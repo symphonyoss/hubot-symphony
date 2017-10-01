@@ -22,7 +22,7 @@ import querystring from 'querystring';
 import nock from 'nock';
 import uuid from 'uuid';
 import Log from 'log';
-import type {EchoType, SymphonyMessageType, RoomInfoType, RoomInfoAlternateType} from '../src/symphony';
+import type {EchoType, SymphonyMessageV2Type, SymphonyMessageV4Type, RoomInfoType, RoomInfoAlternateType} from '../src/symphony';
 
 const logger: Log = new Log(process.env.HUBOT_SYMPHONY_LOG_LEVEL || process.env.HUBOT_LOG_LEVEL || 'info');
 
@@ -34,9 +34,14 @@ type ConstructorArgsType = {
   startWithHelloWorldMessage?: boolean
 };
 
-type SymphonyCreateMessagePayloadType = {
+type SymphonyCreateMessageV2PayloadType = {
   message: string,
   format: string
+};
+
+type SymphonyCreateMessageV4PayloadType = {
+  message: string,
+  data?: string
 };
 
 type KeyValuePairType = {
@@ -65,7 +70,7 @@ type SymphonyUpdateRoomPayloadType = {
 };
 
 class NockServer extends EventEmitter {
-  messages: Array<SymphonyMessageType>;
+  messages: Array<SymphonyMessageV2Type>;
   host: string;
   streamId: string;
   firstMessageTimestamp: string;
@@ -73,7 +78,11 @@ class NockServer extends EventEmitter {
   realUserId: number;
   realUserName: string;
   realUserEmail: string;
+  realUserDisplayName: string;
   botUserId: number;
+  botUserName: string;
+  botUserEmail: string;
+  botUserDisplayName: string;
   _datafeedCreateHttp400Count: number;
   _datafeedReadHttp400Count: number;
 
@@ -99,6 +108,7 @@ class NockServer extends EventEmitter {
     this.realUserId = 7215545078229;
     this.realUserName = 'johndoe';
     this.realUserEmail = 'johndoe@symphony.com';
+    this.realUserDisplayName = 'John Doe';
 
     let realUserObject = {
       id: self.realUserId,
@@ -106,20 +116,21 @@ class NockServer extends EventEmitter {
       firstName: 'John',
       lastName: 'Doe',
       username: self.realUserName,
-      displayName: 'John Doe',
+      displayName: self.realUserDisplayName,
     };
 
     this.botUserId = 7696581411197;
-    let botUserName = 'mozart';
-    let botUserEmail = 'mozart@symphony.com';
+    this.botUserName = 'mozart';
+    this.botUserEmail = 'mozart@symphony.com';
+    this.botUserDisplayName = 'Mozart';
 
     let botUserObject = {
       id: self.realUserId,
-      emailAddress: botUserEmail,
+      emailAddress: self.botUserEmail,
       firstName: 'Wolfgang Amadeus',
       lastName: 'Mozart',
-      username: botUserName,
-      displayName: 'Mozart',
+      username: self.botUserName,
+      displayName: self.botUserDisplayName,
     };
 
     this.datafeedId = '1234';
@@ -192,9 +203,9 @@ class NockServer extends EventEmitter {
       .reply(200, realUserObject)
       .get(`/pod/v2/user?uid=${self.botUserId}&local=true`)
       .reply(200, botUserObject)
-      .get(`/pod/v2/user?email=${botUserEmail}&local=true`)
+      .get(`/pod/v2/user?email=${self.botUserEmail}&local=true`)
       .reply(200, botUserObject)
-      .get(`/pod/v2/user?username=${botUserName}&local=true`)
+      .get(`/pod/v2/user?username=${self.botUserName}&local=true`)
       .reply(200, botUserObject)
       .post('/pod/v1/im/create', [self.realUserId])
       .reply(200, {
@@ -324,7 +335,7 @@ class NockServer extends EventEmitter {
         return requestBody;
       })
       .post(`/agent/v2/stream/${self.streamId}/message/create`)
-      .reply(200, function(uri: string, requestBody: SymphonyCreateMessagePayloadType): SymphonyMessageType {
+      .reply(200, function(uri: string, requestBody: SymphonyCreateMessageV2PayloadType): SymphonyMessageV2Type {
         const message = {
           id: uuid.v1(),
           timestamp: new Date().valueOf().toString(),
@@ -335,6 +346,34 @@ class NockServer extends EventEmitter {
           fromUserId: self.botUserId,
         };
         self._receiveMessage(message);
+        return message;
+      })
+      .post(`/agent/v4/stream/${self.streamId}/message/create`)
+      .reply(200, function(uri: string, requestBody: SymphonyCreateMessageV4PayloadType): SymphonyMessageV4Type {
+        const message = {
+          messageId: uuid.v1(),
+          timestamp: new Date().valueOf().toString(),
+          message: requestBody.message,
+          attachments: [],
+          user: {
+            userId: self.botUserId,
+            displayName: self.botUserDisplayName,
+            email: self.botUserEmail,
+            username: self.botUserName,
+          },
+          stream: {
+            streamId: self.streamId,
+          }
+        };
+        self._receiveMessage({
+          id: message.messageId,
+          timestamp: message.timestamp,
+          v2messageType: 'V2Message',
+          streamId: message.stream.streamId,
+          message: message.message,
+          attachments: message.attachments,
+          fromUserId: message.user.userId,
+        });
         return message;
       })
       .get(`/agent/v2/stream/${self.streamId}/message`)
@@ -375,7 +414,7 @@ class NockServer extends EventEmitter {
     nock.cleanAll();
   }
 
-  _receiveMessage(msg: SymphonyMessageType) {
+  _receiveMessage(msg: SymphonyMessageV2Type) {
     logger.debug(`Received ${JSON.stringify(msg)}`);
     this.messages.push(msg);
     super.emit('received');
