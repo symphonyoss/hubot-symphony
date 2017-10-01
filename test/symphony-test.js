@@ -136,10 +136,10 @@ describe('REST API test suite', () => {
 
   it('sendMessage should obtain session and key tokens and get message ack', (done) => {
     let msg = '<messageML>Testing 123...</messageML>';
-    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
+    symphony.sendMessage(nock.streamId, msg)
       .then((response) => {
         assert.equal(msg, response.message);
-        assert.equal(nock.botUserId, response.fromUserId);
+        assert.equal(nock.botUserId, response.user.userId);
         done();
       })
       .catch((error) => {
@@ -149,7 +149,7 @@ describe('REST API test suite', () => {
 
   it('getMessages should get all messages', (done) => {
     let msg = '<messageML>Yo!</messageML>';
-    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
+    symphony.sendMessage(nock.streamId, msg)
       .then((response) => {
         assert.equal(msg, response.message);
         return symphony.getMessages(nock.streamId);
@@ -184,7 +184,7 @@ describe('REST API test suite', () => {
         // ensure that any previous message state is drained
         return symphony.readDatafeed(initialResponse.id)
           .then((response) => {
-            return symphony.sendMessage(nock.streamId, msg1, 'MESSAGEML');
+            return symphony.sendMessage(nock.streamId, msg1);
           })
           .then((response) => {
             assert.equal(msg1, response.message);
@@ -193,7 +193,7 @@ describe('REST API test suite', () => {
           .then((response) => {
             assert.equal(1, response.length);
             assert.equal(msg1, response[0].message);
-            return symphony.sendMessage(nock.streamId, msg2, 'MESSAGEML');
+            return symphony.sendMessage(nock.streamId, msg2);
           })
           .then((response) => {
             assert.equal(msg2, response.message);

@@ -294,19 +294,35 @@ class Symphony {
   /**
    * Posts a message to an existing stream.
    *
-   * See {@link https://rest-api.symphony.com/docs/create-message-v2|Create Message}
+   * See {@link https://rest-api.symphony.com/docs/create-message-v4|Create Message}
    *
    * @param {string} streamId
    * @param {string} message
-   * @param {string} format <code>TEXT</code> or <code>MESSAGEML</code>
    * @return {Promise.<SymphonyMessageV2Type>}
    */
-  sendMessage(streamId: string, message: string, format: string): Promise<SymphonyMessageV2Type> {
+  sendMessage(streamId: string, message: string): Promise<SymphonyMessageV4Type> {
+    const body = {
+      message: message
+    };
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, body);
+  }
+
+  /**
+   * Posts a message with Structured Objects payload to an existing stream.
+   *
+   * See {@link https://rest-api.symphony.com/docs/create-message-v4|Create Message}
+   *
+   * @param {string} streamId
+   * @param {string} message
+   * @param {string} data
+   * @return {Promise.<SymphonyMessageV2Type>}
+   */
+  sendMessageWithStructuredObjects(streamId: string, message: string, data: string): Promise<SymphonyMessageV4Type> {
     const body = {
       message: message,
-      format: format,
+      data: data,
     };
-    return this._httpAgentPost(`/agent/v2/stream/${streamId}/message/create`, body);
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, body);
   }
 
   /**

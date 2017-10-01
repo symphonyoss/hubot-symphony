@@ -350,10 +350,15 @@ class NockServer extends EventEmitter {
       })
       .post(`/agent/v4/stream/${self.streamId}/message/create`)
       .reply(200, function(uri: string, requestBody: SymphonyCreateMessageV4PayloadType): SymphonyMessageV4Type {
+        let messageML = requestBody.message;
+        const match = /<messageML>(.*)<\/messageML>/i.exec(messageML);
+        if (match === undefined || match === null) {
+          messageML = `<messageML>${messageML}<\/messageML>`;
+        }
         const message = {
           messageId: uuid.v1(),
           timestamp: new Date().valueOf().toString(),
-          message: requestBody.message,
+          message: messageML,
           attachments: [],
           user: {
             userId: self.botUserId,
