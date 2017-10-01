@@ -78,7 +78,7 @@ describe('Foundation Open Developer Platform integration tests', () => {
                 const conversationId = response.id;
                 logger.info(`Created conversation: ${conversationId}`);
                 // send ping from user to bot
-                return userConnection.sendMessage(conversationId, 'ping', 'TEXT');
+                return userConnection.sendMessage(conversationId, 'ping');
               })
               .then((response) => {
                 return botConnection.readDatafeed(datafeedId);

@@ -51,7 +51,7 @@ describe('On-premise key manager / agent', () => {
   });
 
   it('should connect to separate key manager / agent url', (done) => {
-    let msg = {message: 'bar'};
+    const msg = {message: 'bar'};
     symphony.echo(msg)
       .then((response) => {
         assert.deepEqual(msg, response);
@@ -93,7 +93,7 @@ describe('REST API test suite', () => {
   });
 
   it('echo should obtain session and key tokens and echo response', (done) => {
-    let msg = {message: 'bar'};
+    const msg = {message: 'bar'};
     symphony.echo(msg)
       .then((response) => {
         assert.deepEqual(msg, response);
@@ -135,11 +135,11 @@ describe('REST API test suite', () => {
   }
 
   it('sendMessage should obtain session and key tokens and get message ack', (done) => {
-    let msg = '<messageML>Testing 123...</messageML>';
-    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
+    const msg = '<messageML>Testing 123...</messageML>';
+    symphony.sendMessage(nock.streamId, msg)
       .then((response) => {
         assert.equal(msg, response.message);
-        assert.equal(nock.botUserId, response.fromUserId);
+        assert.equal(nock.botUserId, response.user.userId);
         done();
       })
       .catch((error) => {
@@ -148,8 +148,8 @@ describe('REST API test suite', () => {
   });
 
   it('getMessages should get all messages', (done) => {
-    let msg = '<messageML>Yo!</messageML>';
-    symphony.sendMessage(nock.streamId, msg, 'MESSAGEML')
+    const msg = '<messageML>Yo!</messageML>';
+    symphony.sendMessage(nock.streamId, msg)
       .then((response) => {
         assert.equal(msg, response.message);
         return symphony.getMessages(nock.streamId);
@@ -177,14 +177,14 @@ describe('REST API test suite', () => {
   });
 
   it('readDatafeed should pull messages', (done) => {
-    let msg1 = '<messageML>foo</messageML>';
-    let msg2 = '<messageML>bar</messageML>';
+    const msg1 = '<messageML>foo</messageML>';
+    const msg2 = '<messageML>bar</messageML>';
     symphony.createDatafeed()
       .then((initialResponse) => {
         // ensure that any previous message state is drained
         return symphony.readDatafeed(initialResponse.id)
           .then((response) => {
-            return symphony.sendMessage(nock.streamId, msg1, 'MESSAGEML');
+            return symphony.sendMessage(nock.streamId, msg1);
           })
           .then((response) => {
             assert.equal(msg1, response.message);
@@ -193,7 +193,7 @@ describe('REST API test suite', () => {
           .then((response) => {
             assert.equal(1, response.length);
             assert.equal(msg1, response[0].message);
-            return symphony.sendMessage(nock.streamId, msg2, 'MESSAGEML');
+            return symphony.sendMessage(nock.streamId, msg2);
           })
           .then((response) => {
             assert.equal(msg2, response.message);
@@ -395,7 +395,7 @@ describe('REST API test suite', () => {
 describe('Object model test suite', () => {
   for (const text of ['<messageML>Hello World</messageML>', 'Hello World']) {
     it(`parse a V2Message containing '${text}'`, () => {
-      let msg = {
+      const msg = {
         id: 'foobar',
         timestamp: '1464629912263',
         v2messageType: 'V2Message',
@@ -403,12 +403,12 @@ describe('Object model test suite', () => {
         message: text,
         fromUserId: 12345,
       };
-      let user = {
+      const user = {
         id: 12345,
         name: 'johndoe',
         displayName: 'John Doe',
       };
-      let v2 = new V2Message(user, msg);
+      const v2 = new V2Message(user, msg);
       assert.equal('Hello World', v2.text);
       assert.equal('foobar', v2.id);
       assert.equal(12345, v2.user.id);
@@ -419,7 +419,7 @@ describe('Object model test suite', () => {
   }
 
   it('regex test', (done) => {
-    let msg = {
+    const msg = {
       id: 'foobar',
       timestamp: '1464629912263',
       v2messageType: 'V2Message',
@@ -427,16 +427,16 @@ describe('Object model test suite', () => {
       message: 'butler ping',
       fromUserId: 12345,
     };
-    let user = {
+    const user = {
       id: 12345,
       name: 'johndoe',
       displayName: 'John Doe',
     };
-    let robot = new FakeRobot();
-    let callback = () => {
+    const robot = new FakeRobot();
+    const callback = () => {
       done();
     };
-    let listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback);
+    const listener = new TextListener(robot, /^\s*[@]?butler[:,]?\s*(?:PING$)/i, {}, callback);
     listener.call(new V2Message(user, msg));
   });
 });

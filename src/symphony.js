@@ -69,7 +69,7 @@ export type SymphonyAttachmentType = {
   size: number
 };
 
-export type SymphonyMessageType = {
+export type SymphonyMessageV2Type = {
   id: string,
   timestamp: string,
   v2messageType: string,
@@ -77,6 +77,23 @@ export type SymphonyMessageType = {
   message: string,
   attachments?: Array<SymphonyAttachmentType>,
   fromUserId: number
+};
+
+export type SymphonyMessageV4Type = {
+  messageId: string,
+  timestamp: string,
+  message: string,
+  data?: string,
+  attachments?: Array<SymphonyAttachmentType>,
+  user: {
+    userId: number,
+    displayName: string,
+    email: string,
+    username: string
+  },
+  stream: {
+    streamId: string
+  }
 };
 
 export type CreateDatafeedResponseType = {
@@ -277,19 +294,50 @@ class Symphony {
   /**
    * Posts a message to an existing stream.
    *
-   * See {@link https://rest-api.symphony.com/docs/create-message-v2|Create Message}
+   * See {@link https://rest-api.symphony.com/docs/create-message-v4|Create Message}
    *
    * @param {string} streamId
    * @param {string} message
-   * @param {string} format <code>TEXT</code> or <code>MESSAGEML</code>
-   * @return {Promise.<SymphonyMessageType>}
+   * @return {Promise.<SymphonyMessageV2Type>}
    */
-  sendMessage(streamId: string, message: string, format: string): Promise<SymphonyMessageType> {
-    const body = {
-      message: message,
-      format: format,
+  sendMessage(streamId: string, message: string): Promise<SymphonyMessageV4Type> {
+    const formData = {
+      message: {
+        value: message,
+        options: {
+          contentType: 'text/plain'
+        }
+      }
     };
-    return this._httpAgentPost(`/agent/v2/stream/${streamId}/message/create`, body);
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, undefined, formData);
+  }
+
+  /**
+   * Posts a message with Structured Objects payload to an existing stream.
+   *
+   * See {@link https://rest-api.symphony.com/docs/create-message-v4|Create Message}
+   *
+   * @param {string} streamId
+   * @param {string} message
+   * @param {string} data
+   * @return {Promise.<SymphonyMessageV2Type>}
+   */
+  sendMessageWithStructuredObjects(streamId: string, message: string, data: string): Promise<SymphonyMessageV4Type> {
+    const formData = {
+      message: {
+        value: message,
+        options: {
+          contentType: 'text/plain'
+        }
+      },
+      data: {
+        value: data,
+        options: {
+          contentType: 'text/plain'
+        }
+      }
+    };
+    return this._httpAgentPost(`/agent/v4/stream/${streamId}/message/create`, undefined, formData);
   }
 
   /**
@@ -299,9 +347,9 @@ class Symphony {
    * See {@link https://rest-api.symphony.com/docs/messages-v2|Messages}
    *
    * @param {string} streamId
-   * @return {Promise.<Array.<SymphonyMessageType>>}
+   * @return {Promise.<Array.<SymphonyMessageV2Type>>}
    */
-  getMessages(streamId: string): Promise<Array<SymphonyMessageType>> {
+  getMessages(streamId: string): Promise<Array<SymphonyMessageV2Type>> {
     return this._httpAgentGet(`/agent/v2/stream/${streamId}/message`);
   }
 
@@ -325,9 +373,9 @@ class Symphony {
    * See {@link https://rest-api.symphony.com/docs/read-messagesevents-stream|Read Messages/Events Stream}
    *
    * @param {string} datafeedId
-   * @return {Promise.<Array.<SymphonyMessageType>>}
+   * @return {Promise.<Array.<SymphonyMessageV2Type>>}
    */
-  readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageType>> {
+  readDatafeed(datafeedId: string): Promise<Array<SymphonyMessageV2Type>> {
     return this._httpAgentGet(`/agent/v2/datafeed/${datafeedId}/read`);
   }
 
@@ -560,11 +608,12 @@ class Symphony {
    *
    * @param {string} path Symphony API path
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpAgentPost<T>(path: string, body: ?mixed): Promise<T> {
+  _httpAgentPost<T>(path: string, body: ?mixed, formData: ?mixed): Promise<T> {
     return Promise.all([this.sessionAuth(), this.keyAuth()])
       .then((values: Array<AuthenticateResponseType>): Promise<T> => {
         const [sessionToken, keyManagerToken] = values;
@@ -572,7 +621,7 @@ class Symphony {
           sessionToken: sessionToken.token,
           keyManagerToken: keyManagerToken.token,
         };
-        return this._httpPost(this.agentHost, path, headers, body);
+        return this._httpPost(this.agentHost, path, headers, body, formData);
       });
   }
 
@@ -597,12 +646,13 @@ class Symphony {
    * @param {string} path Symphony API path
    * @param {HttpHeaderType} headers HTTP headers
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpPost<T>(host: string, path: string, headers: HttpHeaderType = {}, body: ?mixed): Promise<T> {
-    return this._httpRequest('POST', host, path, headers, body);
+  _httpPost<T>(host: string, path: string, headers: HttpHeaderType = {}, body: ?mixed, formData: ?mixed): Promise<T> {
+    return this._httpRequest('POST', host, path, headers, body, formData);
   }
 
   /**
@@ -613,13 +663,14 @@ class Symphony {
    * @param {string} path Symphony API path
    * @param {HttpHeaderType} headers HTTP headers
    * @param {mixed} body Message payload if appropriate
+   * @param {mixed} formData Form payload if appropriate
    * @return {Promise.<T>}
    * @template T
    * @private
    */
-  _httpRequest<T>(method: string, host: string, path: string, headers: HttpHeaderType, body: ?mixed): Promise<T> {
+  _httpRequest<T>(method: string, host: string, path: string, headers: HttpHeaderType, body: ?mixed, formData: ?mixed): Promise<T> {
     let self = this;
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       let options = {
         baseUrl: `https://${host}`,
         url: path,
@@ -630,11 +681,15 @@ class Symphony {
         cert: fs.readFileSync(self.publicKey),
         passphrase: self.passphrase,
         body: undefined,
+        formData: undefined,
       };
       if (body !== undefined && body !== null) {
         options.body = body;
       }
-      logger.debug(`sending ${options.method} to https://${host}${path}: ${JSON.stringify(options.body)}`);
+      if (formData !== undefined && formData !== null) {
+        options.formData = formData;
+      }
+      logger.debug(`sending ${options.method} to https://${host}${path} [body: ${JSON.stringify(options.body)}] [formData: ${JSON.stringify(options.formData)}]`);
       request(options, (err, res: HttpResponseType, data: T) => {
         if (err !== undefined && err !== null) {
           const statusCode = res ? res.statusCode : 'unknown';

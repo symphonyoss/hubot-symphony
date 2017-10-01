@@ -35,20 +35,27 @@ These arguments are passed through to the NodeJs request module as described [he
 
 ### Non-standard messaging
 
-If you want to send a rich message you can call send with an Object instead of a String:
+If you want to send a rich message you can call send just pass messageML directly to the send method instead of plaintext.  The various supported tags are documented [here](https://rest-api.symphony.com/docs/message-format).  If you want to send [Structured Objects](https://rest-api.symphony.com/v1.47/docs/objects) you can call send with an Object instead of a String (note the text must be valid messageML).
+
 ```
 module.exports = (robot) ->
   robot.respond /pug me/i, (msg) ->
     msg.http("http://pugme.herokuapp.com/random")
       .get() (err, res, body) ->
         pug = JSON.parse(body).pug
+        // send url as text
         msg.send pug
+        // send url as link
+        msg.send "<messageML><a href=\"#{pug}\"/></messageML>"
+        // send url as a card
+        msg.send "<messageML><card iconSrc=\"#{iconSrc}\" accent=\"tempo-bg-color--blue\"><header>PUG!</header><body><img src=\"#{pug}\"/><br/><a href=\"#{pug}\"/></body></card></messageML>"
+        // send message with a structured object
         msg.send {
-          format: 'MESSAGEML'
-          text: "<messageML><a href=\"#{pug}\"/></messageML>"
+          text: myMessageML,
+          data: myStructuredObjectJson
         }
 ```
-The various supported tags are documented [here](https://rest-api.symphony.com/docs/message-format).
+
 
 If you want to send a direct message to a user in response to a webhook you can interact with the adapter via the robot variable:
 ```

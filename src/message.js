@@ -17,32 +17,32 @@
 // @flow
 
 import {TextMessage} from 'hubot';
-import type {SymphonyMessageType} from './symphony';
+import type {SymphonyMessageV2Type} from './symphony';
 
 /**
  * Represents a V2Message received from Symphony for use within Hubot
  */
 export class V2Message extends TextMessage {
-  symphonyMessage: SymphonyMessageType;
+  symphonyMessage: SymphonyMessageV2Type;
   room: string;
 
   /**
    * @param {Object} user Hubot user
-   * @param {SymphonyMessageType} symphonyMessage Message from Symphony
+   * @param {SymphonyMessageV2Type} symphonyMessage Message from Symphony
    * @constructor
    */
-  constructor(user: Object, symphonyMessage: SymphonyMessageType) {
+  constructor(user: Object, symphonyMessage: SymphonyMessageV2Type) {
     super(user, V2Message._getMessageText(symphonyMessage), symphonyMessage.id);
     this.symphonyMessage = symphonyMessage;
     this.room = symphonyMessage.streamId;
   }
 
   /**
-   * @param {SymphonyMessageType} symphonyMessage Message from Symphony
+   * @param {SymphonyMessageV2Type} symphonyMessage Message from Symphony
    * @return {string} message text contained within messageML tag
    * @private
    */
-  static _getMessageText(symphonyMessage: SymphonyMessageType): string {
+  static _getMessageText(symphonyMessage: SymphonyMessageV2Type): string {
     const match = /<messageML>(.*)<\/messageML>/i.exec(symphonyMessage.message);
     if (match === undefined || match === null) {
       return symphonyMessage.message;

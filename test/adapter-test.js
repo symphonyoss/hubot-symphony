@@ -118,7 +118,7 @@ describe('Adapter test suite', () => {
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), 'foo bar');
+      assert.include(nock.messages.map((m) => m.message), '<messageML>foo bar</messageML>');
       done();
     });
     adapter.run();
@@ -130,10 +130,7 @@ describe('Adapter test suite', () => {
     adapter.on('connected', () => {
       assert.isDefined(adapter.symphony);
       let envelope = {room: nock.streamId};
-      adapter.send(envelope, {
-        format: 'MESSAGEML',
-        text: '<messageML><b>foo bar</b></messageML>',
-      });
+      adapter.send(envelope, '<messageML><b>foo bar</b></messageML>');
       adapter.close();
     });
     nock.on('received', () => {
@@ -206,7 +203,7 @@ describe('Adapter test suite', () => {
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), 'username message');
+      assert.include(nock.messages.map((m) => m.message), '<messageML>username message</messageML>');
       done();
     });
     adapter.run();
@@ -221,7 +218,7 @@ describe('Adapter test suite', () => {
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), 'email message');
+      assert.include(nock.messages.map((m) => m.message), '<messageML>email message</messageML>');
       done();
     });
     adapter.run();
@@ -236,7 +233,7 @@ describe('Adapter test suite', () => {
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), 'id message');
+      assert.include(nock.messages.map((m) => m.message), '<messageML>id message</messageML>');
       done();
     });
     adapter.run();
