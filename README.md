@@ -92,7 +92,13 @@ If the script runs as expected it will obtain and log both session and key manag
 
 To check security and legal compliance, the build integrates with Whitesource to submit and validate the list of third-party packages used by the build.
 
-Simply run `npm install ; npm run whitesource` from the root project folder.
+Simply run the following commands from the root project folder.
+```
+export WHITESOURCE_API_KEY=<WhiteSource API Key>
+npm install ; npm run whitesource
+```
+
+The `<WhiteSource API Key>` can be retrieved from the [WhiteSource project dashboard](https://saas.whitesourcesoftware.com/Wss/WSS.html#!home).
 
 If any issue is found, a file called `ws-log-policy-violations.json` will be generated in root project folder; if no issue is found, metrics will be sent to the [WhiteSource project dashboard](https://saas.whitesourcesoftware.com/Wss/WSS.html#!home) (available to project committers).
 
