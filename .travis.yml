@@ -4,6 +4,7 @@ node_js:
 
 env:
   # setup for integration tests & turn off any internal logging in tests
+  - secure: "Mdsu4zcFinuIcSxh/tFOxiZ1rQlh2ZgLI2zGd4lb6jU5C+c405OMe9L5A41s/3W677axNOJBKjuTmoOavuvA2Uh2PaFsmM8wKDcsp4Vn7cFUVWE9Qm38DrBP/meCVATyfUzs+uem6wIX97BlJckettpBJZsG+Fo/9fZ0cIXqHhe4aT6hbzk4ZF5ZYcu8vTVK7hU9Wtv4b4vU8GE2bgBx8jxYKi4+5lpuP4rpCfXbz42xLcvnFjwQWy/VE9lPYLPNWlUQ4O0Lu7d+gMh0BUomGWFDR3FJH4LMhtW33H//i5cpeLkoH5HVC3OP5GX0OFVPa+hqdCsVdU9vWCq3ffP3QVBD2hjNuOUNiiKRqitBrrKGK169owyGM1gP7zs+AplaeXZGR1Ha4I1wvPlujxEZkcydX+oR5ZxdyVYlcgTqc1DEhBKWt6OEHXzqo5KA8Z0+gfR9yPfdq85WuTbcZILmDe6pnZtroqH7YjMk7B4/Km5rxl+uTrKE+p8dGaIxuzkgM4RjlNp1w9EGWP4shJ/hzZzcdU1IWkUYuvQ9b2fLkld/03JrCZ53oh2c8gNviSCDq2bdF3JK13nVjPyTUgtmZC708UuwbAdTCjUQ+bE4hENUeJnofEF+/+z7xuSmGZ4eGcaswargZgsosCkkbrAJVAFZrnjbDI/YFMC79N7lwpU="
   - SYMPHONY_HOST=foundation-dev.symphony.com SYMPHONY_KM_HOST=foundation-dev-api.symphony.com SYMPHONY_SESSIONAUTH_HOST=foundation-dev-api.symphony.com SYMPHONY_AGENT_HOST=foundation-dev-api.symphony.com HUBOT_SYMPHONY_LOG_LEVEL=alert
 
 before_script:
