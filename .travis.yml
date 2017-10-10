@@ -18,6 +18,9 @@ script:
   # execute integration tests against foundation-dev pod
   - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then npm run-script it; fi;"
   - npm run build
+  - npm install ; npm run whitesource ; ls -l ws-log-policy-violations.json
+  # Break the build, if any Whitesource policy violation is found
+  - "if [[ -e 'ws-log-policy-violations.json' ]]; then echo 'Found Whitesource Policy violation, build failed.' ; exit -1; fi;"
 
 after_success:
   # publish coverage results to coveralls

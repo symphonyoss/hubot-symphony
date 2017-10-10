@@ -14,7 +14,8 @@
     "test-cov": "nyc npm test",
     "it": "mocha it/*.js",
     "generate-yarn-lockfile": "npm install -g yarn && npm install --production && yarn install",
-    "semantic-release": "semantic-release pre && npm publish --access public && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish --access public && semantic-release post",
+    "whitesource": "node node_modules/whitesource/bin/whitesource.js run"
   },
   "repository": {
     "type": "git",
@@ -69,7 +70,8 @@
     "semantic-release": "8.0.3",
     "uuid": "3.1.0",
     "validate-commit-msg": "2.14.0",
-    "yargs": "9.0.1"
+    "yargs": "9.0.1",
+    "whitesource": "1.0.9"
   },
   "config": {
     "commitizen": {
