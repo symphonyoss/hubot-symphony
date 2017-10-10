@@ -3,8 +3,10 @@ node_js:
   - 8
 
 env:
- matrix:
-  - SYMPHONY_HOST=foundation-dev.symphony.com SYMPHONY_KM_HOST=foundation-dev-api.symphony.com SYMPHONY_SESSIONAUTH_HOST=foundation-dev-api.symphony.com SYMPHONY_AGENT_HOST=foundation-dev-api.symphony.com HUBOT_SYMPHONY_LOG_LEVEL=alert
+  matrix:
+  - SYMPHONY_HOST=foundation-dev.symphony.com SYMPHONY_KM_HOST=foundation-dev-api.symphony.com
+    SYMPHONY_SESSIONAUTH_HOST=foundation-dev-api.symphony.com SYMPHONY_AGENT_HOST=foundation-dev-api.symphony.com
+    HUBOT_SYMPHONY_LOG_LEVEL=alert
   global:
     secure: P5gESbcawJDYath5XASW2jdhp6BltUIRWHNXp56LXlO8h7pEpXVbEhT0Y6Yg/cGgJNRWJsxfy2Fmjfc9hYh94TpqqM0VHIoJaRP/9yALs1yvw2hrPuAOkk8fYzEJ9bnLvJiYdL9fvMiv+yx+5DodFQOHB01nNWmDSnzfpgejw9bij5bINW/qW3aOCUUgnGQHDJkelkE8ySjf8yhkxNazx/n0RQ9m6shoxsuHkpwzRw16eZU3H40nUFIOEtOiRMOZWmJaHW+O6kBxeZRUERX++EMJdpAcJL9tEjCizZ+2iMwKc13lRyHcrhPZjQQUNX1EMCUAdPuEstJreGq89iKHDxizM9Qp6QPVjCubpu8fKRC9E9Aw9f3u+AeeC+qD4S4YSHKutvLqnOE5bcz3kp7mmiw9nhkkhaON8bB5pStwd8iZnkaVxSi0HQXYAcZnTvHnuPtd+Me9fQqsIP3SJg0PShakQMk7zsFxZT8flaOFzswoXCODM/+g9yUC1Q549oSCNt+nH6Hqd2da9nvkdQSL2h3k/jrOmFWUS4hVlGD1ApbfW9krCJVAH0L82+uxvUQ5/5sS80HJfys4crPgA5CXZ58dteYYXuIjE12ZU24rk+f9lKNG6c36qAJPYy0MCgWLMwkCbsPhs5/Cyp2UzrptvtRVzxOuI3sFrG4UAOScO1c=
 
