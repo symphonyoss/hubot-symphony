@@ -18,9 +18,9 @@ script:
   # execute integration tests against foundation-dev pod
   - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then npm run-script it; fi;"
   - npm run build
+  # Cannot run on external PRs due to https://docs.travis-ci.com/user/pull-requests/#Pull-Requests-and-Security-Restrictions
   - "if [[ $TRAVIS_PULL_REQUEST -eq 'false' ]]; then npm install ; npm run whitesource; fi;"
   # Break the build, if any Whitesource policy violation is found
-  # Cannot run on external PRs due to https://docs.travis-ci.com/user/pull-requests/#Pull-Requests-and-Security-Restrictions
   - "if [[ -e 'ws-log-policy-violations.json' ]]; then echo 'Found Whitesource Policy violation, build failed.' ; exit -1; fi;"
 
 after_success:
