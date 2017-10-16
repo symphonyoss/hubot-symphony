@@ -88,6 +88,20 @@ npm run diagnostic -- --publicKey [key1.pem] --privateKey [key2.pem] --passphras
 
 If the script runs as expected it will obtain and log both session and key manager tokens, look up and log some details of the bot account and then create a datafeed and poll.  If you send a message using the Symphony client to the bot account you should see the details logged.
 
+### Whitesource reports
+
+To check security and legal compliance, the build integrates with Whitesource to submit and validate the list of third-party packages used by the build.
+
+Simply run the following commands from the root project folder.
+```
+export WHITESOURCE_API_KEY=<WhiteSource API Key>
+npm install ; npm run whitesource
+```
+
+The `<WhiteSource API Key>` can be retrieved from the [WhiteSource project dashboard](https://saas.whitesourcesoftware.com/Wss/WSS.html#!home).
+
+If any issue is found, a file called `ws-log-policy-violations.json` will be generated in root project folder; if no issue is found, metrics will be sent to the [WhiteSource project dashboard](https://saas.whitesourcesoftware.com/Wss/WSS.html#!home) (available to project committers).
+
 ### Contribute
 
 Contributions are accepted via GitHub pull requests. All contributors must be covered by contributor license agreements to comply with the [Code Contribution Process](https://symphonyoss.atlassian.net/wiki/display/FM/Code+Contribution+Process).
