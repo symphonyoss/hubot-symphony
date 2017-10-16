@@ -363,7 +363,7 @@ class NockServer extends EventEmitter {
           busboy.end(requestBody);
         }).then((parts) => {
           let messageML = parts.message;
-          const match = /<messageML>(.*)<\/messageML>/i.exec(messageML);
+          const match = /<messageML>([\s\S]*)<\/messageML>/i.exec(messageML);
           if (match === undefined || match === null) {
             messageML = `<messageML>${messageML}<\/messageML>`;
           }

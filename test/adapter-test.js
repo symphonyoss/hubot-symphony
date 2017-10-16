@@ -17,9 +17,9 @@
 // @flow
 
 const assert = require('chai').assert;
-import SymphonyAdapter from '../src/adapter';
-import NockServer from './nock-server';
-import FakeRobot from './fakes';
+import SymphonyAdapter from "../src/adapter";
+import NockServer from "./nock-server";
+import FakeRobot from "./fakes";
 
 process.env['HUBOT_SYMPHONY_HOST'] = 'foundation.symphony.com';
 process.env['HUBOT_SYMPHONY_PUBLIC_KEY'] = './test/resources/publicKey.pem';
@@ -108,36 +108,35 @@ describe('Adapter test suite', () => {
     nock.close();
   });
 
-  it('should send with no adornment', (done) => {
+  const expectMessage = (send: string, receive: string, done: () => void) => {
     let robot = new FakeRobot();
     let adapter = SymphonyAdapter.use(robot);
     adapter.on('connected', () => {
       assert.isDefined(adapter.symphony);
       let envelope = {room: nock.streamId};
-      adapter.send(envelope, 'foo bar');
+      adapter.send(envelope, send);
       adapter.close();
     });
     nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), '<messageML>foo bar</messageML>');
+      const received = nock.messages.map((m) => m.message);
+      assert.include(received, receive, `Received ${JSON.stringify(received)}`);
       done();
     });
     adapter.run();
+  };
+
+  it('should send with no adornment', (done) => {
+    expectMessage('foo bar', '<messageML>foo bar</messageML>', done);
   });
 
   it('should send MESSAGEML', (done) => {
-    let robot = new FakeRobot();
-    let adapter = SymphonyAdapter.use(robot);
-    adapter.on('connected', () => {
-      assert.isDefined(adapter.symphony);
-      let envelope = {room: nock.streamId};
-      adapter.send(envelope, '<messageML><b>foo bar</b></messageML>');
-      adapter.close();
-    });
-    nock.on('received', () => {
-      assert.include(nock.messages.map((m) => m.message), '<messageML><b>foo bar</b></messageML>');
-      done();
-    });
-    adapter.run();
+    expectMessage('<messageML><b>foo bar</b></messageML>', '<messageML><b>foo bar</b></messageML>', done);
+  });
+
+  it('should send MESSAGEML with newlines', (done) => {
+    expectMessage(`<messageML><b>foo
+    bar</b></messageML>`, `<messageML><b>foo
+    bar</b></messageML>`, done);
   });
 
   it('should reply with @mention', (done) => {
