@@ -100,5 +100,5 @@ symphony.createDatafeed()
     process.exit(0);
   })
   .catch((err) => {
-    logger.error(`Failed to fetch key manager token: ${err}`);
+    logger.error(`Was it something I said? You didn't send me a message...: ${err}`);
   });
