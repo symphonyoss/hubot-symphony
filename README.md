@@ -1,17 +1,16 @@
 # hubot-symphony
 
-[Hubot](http://hubot.github.com/) adapter for [Symphony](https://symphony.com) developed by the [Symphony Foundation](http://symphony.foundation/)
+[Hubot](http://hubot.github.com/) adapter for [Symphony](https://symphony.com) hosted by the [Symphony Program](https://finosfoundation.atlassian.net/wiki/spaces/SYM/overview) part of [FINOS](https://www.finos.org/)
 
 Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHub, with this adapter you can get up and running with a programmable bot written in JavaScript/Coffescript [in a few minutes](http://blog.symphony.foundation/run-a-symphony-bot-in-less-than-three-minutes-on-docker).  This project wraps a small number of the Symphony REST APIs required for two-way bot communication and user lookup together with offline test cases, the adapter is in use both by Symphony clients and by Symphony themselves.
 
-[![Symphony Software Foundation - Active](https://cdn.rawgit.com/symphonyoss/contrib-toolbox/master/images/ssf-badge-active.svg)](https://symphonyoss.atlassian.net/wiki/display/FM/Active)
+In mid-2018 Symphony released their own JavaScript API together with a Yeoman generator which facilitates creating simple bots, unless you wish to make use of existing Hubot scripts it's recommended to use this instead.  See the developer site [here](https://symphony-developers.symphony.com/) and [symphony-api-client-node](https://www.npmjs.com/package/symphony-api-client-node).
+
+[![FINOS - Released](https://cdn.rawgit.com/finos/contrib-toolbox/master/images/badge-released.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Released)
 
 [![Build Status](https://travis-ci.org/symphonyoss/hubot-symphony.svg?branch=master)](https://travis-ci.org/symphonyoss/hubot-symphony)
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
-[![Versioneye dependencies](https://www.versioneye.com/user/projects/58cfec3d6893fd003b3c36ce/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58cfec3d6893fd003b3c36ce)
-[![bitHound Dependencies](https://www.bithound.io/github/symphonyoss/hubot-symphony/badges/dependencies.svg)](https://www.bithound.io/github/symphonyoss/hubot-symphony/master/dependencies/npm)
-[![bitHound Dev Dependencies](https://www.bithound.io/github/symphonyoss/hubot-symphony/badges/devDependencies.svg)](https://www.bithound.io/github/symphonyoss/hubot-symphony/master/dependencies/npm)
 [![NSP Status](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a/badge)](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a)
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
