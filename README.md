@@ -12,11 +12,12 @@ In mid-2018 Symphony released their own JavaScript API together with a Yeoman ge
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
 [![Code Climate](https://codeclimate.com/github/symphonyoss/hubot-symphony/badges/gpa.svg)](https://codeclimate.com/github/symphonyoss/hubot-symphony)
 [![NSP Status](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a/badge)](https://nodesecurity.io/orgs/symphonyoss/projects/9309ce59-9a6b-43a9-b7bb-54c6f0117e0a)
+[![Greenkeeper badge](https://badges.greenkeeper.io/symphonyoss/hubot-symphony.svg)](https://greenkeeper.io/)
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
-[![NPM](https://nodei.co/npm/hubot-symphony.png?downloads=true&stars=true)](https://nodei.co/npm/hubot-symphony/) [![Greenkeeper badge](https://badges.greenkeeper.io/symphonyoss/hubot-symphony.svg)](https://greenkeeper.io/)
+[![NPM](https://nodei.co/npm/hubot-symphony.png?downloads=true&stars=true)](https://nodei.co/npm/hubot-symphony/)
 
 ## Usage
 You must pass the following environment variables to hubot

@@ -11,7 +11,7 @@
     "flow": "flow",
     "eslint": "eslint src/*.js test/*.js it/*.js",
     "test": "mocha test/*.js",
-    "test-cov": "nyc npm test",
+    "test-cov": "nyc mocha test/*.js",
     "it": "mocha it/*.js",
     "semantic-release": "semantic-release pre && npm publish --access public && semantic-release post",
     "whitesource": "node node_modules/whitesource/bin/whitesource.js run"
@@ -35,7 +35,7 @@
   "dependencies": {
     "backoff": "2.5.0",
     "html-entities": "1.2.1",
-    "log": "6.0.0",
+    "log": "1.4.0",
     "memoizee": "0.4.14",
     "request": "2.88.0"
   },
@@ -61,10 +61,10 @@
     "eslint-plugin-mocha": "6.1.1",
     "flow-bin": "0.107.0",
     "ghooks": "2.0.4",
-    "hubot": "3.3.2",
+    "hubot": "2.19.0",
     "husky": "3.0.5",
-    "mocha": "6.2.0",
-    "nock": "11.3.3",
+    "mocha": "3.5.3",
+    "nock": "9.0.22",
     "nyc": "14.1.1",
     "semantic-release": "15.13.24",
     "uuid": "3.3.3",
