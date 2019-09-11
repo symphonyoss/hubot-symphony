@@ -16,7 +16,7 @@ In mid-2018 Symphony released their own JavaScript API together with a Yeoman ge
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
-[![NPM](https://nodei.co/npm/hubot-symphony.png?downloads=true&stars=true)](https://nodei.co/npm/hubot-symphony/)
+[![NPM](https://nodei.co/npm/hubot-symphony.png?downloads=true&stars=true)](https://nodei.co/npm/hubot-symphony/) [![Greenkeeper badge](https://badges.greenkeeper.io/symphonyoss/hubot-symphony.svg)](https://greenkeeper.io/)
 
 ## Usage
 You must pass the following environment variables to hubot
