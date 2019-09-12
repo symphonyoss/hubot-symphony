@@ -11,4 +11,3 @@ flow-typed
 
 [options]
 module.use_strict=true
-unsafe.enable_getters_and_setters=true

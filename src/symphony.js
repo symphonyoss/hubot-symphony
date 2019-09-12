@@ -689,18 +689,18 @@ class Symphony {
       if (formData !== undefined && formData !== null) {
         options.formData = formData;
       }
-      logger.debug(`sending ${options.method} to https://${host}${path} [body: ${JSON.stringify(options.body)}] [formData: ${JSON.stringify(options.formData)}]`);
+      logger.debug(`sending ${options.method} to https://${host}${path} [body: ${JSON.stringify(options.body) || 'undefined'}] [formData: ${JSON.stringify(options.formData) || 'undefined'}]`);
       request(options, (err, res: HttpResponseType, data: T) => {
         if (err !== undefined && err !== null) {
           const statusCode = res ? res.statusCode : 'unknown';
           logger.warning(`received ${statusCode} error response from https://${host}${path}: ${err}`);
           reject(new Error(err));
         } else if (Math.floor(res.statusCode / 100) !== 2) {
-          const err = `received ${res.statusCode} response from https://${host}${path}: ${JSON.stringify(data)}`;
+          const err = `received ${res.statusCode} response from https://${host}${path}: ${JSON.stringify(data) || 'undefined'}`;
           logger.warning(err);
           reject(new Error(err));
         } else {
-          logger.debug(`received ${res.statusCode} response from https://${host}${path}: ${JSON.stringify(data)}`);
+          logger.debug(`received ${res.statusCode} response from https://${host}${path}: ${JSON.stringify(data) || 'undefined'}`);
           resolve(data);
         }
       });
