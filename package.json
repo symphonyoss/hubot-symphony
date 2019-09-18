@@ -13,7 +13,6 @@
     "test": "mocha test/*.js",
     "test-cov": "nyc npm test",
     "it": "mocha it/*.js",
-    "semantic-release": "semantic-release pre && npm publish --access public && semantic-release post",
     "whitesource": "node node_modules/whitesource/bin/whitesource.js run"
   },
   "repository": {
