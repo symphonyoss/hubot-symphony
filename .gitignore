@@ -9,7 +9,6 @@ hubot-symphony.iml
 certs
 **/*-compiled.js
 **/*-compiled.js.map
-package-lock.json
 
 ws-log*
 ws-ls*
