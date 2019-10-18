@@ -65,7 +65,7 @@
     "mocha": "6.2.0",
     "nock": "9.0.22",
     "nyc": "14.1.1",
-    "semantic-release": "15.13.24",
+    "semantic-release": "15.13.27",
     "uuid": "3.3.3",
     "validate-commit-msg": "2.14.0",
     "yargs": "14.0.0",
