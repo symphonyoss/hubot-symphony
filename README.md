@@ -6,7 +6,7 @@ Hubot is a [chatops](http://lmgtfy.com/?q=chatops+hubot) tool developed by GitHu
 
 In mid-2018 Symphony released their own JavaScript API together with a Yeoman generator which facilitates creating simple bots, unless you wish to make use of existing Hubot scripts it's recommended to use this instead.  See the developer site [here](https://symphony-developers.symphony.com/) and [symphony-api-client-node](https://www.npmjs.com/package/symphony-api-client-node).
 
-[![FINOS - Released](https://cdn.rawgit.com/finos/contrib-toolbox/master/images/badge-released.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Released)
+[![FINOS - Archived](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-archived.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Archived)
 
 [![Build Status](https://travis-ci.org/symphonyoss/hubot-symphony.svg?branch=master)](https://travis-ci.org/symphonyoss/hubot-symphony)
 [![Coverage Status](https://coveralls.io/repos/github/symphonyoss/hubot-symphony/badge.svg?branch=master)](https://coveralls.io/github/symphonyoss/hubot-symphony)
