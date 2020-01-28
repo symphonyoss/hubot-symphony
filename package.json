@@ -52,7 +52,7 @@
     "coffee-script": "1.12.7",
     "coveralls": "3.0.6",
     "cross-env": "6.0.0",
-    "cz-conventional-changelog": "3.0.2",
+    "cz-conventional-changelog": "3.1.0",
     "eslint": "6.3.0",
     "eslint-config-canonical": "17.7.0",
     "eslint-config-google": "0.14.0",
