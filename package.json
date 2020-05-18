@@ -56,7 +56,7 @@
     "eslint": "6.3.0",
     "eslint-config-canonical": "17.7.0",
     "eslint-config-google": "0.14.0",
-    "eslint-plugin-flowtype": "4.3.0",
+    "eslint-plugin-flowtype": "5.1.0",
     "eslint-plugin-mocha": "6.1.1",
     "flow-bin": "0.107.0",
     "ghooks": "2.0.4",
