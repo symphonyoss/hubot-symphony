@@ -36,7 +36,7 @@
     "html-entities": "1.2.1",
     "log": "1.4.0",
     "memoizee": "0.4.14",
-    "request": "2.88.0"
+    "request": "2.88.2"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
