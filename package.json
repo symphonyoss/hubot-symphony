@@ -68,7 +68,7 @@
     "semantic-release": "17.0.7",
     "uuid": "3.3.3",
     "validate-commit-msg": "2.14.0",
-    "yargs": "14.0.0",
+    "yargs": "15.3.1",
     "whitesource": "20.3.2"
   },
   "config": {
