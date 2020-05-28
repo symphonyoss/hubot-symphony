@@ -57,7 +57,7 @@
     "eslint-config-canonical": "20.0.5",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-flowtype": "4.3.0",
-    "eslint-plugin-mocha": "6.1.1",
+    "eslint-plugin-mocha": "6.3.0",
     "flow-bin": "0.125.1",
     "ghooks": "2.0.4",
     "hubot": "2.19.0",
