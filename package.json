@@ -54,7 +54,7 @@
     "cross-env": "7.0.2",
     "cz-conventional-changelog": "3.2.0",
     "eslint": "7.3.1",
-    "eslint-config-canonical": "20.0.6",
+    "eslint-config-canonical": "20.1.0",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-flowtype": "5.2.0",
     "eslint-plugin-mocha": "7.0.1",
