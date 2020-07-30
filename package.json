@@ -62,7 +62,7 @@
     "ghooks": "2.0.4",
     "hubot": "2.19.0",
     "husky": "4.2.5",
-    "mocha": "7.2.0",
+    "mocha": "8.1.0",
     "nock": "9.0.22",
     "nyc": "15.1.0",
     "semantic-release": "17.1.1",
