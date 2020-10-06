@@ -69,7 +69,7 @@
     "uuid": "3.3.3",
     "validate-commit-msg": "2.14.0",
     "yargs": "16.0.3",
-    "whitesource": "20.3.2"
+    "whitesource": "20.9.1"
   },
   "config": {
     "commitizen": {
